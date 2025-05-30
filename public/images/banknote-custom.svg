@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   width="24"
+   height="24"
+   viewBox="0 0 24 24"
+   fill="none"
+   stroke="currentColor"
+   stroke-width="2"
+   stroke-linecap="round"
+   stroke-linejoin="round"
+   class="lucide lucide-banknote-icon lucide-banknote"
+   version="1.1"
+   id="svg7952"
+   sodipodi:docname="banknote.svg"
+   inkscape:version="1.1 (c4e8f9e, 2021-05-24)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs7956" />
+  <sodipodi:namedview
+     id="namedview7954"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     showgrid="false"
+     showguides="true"
+     inkscape:guide-bbox="true"
+     inkscape:zoom="21.062088"
+     inkscape:cx="12.463152"
+     inkscape:cy="12.629327"
+     inkscape:window-width="1384"
+     inkscape:window-height="800"
+     inkscape:window-x="0"
+     inkscape:window-y="25"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="svg7952">
+    <sodipodi:guide
+       position="19.70365,25.661754"
+       orientation="0,-1"
+       id="guide8015" />
+  </sodipodi:namedview>
+  <rect
+     width="20"
+     height="12"
+     x="2"
+     y="6"
+     rx="2"
+     id="rect7946" />
+  <path
+     d="M6 12h.01M18 12h.01"
+     id="path7950" />
+  <text
+     xml:space="preserve"
+     style="font-size:40px;line-height:1.25;font-family:'a Big Deal';-inkscape-font-specification:'a Big Deal'"
+     x="4.6920414"
+     y="-8.0553637"
+     id="text19025"><tspan
+       sodipodi:role="line"
+       id="tspan19023"
+       x="4.6920414"
+       y="-8.0553637" /></text>
+  <g
+     aria-label="D"
+     id="text34926"
+     style="font-size:10.6667px;line-height:1.25;font-family:'a Big Deal';-inkscape-font-specification:'a Big Deal'"
+     transform="translate(0,-0.04747867)">
+    <path
+       d="m 8.0269266,15.374299 h 2.8848884 c 1.537341,0 2.685603,-0.427038 3.482743,-1.224179 0.711732,-0.711731 1.091322,-1.622749 1.091322,-2.619174 0,-0.80663 -0.227754,-1.451935 -0.721221,-1.9454026 C 14.261701,9.0825864 13.455071,8.7314647 12.164463,8.7314647 H 9.8110023 Z"
+       style="font-family:'Gotham Ultra';-inkscape-font-specification:'Gotham Ultra';stroke-width:1.77933"
+       id="path43041"
+       sodipodi:nodetypes="cssssscc" />
+  </g>
+</svg>
+
