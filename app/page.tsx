@@ -1,18 +1,16 @@
 "use client"
 import MainApp from "@/components/main-app"
-import LoginScreen from "@/components/login-screen"
 import { useAuth } from "@/hooks/use-auth"
+import { useEffect } from "react"
 
 export default function BeansApp() {
   const { login, isAuthenticated } = useAuth()
 
-  if (!isAuthenticated) {
-    return (
-      <div className="flex flex-col h-screen max-w-md mx-auto bg-gray-950 overflow-hidden">
-        <LoginScreen onLogin={login} />
-      </div>
-    )
-  }
+  useEffect(() => {
+    if (!isAuthenticated) {
+      login("juampi") // Uses the iamjuampi profile from USER_DATA
+    }
+  }, [isAuthenticated, login])
 
   return (
     <div className="flex flex-col h-screen max-w-md mx-auto bg-gray-50 overflow-hidden">
