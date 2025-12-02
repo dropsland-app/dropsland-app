@@ -60,7 +60,6 @@ export default function TikTokFeed({ onSelectArtist, posts, type = "home" }: Tik
       }
     })
 
-    // Then, play only the current post's media after a small delay
     const playTimeout = setTimeout(() => {
       const currentPost = posts[currentIndex]
       if (currentPost?.videoUrl && videoRefs[postKey]) {
@@ -76,20 +75,8 @@ export default function TikTokFeed({ onSelectArtist, posts, type = "home" }: Tik
               }
             })
         }
-      } else if (audioRefs[postKey]) {
-        const playPromise = audioRefs[postKey].play()
-        if (playPromise !== undefined) {
-          playPromise
-            .then(() => {
-              setIsPlaying((prev) => ({ ...prev, [postKey]: true }))
-            })
-            .catch((error) => {
-              if (error.name !== "AbortError") {
-                console.error("Audio play error:", error)
-              }
-            })
-        }
       }
+      // Audio files (mp3) are NOT autoplayed - user must press play button
     }, 100)
 
     return () => clearTimeout(playTimeout)
