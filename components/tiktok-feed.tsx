@@ -254,8 +254,10 @@ export default function TikTokFeed({ onSelectArtist, posts, type = "home" }: Tik
                   className="absolute inset-0 w-full h-full object-cover z-0"
                   playsInline
                   loop
+                  autoPlay
                   onLoadedData={(e) => {
                     const video = e.currentTarget
+                    setIsPlaying((prev) => ({ ...prev, [postKey]: true }))
                     if (currentIndex === index) {
                       video.play().catch((error) => {
                         console.log("[v0] Video autoplay failed:", error)
