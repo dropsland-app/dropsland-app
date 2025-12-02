@@ -32,6 +32,17 @@ export default function HomeView({ onSelectArtist }: HomeViewProps) {
       artistId: "iamjuampi",
       audioUrl: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/dropsland%20intro%20-zLJ8jWsSzQtpbfyFxg7ZRU5O6DnNec.mp3",
     })),
+    {
+      id: "video-3",
+      name: "iamjuampi",
+      avatar: "/avatars/juampi.jpg",
+      content: "LABITCONF intro 🔥",
+      time: "Just now",
+      artistId: "iamjuampi",
+      videoUrl: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/test-2-ZTNstzj7Cjh3UkPaugEBVKCVDfQUdJ.mp4",
+      likes: 0,
+      comments: 0,
+    },
     // Activity posts
     ...recentActivity
       .filter((activity) => activity.type === "post")
