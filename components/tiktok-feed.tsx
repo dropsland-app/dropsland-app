@@ -61,11 +61,33 @@ export default function TikTokFeed({ onSelectArtist, posts, type = "home" }: Tik
 
     const currentPost = posts[currentIndex]
     if (currentPost?.videoUrl && videoRefs[postKey]) {
-      videoRefs[postKey].play()
-      setIsPlaying((prev) => ({ ...prev, [postKey]: true }))
+      const playPromise = videoRefs[postKey].play()
+      if (playPromise !== undefined) {
+        playPromise
+          .then(() => {
+            setIsPlaying((prev) => ({ ...prev, [postKey]: true }))
+          })
+          .catch((error) => {
+            // Ignore AbortError - it happens when user navigates away quickly
+            if (error.name !== "AbortError") {
+              console.error("Video play error:", error)
+            }
+          })
+      }
     } else if (audioRefs[postKey]) {
-      audioRefs[postKey].play()
-      setIsPlaying((prev) => ({ ...prev, [postKey]: true }))
+      const playPromise = audioRefs[postKey].play()
+      if (playPromise !== undefined) {
+        playPromise
+          .then(() => {
+            setIsPlaying((prev) => ({ ...prev, [postKey]: true }))
+          })
+          .catch((error) => {
+            // Ignore AbortError - it happens when user navigates away quickly
+            if (error.name !== "AbortError") {
+              console.error("Audio play error:", error)
+            }
+          })
+      }
     }
   }, [currentIndex, type, posts, audioRefs, videoRefs])
 
@@ -154,8 +176,18 @@ export default function TikTokFeed({ onSelectArtist, posts, type = "home" }: Tik
       mediaElement.pause()
       setIsPlaying((prev) => ({ ...prev, [postKey]: false }))
     } else {
-      mediaElement.play()
-      setIsPlaying((prev) => ({ ...prev, [postKey]: true }))
+      const playPromise = mediaElement.play()
+      if (playPromise !== undefined) {
+        playPromise
+          .then(() => {
+            setIsPlaying((prev) => ({ ...prev, [postKey]: true }))
+          })
+          .catch((error) => {
+            if (error.name !== "AbortError") {
+              console.error("Media play error:", error)
+            }
+          })
+      }
     }
   }
 
@@ -172,8 +204,18 @@ export default function TikTokFeed({ onSelectArtist, posts, type = "home" }: Tik
     if (!mediaElement) return
     mediaElement.currentTime = timestamp
     if (!isPlaying[postKey]) {
-      mediaElement.play()
-      setIsPlaying((prev) => ({ ...prev, [postKey]: true }))
+      const playPromise = mediaElement.play()
+      if (playPromise !== undefined) {
+        playPromise
+          .then(() => {
+            setIsPlaying((prev) => ({ ...prev, [postKey]: true }))
+          })
+          .catch((error) => {
+            if (error.name !== "AbortError") {
+              console.error("Media play error:", error)
+            }
+          })
+      }
     }
     setShowCommentDialog(false)
   }
