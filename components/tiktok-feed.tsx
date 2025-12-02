@@ -287,6 +287,7 @@ export default function TikTokFeed({ onSelectArtist, posts, type = "home" }: Tik
                   className="absolute inset-0 w-full h-full object-cover z-0"
                   playsInline
                   loop
+                  preload="metadata"
                   onLoadedData={(e) => {
                     const video = e.currentTarget
                     setIsPlaying((prev) => ({ ...prev, [postKey]: false }))
