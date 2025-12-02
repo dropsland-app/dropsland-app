@@ -658,28 +658,6 @@ export const userPosts = [
     comments: 14,
     image: "/images/dj-mixer.png",
   },
-  {
-    content:
-      "Preparing my set for this weekend at Club Underground. It's going to be an epic night of techno and house. Who's coming? 🎧",
-    time: "1 day ago",
-    likes: 65,
-    comments: 23,
-  },
-  {
-    content:
-      "Happy to announce I'll be playing at the Electronic Dreams festival next month. See you there! #ElectronicDreams #Festival",
-    time: "3 days ago",
-    likes: 112,
-    comments: 31,
-    image: "/images/dj-mixer.png",
-  },
-  {
-    content:
-      "Working on new sounds for my upcoming release. I'm experimenting with analog synthesizers and 90s samples.",
-    time: "1 week ago",
-    likes: 94,
-    comments: 17,
-  },
 ]
 
 // Certifications with artist achievements

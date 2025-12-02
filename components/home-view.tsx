@@ -125,19 +125,6 @@ const featuredArtists = [
 // Recent activity combining transactions and posts
 const recentActivity = [
   {
-    id: "p1",
-    type: "post",
-    name: "Banger",
-    avatar: "/avatars/banger.jpg",
-    content: "New collaboration with @nicolamarti coming soon. Get ready to dance!",
-    time: "2 hours ago",
-    artistId: "banger",
-    image: "/dj-performing-at-a-festival.jpg",
-    likes: 234,
-    comments: 45,
-    audioUrl: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/dropsland%20intro%20-zLJ8jWsSzQtpbfyFxg7ZRU5O6DnNec.mp3",
-  },
-  {
     id: "a1",
     type: "transaction",
     name: "iamjuampi",
@@ -150,19 +137,6 @@ const recentActivity = [
     image: "/crypto-tokens-glowing.jpg",
     likes: 89,
     comments: 12,
-    audioUrl: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/dropsland%20intro%20-zLJ8jWsSzQtpbfyFxg7ZRU5O6DnNec.mp3",
-  },
-  {
-    id: "p2",
-    type: "post",
-    name: "AXS",
-    avatar: "/avatars/axs.jpg",
-    content: "My set at Techno Revolution festival is now available for listening.",
-    time: "1 day ago",
-    artistId: "axs",
-    image: "/electronic-music-stage-lights.jpg",
-    likes: 567,
-    comments: 89,
     audioUrl: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/dropsland%20intro%20-zLJ8jWsSzQtpbfyFxg7ZRU5O6DnNec.mp3",
   },
   {
