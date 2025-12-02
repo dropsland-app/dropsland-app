@@ -113,4 +113,3 @@ export default function DonateForm({ creatorId, creatorName }: DonateFormProps) 
     </Card>
   )
 }
-

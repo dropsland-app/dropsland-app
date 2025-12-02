@@ -164,4 +164,3 @@ export default function ProfileScreen({ creator = null, onBack, onDonate, isCurr
     </div>
   )
 }
-

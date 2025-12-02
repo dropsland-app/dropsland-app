@@ -26,4 +26,3 @@ export function BanknoteSvg({ className = "" }: BanknoteSvgProps) {
     </svg>
   )
 }
-

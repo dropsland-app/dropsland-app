@@ -147,4 +147,3 @@ export const getCreatorInfo = async (creatorId: string) => {
     }
   }
 }
-

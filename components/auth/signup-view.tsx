@@ -173,4 +173,3 @@ export default function SignupView({ onSignup, onNavigateToLogin }: SignupViewPr
     </div>
   )
 }
-

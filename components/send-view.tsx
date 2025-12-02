@@ -232,4 +232,3 @@ export default function SendView({ onBack }: SendViewProps) {
     </div>
   )
 }
-

@@ -32,7 +32,7 @@ export default function ActivityView({ onSelectArtist }: ActivityViewProps) {
   })
 
   return (
-    <div className="p-4 pb-6 bg-gray-50 dark:bg-gray-950">
+    <div className="w-full max-w-full p-4 pb-6 bg-gray-950 h-full overflow-y-auto overflow-x-hidden">
       <h1 className="text-xl font-bold mb-4 text-white">Activity</h1>
 
       {filteredActivity.length > 0 ? (
@@ -63,26 +63,26 @@ function ActivityCard({
   onSelectArtist: (artistId: string) => void
 }) {
   return (
-    <Card className="overflow-hidden bg-gray-800 border-gray-700">
+    <Card className="overflow-hidden bg-white/5 backdrop-blur-md border-white/10 max-w-full">
       <CardContent className="p-3">
-        <div className="flex gap-3">
-          <Avatar className="h-10 w-10 cursor-pointer" onClick={() => onSelectArtist(activity.artistId)}>
-            <AvatarImage src={activity.avatar} alt={activity.name} />
+        <div className="flex gap-3 min-w-0">
+          <Avatar className="h-10 w-10 cursor-pointer flex-shrink-0" onClick={() => onSelectArtist(activity.artistId)}>
+            <AvatarImage src={activity.avatar || "/placeholder.svg"} alt={activity.name} />
             <AvatarFallback>{activity.name.substring(0, 2).toUpperCase()}</AvatarFallback>
           </Avatar>
-          <div className="flex-1">
-            <p className="text-sm text-white">
+          <div className="flex-1 min-w-0">
+            <p className="text-sm text-white break-words">
               <span className="font-medium">{activity.name}</span> {activity.action}
             </p>
             {activity.message && (
-              <p className="text-sm mt-1 bg-gray-700 p-2 rounded-lg text-gray-300">{activity.message}</p>
+              <p className="text-sm mt-1 bg-gray-700 p-2 rounded-lg text-gray-300 break-words">{activity.message}</p>
             )}
-            <div className="flex items-center mt-1">
+            <div className="flex items-center mt-1 flex-wrap gap-2">
               <p className="text-xs text-gray-400">{activity.time}</p>
               {activity.type === "purchase" && (
-                <div className="flex items-center text-bright-yellow text-xs font-medium ml-2">
-                  <BanknoteIcon className="h-4 w-4 mr-1" />
-                  <span>
+                <div className="flex items-center text-bright-yellow text-xs font-medium">
+                  <BanknoteIcon className="h-4 w-4 mr-1 flex-shrink-0" />
+                  <span className="whitespace-nowrap">
                     {activity.amount} ${activity.tokenName}
                   </span>
                 </div>
@@ -237,4 +237,3 @@ const allActivity: Activity[] = [
     relatedTo: "fan",
   },
 ]
-
