@@ -61,13 +61,11 @@ export default function TikTokFeed({ onSelectArtist, posts, type = "home" }: Tik
 
     const currentPost = posts[currentIndex]
     if (currentPost?.videoUrl && videoRefs[postKey]) {
-      videoRefs[postKey].pause()
-      videoRefs[postKey].currentTime = 0
-      setIsPlaying((prev) => ({ ...prev, [postKey]: false }))
+      videoRefs[postKey].play()
+      setIsPlaying((prev) => ({ ...prev, [postKey]: true }))
     } else if (audioRefs[postKey]) {
-      audioRefs[postKey].pause()
-      audioRefs[postKey].currentTime = 0
-      setIsPlaying((prev) => ({ ...prev, [postKey]: false }))
+      audioRefs[postKey].play()
+      setIsPlaying((prev) => ({ ...prev, [postKey]: true }))
     }
   }, [currentIndex, type, posts, audioRefs, videoRefs])
 
