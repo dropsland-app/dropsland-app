@@ -43,8 +43,9 @@ export default function TikTokFeed({ onSelectArtist, posts, type = "home" }: Tik
   useEffect(() => {
     const postKey = `${type}-${posts[currentIndex]?.id || currentIndex}`
 
+    // First, pause and reset ALL audio and video elements
     Object.keys(audioRefs).forEach((key) => {
-      if (key !== postKey && audioRefs[key]) {
+      if (audioRefs[key]) {
         audioRefs[key].pause()
         audioRefs[key].currentTime = 0
         setIsPlaying((prev) => ({ ...prev, [key]: false }))
@@ -52,43 +53,46 @@ export default function TikTokFeed({ onSelectArtist, posts, type = "home" }: Tik
     })
 
     Object.keys(videoRefs).forEach((key) => {
-      if (key !== postKey && videoRefs[key]) {
+      if (videoRefs[key]) {
         videoRefs[key].pause()
         videoRefs[key].currentTime = 0
         setIsPlaying((prev) => ({ ...prev, [key]: false }))
       }
     })
 
-    const currentPost = posts[currentIndex]
-    if (currentPost?.videoUrl && videoRefs[postKey]) {
-      const playPromise = videoRefs[postKey].play()
-      if (playPromise !== undefined) {
-        playPromise
-          .then(() => {
-            setIsPlaying((prev) => ({ ...prev, [postKey]: true }))
-          })
-          .catch((error) => {
-            // Ignore AbortError - it happens when user navigates away quickly
-            if (error.name !== "AbortError") {
-              console.error("Video play error:", error)
-            }
-          })
+    // Then, play only the current post's media after a small delay
+    const playTimeout = setTimeout(() => {
+      const currentPost = posts[currentIndex]
+      if (currentPost?.videoUrl && videoRefs[postKey]) {
+        const playPromise = videoRefs[postKey].play()
+        if (playPromise !== undefined) {
+          playPromise
+            .then(() => {
+              setIsPlaying((prev) => ({ ...prev, [postKey]: true }))
+            })
+            .catch((error) => {
+              if (error.name !== "AbortError") {
+                console.error("Video play error:", error)
+              }
+            })
+        }
+      } else if (audioRefs[postKey]) {
+        const playPromise = audioRefs[postKey].play()
+        if (playPromise !== undefined) {
+          playPromise
+            .then(() => {
+              setIsPlaying((prev) => ({ ...prev, [postKey]: true }))
+            })
+            .catch((error) => {
+              if (error.name !== "AbortError") {
+                console.error("Audio play error:", error)
+              }
+            })
+        }
       }
-    } else if (audioRefs[postKey]) {
-      const playPromise = audioRefs[postKey].play()
-      if (playPromise !== undefined) {
-        playPromise
-          .then(() => {
-            setIsPlaying((prev) => ({ ...prev, [postKey]: true }))
-          })
-          .catch((error) => {
-            // Ignore AbortError - it happens when user navigates away quickly
-            if (error.name !== "AbortError") {
-              console.error("Audio play error:", error)
-            }
-          })
-      }
-    }
+    }, 100)
+
+    return () => clearTimeout(playTimeout)
   }, [currentIndex, type, posts, audioRefs, videoRefs])
 
   const handleScroll = () => {
