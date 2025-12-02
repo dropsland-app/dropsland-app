@@ -61,9 +61,11 @@ export default function TikTokFeed({ onSelectArtist, posts, type = "home" }: Tik
 
     const currentPost = posts[currentIndex]
     if (currentPost?.videoUrl && videoRefs[postKey]) {
+      videoRefs[postKey].pause()
       videoRefs[postKey].currentTime = 0
       setIsPlaying((prev) => ({ ...prev, [postKey]: false }))
     } else if (audioRefs[postKey]) {
+      audioRefs[postKey].pause()
       audioRefs[postKey].currentTime = 0
       setIsPlaying((prev) => ({ ...prev, [postKey]: false }))
     }
@@ -254,15 +256,9 @@ export default function TikTokFeed({ onSelectArtist, posts, type = "home" }: Tik
                   className="absolute inset-0 w-full h-full object-cover z-0"
                   playsInline
                   loop
-                  autoPlay
                   onLoadedData={(e) => {
                     const video = e.currentTarget
-                    setIsPlaying((prev) => ({ ...prev, [postKey]: true }))
-                    if (currentIndex === index) {
-                      video.play().catch((error) => {
-                        console.log("[v0] Video autoplay failed:", error)
-                      })
-                    }
+                    setIsPlaying((prev) => ({ ...prev, [postKey]: false }))
                   }}
                   onTimeUpdate={(e) => {
                     const video = e.currentTarget
