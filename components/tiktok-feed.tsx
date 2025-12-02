@@ -255,7 +255,6 @@ export default function TikTokFeed({ onSelectArtist, posts, type = "home" }: Tik
                   src={videoUrl}
                   className="absolute inset-0 w-full h-full object-cover z-0"
                   playsInline
-                  muted
                   loop
                   onLoadedData={(e) => {
                     const video = e.currentTarget
