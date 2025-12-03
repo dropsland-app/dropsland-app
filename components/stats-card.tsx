@@ -37,4 +37,3 @@ export default function StatsCard({ icon, title, value, trend, trendUp }: StatsC
     </Card>
   )
 }
-

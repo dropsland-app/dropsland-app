@@ -22,7 +22,11 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning className="dark">
       <body className={inter.className}>
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
-          <AuthProvider>{children}</AuthProvider>
+          <div className="flex justify-center items-start min-h-screen bg-gray-900">
+            <div className="w-full max-w-md min-h-screen bg-black relative">
+              <AuthProvider>{children}</AuthProvider>
+            </div>
+          </div>
           <Toaster />
         </ThemeProvider>
       </body>
@@ -31,4 +35,3 @@ export default function RootLayout({
 }
 
 import "./globals.css"
-

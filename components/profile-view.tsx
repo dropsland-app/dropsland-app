@@ -21,6 +21,7 @@ import {
   Paperclip,
   Send,
   LogOut,
+  Star,
 } from "lucide-react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
@@ -127,7 +128,7 @@ export default function ProfileView({ username = "usuario" }: ProfileViewProps) 
   }
 
   return (
-    <div className="pb-6 bg-gray-950">
+    <div className="w-full max-w-full pb-6 bg-gray-950 h-full overflow-y-auto overflow-x-hidden">
       {/* Profile Header */}
       <div className="relative">
         {hasCoverImage ? (
@@ -145,9 +146,9 @@ export default function ProfileView({ username = "usuario" }: ProfileViewProps) 
           <div className="h-32 bg-gradient-to-r from-gray-800 to-black"></div>
         )}
         <div className="absolute top-20 left-0 w-full px-4">
-          <div className="flex justify-between">
-            <Avatar className="h-24 w-24">
-              <AvatarImage src={avatarSrc} alt="Your profile" />
+          <div className="flex justify-between max-w-full">
+            <Avatar className="h-24 w-24 flex-shrink-0">
+              <AvatarImage src={avatarSrc || "/placeholder.svg"} alt="Your profile" />
               <AvatarFallback>{userProfile.name.substring(0, 2).toUpperCase()}</AvatarFallback>
             </Avatar>
             <Button
@@ -172,31 +173,12 @@ export default function ProfileView({ username = "usuario" }: ProfileViewProps) 
       </div>
 
       {/* Profile Info */}
-      <div className="mt-16 px-4">
-        <div className="flex items-center">
-          <h1 className="text-xl font-bold text-white">{userProfile.name}</h1>
-          {userProfile.isVerified && (
-            <div className="ml-1 -mt-1">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="16"
-                height="16"
-                viewBox="0 0 256 256"
-                className="inline-block"
-              >
-                <g transform="translate(1.4065934065934016 1.4065934065934016) scale(2.81 2.81)">
-                  <path
-                    d="M 49.66 1.125 L 49.66 1.125 c 4.67 -2.393 10.394 -0.859 13.243 3.548 l 0 0 c 1.784 2.761 4.788 4.495 8.071 4.66 l 0 0 c 5.241 0.263 9.431 4.453 9.694 9.694 v 0 c 0.165 3.283 1.899 6.286 4.66 8.071 l 0 0 c 4.407 2.848 5.941 8.572 3.548 13.242 l 0 0 c -1.499 2.926 -1.499 6.394 0 9.319 l 0 0 c 2.393 4.67 0.859 10.394 -3.548 13.242 l 0 0 c -2.761 1.784 -4.495 4.788 -4.66 8.071 v 0 c -0.263 5.241 -4.453 9.431 -9.694 9.694 h 0 c -3.283 0.165 -6.286 1.899 -8.071 4.66 l 0 0 c -2.848 4.407 -8.572 5.941 -13.242 3.548 l 0 0 c -2.926 -1.499 -6.394 -1.499 -9.319 0 l 0 0 c -4.67 2.393 -10.394 0.859 -13.242 -3.548 l 0 0 c -1.784 -2.761 -4.788 -4.495 -8.071 -4.66 h 0 c -5.241 -0.263 -9.431 -4.453 -9.694 -9.694 l 0 0 c -0.165 -3.283 -1.899 -6.286 -4.66 -8.071 l 0 0 C 0.266 60.054 -1.267 54.33 1.125 49.66 l 0 0 c 1.499 -2.926 1.499 -6.394 0 -9.319 l 0 0 c -2.393 -4.67 -0.859 -10.394 3.548 -13.242 l 0 0 c 2.761 -1.784 4.495 -4.788 4.66 -8.071 l 0 0 c 0.263 -5.241 4.453 -9.431 9.694 -9.694 l 0 0 c 3.283 -0.165 6.286 -1.899 8.071 -4.66 l 0 0 c 2.848 -4.407 8.572 -5.941 13.242 -3.548 l 0 0 C 43.266 2.624 46.734 2.624 49.66 1.125 z"
-                    fill="#0083f9"
-                  />
-                  <polygon points="36.94,66.3 36.94,66.3 36.94,46.9 36.94,46.9 62.8,35.34 72.5,45.04" fill="#0077e3" />
-                  <polygon points="36.94,66.3 17.5,46.87 27.2,37.16 36.94,46.9 60.11,23.7 69.81,33.39" fill="#ffffff" />
-                </g>
-              </svg>
-            </div>
-          )}
+      <div className="mt-16 px-4 max-w-full">
+        <div className="flex items-center gap-2">
+          <h2 className="text-2xl font-bold text-white truncate">{userProfile.name}</h2>
+          {userProfile.isVerified && <Star className="h-5 w-5 text-bright-yellow fill-bright-yellow" />}
         </div>
-        <p className="text-gray-400">{userProfile.handle}</p>
+        <p className="text-gray-400 break-words">@{userProfile.handle}</p>
 
         <div className="flex items-center mt-2">
           <Badge variant="outline" className="bg-gray-800 text-gray-300 border-gray-700">
@@ -206,7 +188,7 @@ export default function ProfileView({ username = "usuario" }: ProfileViewProps) 
         </div>
 
         {isEditing ? (
-          <div className="mt-3 space-y-3">
+          <div className="space-y-3 mt-3">
             <div>
               <label className="text-xs text-gray-400 mb-1 block">Bio</label>
               <Textarea
@@ -220,16 +202,16 @@ export default function ProfileView({ username = "usuario" }: ProfileViewProps) 
               <label className="text-xs text-gray-400 mb-1 block">Category</label>
               <Input
                 defaultValue={userProfile.category}
-                className="text-sm text-gray-300 border border-gray-700 p-2 rounded-md bg-gray-800"
+                className="text-sm text-gray-300 border border-gray-700 p-2 rounded-md bg-gray-800 w-full"
               />
             </div>
           </div>
         ) : (
-          <p className="text-sm mt-3 text-gray-300">{userProfile.bio}</p>
+          <p className="text-sm mt-3 text-gray-300 break-words">{userProfile.bio}</p>
         )}
 
         {/* Update the section showing balance and purchased value */}
-        <div className="flex gap-4 mt-4">
+        <div className="flex flex-wrap gap-4 mt-4">
           <div>
             <p className="text-sm text-gray-400">Balance</p>
             <div className="flex items-center">
@@ -250,7 +232,7 @@ export default function ProfileView({ username = "usuario" }: ProfileViewProps) 
       </div>
 
       {/* Tabs - Reordered as requested */}
-      <div className="mt-6">
+      <div className="mt-6 w-full max-w-full">
         <Tabs defaultValue={isArtist() ? "posts" : "artists"}>
           <TabsList className={`grid w-full px-4 bg-gray-800 ${isArtist() ? "grid-cols-3" : "grid-cols-2"}`}>
             {isArtist() ? (
@@ -278,14 +260,14 @@ export default function ProfileView({ username = "usuario" }: ProfileViewProps) 
           </TabsList>
 
           {/* Posts Tab - For All Users */}
-          <TabsContent value="posts" className="px-4 mt-4 space-y-4">
+          <TabsContent value="posts" className="px-4 mt-4 space-y-4 max-w-full">
             {/* New Post Creation Area - Only for Artists */}
             {isArtist() && (
-              <Card className="bg-gray-800 border-gray-700">
+              <Card className="bg-white/5 backdrop-blur-md border-white/10">
                 <CardContent className="p-4">
                   <div className="flex items-start gap-3">
                     <Avatar className="h-10 w-10">
-                      <AvatarImage src={avatarSrc} alt={userProfile.name} />
+                      <AvatarImage src={avatarSrc || "/placeholder.svg"} alt={userProfile.name} />
                       <AvatarFallback>{userProfile.name.substring(0, 2).toUpperCase()}</AvatarFallback>
                     </Avatar>
                     <div className="flex-1">
@@ -317,7 +299,7 @@ export default function ProfileView({ username = "usuario" }: ProfileViewProps) 
 
             {/* For fans, show a message about their activity */}
             {!isArtist() && (
-              <Card className="bg-gray-800 border-gray-700">
+              <Card className="bg-white/5 backdrop-blur-md border-white/10">
                 <CardContent className="p-4 text-center">
                   <p className="text-gray-300">Welcome to your feed. Here you'll see posts from artists you follow.</p>
                   <p className="text-gray-400 text-sm mt-2">
@@ -328,11 +310,11 @@ export default function ProfileView({ username = "usuario" }: ProfileViewProps) 
             )}
 
             {userPosts.map((post, index) => (
-              <Card key={index} className="bg-gray-800 border-gray-700">
+              <Card key={index} className="bg-white/5 backdrop-blur-md border-white/10">
                 <CardContent className="p-4">
                   <div className="flex items-center mb-3">
                     <Avatar className="h-8 w-8 mr-2">
-                      <AvatarImage src={avatarSrc} alt={userProfile.name} />
+                      <AvatarImage src={avatarSrc || "/placeholder.svg"} alt={userProfile.name} />
                       <AvatarFallback>{userProfile.name.substring(0, 2).toUpperCase()}</AvatarFallback>
                     </Avatar>
                     <div>
@@ -378,7 +360,7 @@ export default function ProfileView({ username = "usuario" }: ProfileViewProps) 
               </div>
 
               {artistRewards.map((reward, index) => (
-                <Card key={index} className="overflow-hidden bg-gray-800 border-gray-700">
+                <Card key={index} className="overflow-hidden bg-white/5 backdrop-blur-md border-white/10">
                   <CardContent className="p-3">
                     <div className="flex items-center gap-3">
                       <div className="flex-1">
@@ -404,7 +386,7 @@ export default function ProfileView({ username = "usuario" }: ProfileViewProps) 
           {/* Certifications Tab - For Artists */}
           <TabsContent value="certifications" className="px-4 mt-4 space-y-3">
             {certifications.map((cert) => (
-              <Card key={cert.id} className="overflow-hidden bg-gray-800 border-gray-700">
+              <Card key={cert.id} className="overflow-hidden bg-white/5 backdrop-blur-md border-white/10">
                 <CardContent className="p-3">
                   <div className="flex items-start gap-3">
                     <div className="w-12 h-12 rounded-full bg-bright-yellow/20 flex items-center justify-center">
@@ -472,11 +454,11 @@ export default function ProfileView({ username = "usuario" }: ProfileViewProps) 
               </div>
 
               {rewards.map((reward) => (
-                <Card key={reward.id} className="overflow-hidden bg-gray-800 border-gray-700">
+                <Card key={reward.id} className="overflow-hidden bg-white/5 backdrop-blur-md border-white/10">
                   <CardContent className="p-3">
                     <div className="flex items-center gap-3">
                       <Avatar className="h-10 w-10">
-                        <AvatarImage src={reward.artistAvatar} alt={reward.artistName} />
+                        <AvatarImage src={reward.artistAvatar || "/placeholder.svg"} alt={reward.artistName} />
                         <AvatarFallback>{reward.artistName.substring(0, 2).toUpperCase()}</AvatarFallback>
                       </Avatar>
                       <div className="flex-1">
@@ -496,7 +478,7 @@ export default function ProfileView({ username = "usuario" }: ProfileViewProps) 
               ))}
 
               {rewards.length === 0 && (
-                <div className="text-center py-8 bg-gray-800 rounded-lg border border-gray-700">
+                <div className="text-center py-8 bg-white/5 backdrop-blur-md rounded-lg border border-white/10">
                   <Banknote className="h-12 w-12 text-gray-600 mx-auto mb-3" />
                   <p className="text-gray-300 font-medium">You don't have any rewards yet</p>
                   <p className="text-gray-400 text-sm mt-1">
@@ -516,13 +498,13 @@ export default function ProfileView({ username = "usuario" }: ProfileViewProps) 
               {followedArtists.map((artist) => (
                 <Card
                   key={artist.id}
-                  className="overflow-hidden bg-gray-800 border-gray-700 cursor-pointer"
+                  className="overflow-hidden bg-white/5 backdrop-blur-md border-white/10 cursor-pointer"
                   onClick={() => window.open("/artist/iamjuampi", "_self")}
                 >
                   <CardContent className="p-3">
                     <div className="flex items-center gap-3">
                       <Avatar className="h-10 w-10">
-                        <AvatarImage src={artist.avatar} alt={artist.name} />
+                        <AvatarImage src={artist.avatar || "/placeholder.svg"} alt={artist.name} />
                         <AvatarFallback>{artist.name.substring(0, 2).toUpperCase()}</AvatarFallback>
                       </Avatar>
                       <div className="flex-1">
@@ -591,7 +573,7 @@ export default function ProfileView({ username = "usuario" }: ProfileViewProps) 
           </Dialog>
 
           {!isArtist() && (
-            <Card className="bg-gray-800 border-gray-700 mt-4">
+            <Card className="bg-white/5 backdrop-blur-md border-white/10 mt-4">
               <CardContent className="p-4">
                 <div className="flex items-center">
                   <Lock className="h-5 w-5 text-bright-yellow mr-2" />
@@ -609,7 +591,7 @@ export default function ProfileView({ username = "usuario" }: ProfileViewProps) 
 
       {/* Diálogo de comentarios */}
       <Dialog open={showCommentDialog} onOpenChange={setShowCommentDialog}>
-        <DialogContent className="bg-gray-800 text-white border-gray-700">
+        <DialogContent className="bg-white/5 backdrop-blur-md text-white border-white/10">
           <DialogHeader>
             <DialogTitle>Comments</DialogTitle>
           </DialogHeader>
@@ -675,28 +657,6 @@ export const userPosts = [
     likes: 87,
     comments: 14,
     image: "/images/dj-mixer.png",
-  },
-  {
-    content:
-      "Preparing my set for this weekend at Club Underground. It's going to be an epic night of techno and house. Who's coming? 🎧",
-    time: "1 day ago",
-    likes: 65,
-    comments: 23,
-  },
-  {
-    content:
-      "Happy to announce I'll be playing at the Electronic Dreams festival next month. See you there! #ElectronicDreams #Festival",
-    time: "3 days ago",
-    likes: 112,
-    comments: 31,
-    image: "/images/dj-mixer.png",
-  },
-  {
-    content:
-      "Working on new sounds for my upcoming release. I'm experimenting with analog synthesizers and 90s samples.",
-    time: "1 week ago",
-    likes: 94,
-    comments: 17,
   },
 ]
 
@@ -817,4 +777,3 @@ const followedArtists = [
     tokens: 5,
   },
 ]
-

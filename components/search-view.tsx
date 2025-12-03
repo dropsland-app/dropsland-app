@@ -227,4 +227,3 @@ const trendingTopics = [
   "#DrumAndBass",
   "#DubstepVibes",
 ]
-

@@ -82,11 +82,11 @@ export default function LoginScreen({ onLogin }: LoginScreenProps) {
   return (
     <div className="flex flex-col h-full bg-gray-950">
       <div className="flex-1 flex flex-col justify-center items-center p-6">
-        <div className="w-full max-w-sm">
+        <div className="w-full max-w-sm bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-6">
           <div className="flex flex-col items-center mb-4">
             <div className="w-64 h-24 flex items-center justify-center mb-2">
               <Image
-                src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/DROPSLAND%20LOGO%202025%20ddd-nfqg5kaSPrNfbfdDcR6ZDVK5eGNEvt.png"
+                src="/images/dropsland-20logo-202025-20ddd.png"
                 alt="DROPSLAND"
                 width={240}
                 height={80}
@@ -106,7 +106,7 @@ export default function LoginScreen({ onLogin }: LoginScreenProps) {
                 <Input
                   id="username"
                   placeholder="Enter your username"
-                  className="pl-10 bg-gray-800 border-gray-700 text-white"
+                  className="pl-10 bg-white/5 backdrop-blur-sm border-white/20 text-white"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
                 />
@@ -123,7 +123,7 @@ export default function LoginScreen({ onLogin }: LoginScreenProps) {
                   id="password"
                   type={showPassword ? "text" : "password"}
                   placeholder="Enter your password"
-                  className="pl-10 bg-gray-800 border-gray-700 text-white"
+                  className="pl-10 bg-white/5 backdrop-blur-sm border-white/20 text-white"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                 />
@@ -167,4 +167,3 @@ export default function LoginScreen({ onLogin }: LoginScreenProps) {
     </div>
   )
 }
-

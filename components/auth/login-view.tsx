@@ -128,4 +128,3 @@ export default function LoginView({ onLogin, onNavigateToSignup }: LoginViewProp
     </div>
   )
 }
-

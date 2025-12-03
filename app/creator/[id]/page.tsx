@@ -221,4 +221,3 @@ export default function CreatorPage({ params }: { params: { id: string } }) {
     </div>
   )
 }
-

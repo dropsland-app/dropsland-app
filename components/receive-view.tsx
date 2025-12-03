@@ -143,4 +143,3 @@ export default function ReceiveView({ onBack }: ReceiveViewProps) {
     </div>
   )
 }
-

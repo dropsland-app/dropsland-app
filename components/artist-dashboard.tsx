@@ -332,4 +332,3 @@ const supporters = [
     since: "Supporting since Mar 2025",
   },
 ]
-

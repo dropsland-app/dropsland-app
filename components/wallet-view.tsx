@@ -7,19 +7,25 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { useAuth } from "@/hooks/use-auth"
 import { BanknoteIcon } from "@/components/icons/banknote-icon"
 
-interface WalletViewProps {
-  onBuy: () => void
-  onSend: () => void
-  onReceive: () => void
-}
-
-export default function WalletView({ onBuy, onSend, onReceive }: WalletViewProps) {
+export default function WalletView() {
   const { balance, donated } = useAuth()
 
+  const handleBuy = () => {
+    alert("Buy tokens feature coming soon!")
+  }
+
+  const handleSend = () => {
+    alert("Send tokens feature coming soon!")
+  }
+
+  const handleReceive = () => {
+    alert("Receive tokens feature coming soon!")
+  }
+
   return (
-    <div className="pb-6 bg-gray-950">
+    <div className="pb-6 bg-gray-950 h-full overflow-y-auto">
       {/* Balance Card */}
-      <div className="px-4 py-6 bg-gradient-to-r from-black to-gray-800 text-white">
+      <div className="px-4 py-6 bg-gradient-to-r from-black/60 to-gray-800/60 backdrop-blur-xl text-white border-b border-white/10">
         <h1 className="text-xl font-bold mb-2">Wallet</h1>
         <h2 className="text-sm font-medium opacity-90">Your Balance</h2>
         <div className="flex items-center mt-1">
@@ -29,24 +35,24 @@ export default function WalletView({ onBuy, onSend, onReceive }: WalletViewProps
           <Button
             size="sm"
             variant="outline"
-            className="border-white text-white hover:bg-white/20 bg-white/20 backdrop-blur-sm"
-            onClick={onReceive}
+            className="border-white/30 text-white hover:bg-white/20 bg-white/10 backdrop-blur-md"
+            onClick={handleReceive}
           >
             Receive
           </Button>
           <Button
             size="sm"
             variant="outline"
-            className="border-white text-white hover:bg-white/20 bg-white/20 backdrop-blur-sm"
-            onClick={onBuy}
+            className="border-white/30 text-white hover:bg-white/20 bg-white/10 backdrop-blur-md"
+            onClick={handleBuy}
           >
             Buy
           </Button>
           <Button
             size="sm"
             variant="outline"
-            className="border-white text-white hover:bg-white/20 bg-white/20 backdrop-blur-sm"
-            onClick={onSend}
+            className="border-white/30 text-white hover:bg-white/20 bg-white/10 backdrop-blur-md"
+            onClick={handleSend}
           >
             Send
           </Button>
@@ -55,7 +61,7 @@ export default function WalletView({ onBuy, onSend, onReceive }: WalletViewProps
 
       {/* Stats Cards */}
       <div className="grid grid-cols-3 gap-2 px-4 mt-4">
-        <Card className="bg-gray-800 shadow-sm border-gray-700">
+        <Card className="bg-white/5 backdrop-blur-md shadow-sm border-white/10">
           <CardContent className="p-3">
             <div className="flex flex-col items-center">
               <BanknoteIcon className="h-6 w-6 text-bright-yellow mb-1" />
@@ -64,7 +70,7 @@ export default function WalletView({ onBuy, onSend, onReceive }: WalletViewProps
             </div>
           </CardContent>
         </Card>
-        <Card className="bg-gray-800 shadow-sm border-gray-700">
+        <Card className="bg-white/5 backdrop-blur-md shadow-sm border-white/10">
           <CardContent className="p-3">
             <div className="flex flex-col items-center">
               <Users className="h-6 w-6 text-bright-yellow mb-1" />
@@ -73,7 +79,7 @@ export default function WalletView({ onBuy, onSend, onReceive }: WalletViewProps
             </div>
           </CardContent>
         </Card>
-        <Card className="bg-gray-800 shadow-sm border-gray-700">
+        <Card className="bg-white/5 backdrop-blur-md shadow-sm border-white/10">
           <CardContent className="p-3">
             <div className="flex flex-col items-center">
               <TrendingUp className="h-6 w-6 text-bright-yellow mb-1" />
@@ -89,11 +95,11 @@ export default function WalletView({ onBuy, onSend, onReceive }: WalletViewProps
         <h2 className="text-lg font-semibold mb-3 text-white">Artist Tokens</h2>
         <div className="space-y-3">
           {artistTokens.map((token) => (
-            <Card key={token.id} className="bg-gray-800 shadow-sm border-gray-700">
+            <Card key={token.id} className="bg-white/5 backdrop-blur-md shadow-sm border-white/10">
               <CardContent className="p-3">
                 <div className="flex items-center gap-3">
                   <Avatar className="h-10 w-10">
-                    <AvatarImage src={token.avatar} alt={token.name} />
+                    <AvatarImage src={token.avatar || "/placeholder.svg"} alt={token.name} />
                     <AvatarFallback>{token.name.substring(0, 2).toUpperCase()}</AvatarFallback>
                   </Avatar>
                   <div className="flex-1">
@@ -116,7 +122,7 @@ export default function WalletView({ onBuy, onSend, onReceive }: WalletViewProps
           ))}
 
           {artistTokens.length === 0 && (
-            <div className="text-center py-6 bg-gray-800 rounded-lg border border-gray-700">
+            <div className="text-center py-6 bg-white/5 backdrop-blur-md rounded-lg border border-white/10">
               <p className="text-gray-300">No tienes tokens de artistas aún</p>
               <p className="text-gray-400 text-sm mt-1">
                 Compra tokens para apoyar a tus artistas favoritos y recibir recompensas exclusivas
@@ -132,7 +138,7 @@ export default function WalletView({ onBuy, onSend, onReceive }: WalletViewProps
         <h2 className="text-lg font-semibold mb-3 text-white">Transaction History</h2>
         <div className="space-y-3">
           {transactions.map((transaction) => (
-            <Card key={transaction.id} className="bg-gray-800 shadow-sm border-gray-700">
+            <Card key={transaction.id} className="bg-white/5 backdrop-blur-md shadow-sm border-white/10">
               <CardContent className="p-3">
                 <div className="flex items-center gap-3">
                   <div
@@ -242,4 +248,3 @@ const transactions = [
     date: "Mar 1, 2025",
   },
 ]
-

@@ -31,4 +31,3 @@ export function BanknoteIcon({ className = "", size = 24 }: BanknoteIconProps) {
     </svg>
   )
 }
-

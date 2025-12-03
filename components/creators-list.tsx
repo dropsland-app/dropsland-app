@@ -155,4 +155,3 @@ export default function ArtistsList() {
     </div>
   )
 }
-
