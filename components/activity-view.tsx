@@ -65,19 +65,21 @@ function ActivityCard({
   onSelectArtist: (artistId: string) => void
 }) {
   return (
-    <Card className="overflow-hidden bg-white/5 backdrop-blur-md border-white/10 max-w-full">
+    <Card className="overflow-hidden bg-white/5 backdrop-blur-md border-white/10 w-full">
       <CardContent className="p-3">
-        <div className="flex gap-3 min-w-0">
+        <div className="flex gap-3 w-full overflow-hidden">
           <Avatar className="h-10 w-10 cursor-pointer flex-shrink-0" onClick={() => onSelectArtist(activity.artistId)}>
             <AvatarImage src={activity.avatar || "/placeholder.svg"} alt={activity.name} />
             <AvatarFallback>{activity.name.substring(0, 2).toUpperCase()}</AvatarFallback>
           </Avatar>
-          <div className="flex-1 min-w-0">
-            <p className="text-sm text-white break-words">
+          <div className="flex-1 min-w-0 overflow-hidden">
+            <p className="text-sm text-white overflow-wrap break-words">
               <span className="font-medium">{activity.name}</span> {activity.action}
             </p>
             {activity.message && (
-              <p className="text-sm mt-1 bg-gray-700 p-2 rounded-lg text-gray-300 break-words">{activity.message}</p>
+              <p className="text-sm mt-1 bg-gray-700 p-2 rounded-lg text-gray-300 break-words overflow-wrap-anywhere">
+                {activity.message}
+              </p>
             )}
             <div className="flex items-center mt-1 flex-wrap gap-2">
               <p className="text-xs text-gray-400">{activity.time}</p>
