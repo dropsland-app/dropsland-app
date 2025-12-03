@@ -13,6 +13,17 @@ export default function HomeView({ onSelectArtist }: HomeViewProps) {
 
   const feedPosts = [
     {
+      id: "youtube-1",
+      name: "iamjuampi",
+      avatar: "/avatars/juampi.jpg",
+      content: "New track 🔥",
+      time: "Just now",
+      artistId: "iamjuampi",
+      videoUrl: "https://www.youtube.com/watch?v=uPPM_fHpNqM",
+      likes: 0,
+      comments: 0,
+    },
+    {
       id: "video-1",
       name: "iamjuampi",
       avatar: "/avatars/juampi.jpg",

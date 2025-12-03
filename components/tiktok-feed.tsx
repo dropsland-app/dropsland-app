@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { BanknoteIcon } from "@/components/icons/banknote-icon"
+import { extractYouTubeVideoId, isYouTubeUrl, getYouTubeEmbedUrl } from "@/lib/youtube-utils"
 
 interface TikTokFeedProps {
   onSelectArtist: (artistId: string) => void
@@ -35,6 +36,7 @@ export default function TikTokFeed({ onSelectArtist, posts, type = "home" }: Tik
 
   const [audioRefs] = useState<{ [key: string]: HTMLAudioElement }>({})
   const [videoRefs] = useState<{ [key: string]: HTMLVideoElement }>({})
+  const [youtubeRefs] = useState<{ [key: string]: HTMLIFrameElement }>({})
   const [isPlaying, setIsPlaying] = useState<{ [key: string]: boolean }>({})
   const [currentTime, setCurrentTime] = useState<{ [key: string]: number }>({})
   const [duration, setDuration] = useState<{ [key: string]: number }>({})
@@ -60,9 +62,29 @@ export default function TikTokFeed({ onSelectArtist, posts, type = "home" }: Tik
       }
     })
 
+    Object.keys(youtubeRefs).forEach((key) => {
+      if (youtubeRefs[key]) {
+        try {
+          youtubeRefs[key].contentWindow?.postMessage('{"event":"command","func":"pauseVideo","args":""}', "*")
+        } catch (error) {
+          console.error("YouTube pause error:", error)
+        }
+      }
+    })
+
     const playTimeout = setTimeout(() => {
       const currentPost = posts[currentIndex]
-      if (currentPost?.videoUrl && videoRefs[postKey]) {
+      if (currentPost?.videoUrl && isYouTubeUrl(currentPost.videoUrl)) {
+        const iframe = youtubeRefs[postKey]
+        if (iframe) {
+          try {
+            iframe.contentWindow?.postMessage('{"event":"command","func":"playVideo","args":""}', "*")
+            setIsPlaying((prev) => ({ ...prev, [postKey]: true }))
+          } catch (error) {
+            console.error("YouTube play error:", error)
+          }
+        }
+      } else if (currentPost?.videoUrl && videoRefs[postKey]) {
         const playPromise = videoRefs[postKey].play()
         if (playPromise !== undefined) {
           playPromise
@@ -80,7 +102,7 @@ export default function TikTokFeed({ onSelectArtist, posts, type = "home" }: Tik
     }, 100)
 
     return () => clearTimeout(playTimeout)
-  }, [currentIndex, type, posts, audioRefs, videoRefs])
+  }, [currentIndex, type, posts, audioRefs, videoRefs, youtubeRefs])
 
   const handleScroll = () => {
     if (!containerRef.current) return
@@ -160,7 +182,24 @@ export default function TikTokFeed({ onSelectArtist, posts, type = "home" }: Tik
   const togglePlayPause = (postKey: string) => {
     const audio = audioRefs[postKey]
     const video = videoRefs[postKey]
+    const youtubeIframe = youtubeRefs[postKey]
     const mediaElement = video || audio
+
+    if (youtubeIframe) {
+      try {
+        if (isPlaying[postKey]) {
+          youtubeIframe.contentWindow?.postMessage('{"event":"command","func":"pauseVideo","args":""}', "*")
+          setIsPlaying((prev) => ({ ...prev, [postKey]: false }))
+        } else {
+          youtubeIframe.contentWindow?.postMessage('{"event":"command","func":"playVideo","args":""}', "*")
+          setIsPlaying((prev) => ({ ...prev, [postKey]: true }))
+        }
+      } catch (error) {
+        console.error("YouTube toggle error:", error)
+      }
+      return
+    }
+
     if (!mediaElement) return
 
     if (isPlaying[postKey]) {
@@ -268,7 +307,9 @@ export default function TikTokFeed({ onSelectArtist, posts, type = "home" }: Tik
           const commentsCount =
             (postComments[postKey]?.length || 0) + (post.comments || Math.floor(Math.random() * 20) + 5)
 
-          const isVideo = !!post.videoUrl
+          const isYouTubeVideo = post.videoUrl && isYouTubeUrl(post.videoUrl)
+          const youtubeVideoId = isYouTubeVideo ? extractYouTubeVideoId(post.videoUrl) : null
+          const isVideo = !!post.videoUrl && !isYouTubeVideo
           const audioUrl = post.audioUrl || "/placeholder-audio.mp3"
           const videoUrl = post.videoUrl
 
@@ -278,7 +319,29 @@ export default function TikTokFeed({ onSelectArtist, posts, type = "home" }: Tik
               className="snap-start relative bg-black flex items-center justify-center w-full"
               style={{ height: "calc(100vh - 2.5rem)" }}
             >
-              {isVideo ? (
+              {isYouTubeVideo && youtubeVideoId ? (
+                <iframe
+                  ref={(el) => {
+                    if (el) youtubeRefs[postKey] = el
+                  }}
+                  src={getYouTubeEmbedUrl(videoUrl)}
+                  className="absolute inset-0 w-full h-full z-0"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  style={{
+                    pointerEvents: "none",
+                    border: "none",
+                    width: "100%",
+                    minWidth: "100%",
+                    height: "100%",
+                    minHeight: "100vh",
+                    position: "absolute",
+                    top: "50%",
+                    left: "50%",
+                    transform: "translate(-50%, -50%)",
+                    objectFit: "cover",
+                  }}
+                />
+              ) : isVideo ? (
                 <video
                   ref={(el) => {
                     if (el) videoRefs[postKey] = el
@@ -330,7 +393,7 @@ export default function TikTokFeed({ onSelectArtist, posts, type = "home" }: Tik
                 />
               )}
 
-              {!isVideo && post.image && (
+              {!isVideo && !isYouTubeVideo && post.image && (
                 <div className="absolute inset-0 z-0">
                   <img
                     src={post.image || "/placeholder.svg"}
@@ -341,7 +404,7 @@ export default function TikTokFeed({ onSelectArtist, posts, type = "home" }: Tik
                 </div>
               )}
 
-              {isVideo && (
+              {(isVideo || isYouTubeVideo) && (
                 <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-black/50 z-[5]" />
               )}
 
@@ -375,14 +438,16 @@ export default function TikTokFeed({ onSelectArtist, posts, type = "home" }: Tik
                   </div>
 
                   <div className="flex flex-col items-center gap-4 flex-shrink-0">
-                    <button
-                      onClick={() => togglePlayPause(postKey)}
-                      className="flex flex-col items-center gap-1 text-white"
-                    >
-                      <div className="bg-white/10 backdrop-blur-md p-3 rounded-full border border-white/20">
-                        {isPlaying[postKey] ? <Pause className="h-6 w-6" /> : <Play className="h-6 w-6" />}
-                      </div>
-                    </button>
+                    {!isYouTubeVideo && (
+                      <button
+                        onClick={() => togglePlayPause(postKey)}
+                        className="flex flex-col items-center gap-1 text-white"
+                      >
+                        <div className="bg-white/10 backdrop-blur-md p-3 rounded-full border border-white/20">
+                          {isPlaying[postKey] ? <Pause className="h-6 w-6" /> : <Play className="h-6 w-6" />}
+                        </div>
+                      </button>
+                    )}
 
                     <button onClick={() => handleLike(postKey)} className="flex flex-col items-center gap-1 text-white">
                       <div className="bg-white/10 backdrop-blur-md p-3 rounded-full border border-white/20">
@@ -412,31 +477,33 @@ export default function TikTokFeed({ onSelectArtist, posts, type = "home" }: Tik
                   </div>
                 </div>
 
-                <div className="w-full mb-2">
-                  <div
-                    className="bg-white/20 backdrop-blur-sm rounded-full h-2 overflow-hidden cursor-pointer relative"
-                    onClick={(e) => handleProgressClick(e, postKey)}
-                    onTouchStart={() => handleSeekStart(postKey)}
-                    onTouchEnd={() => handleSeekEnd(postKey)}
-                    onTouchMove={(e) => {
-                      if (isSeeking[postKey]) {
-                        e.preventDefault()
-                        handleProgressClick(e, postKey)
-                      }
-                    }}
-                  >
+                {!isYouTubeVideo && (
+                  <div className="w-full mb-2">
                     <div
-                      className="bg-bright-yellow h-full transition-all duration-100"
-                      style={{
-                        width: `${((currentTime[postKey] || 0) / (duration[postKey] || 1)) * 100}%`,
+                      className="bg-white/20 backdrop-blur-sm rounded-full h-2 overflow-hidden cursor-pointer relative"
+                      onClick={(e) => handleProgressClick(e, postKey)}
+                      onTouchStart={() => handleSeekStart(postKey)}
+                      onTouchEnd={() => handleSeekEnd(postKey)}
+                      onTouchMove={(e) => {
+                        if (isSeeking[postKey]) {
+                          e.preventDefault()
+                          handleProgressClick(e, postKey)
+                        }
                       }}
-                    />
+                    >
+                      <div
+                        className="bg-bright-yellow h-full transition-all duration-100"
+                        style={{
+                          width: `${((currentTime[postKey] || 0) / (duration[postKey] || 1)) * 100}%`,
+                        }}
+                      />
+                    </div>
+                    <div className="flex justify-between text-white text-xs mt-1 px-1 text-shadow">
+                      <span>{formatTime(currentTime[postKey] || 0)}</span>
+                      <span>{formatTime(duration[postKey] || 0)}</span>
+                    </div>
                   </div>
-                  <div className="flex justify-between text-white text-xs mt-1 px-1 text-shadow">
-                    <span>{formatTime(currentTime[postKey] || 0)}</span>
-                    <span>{formatTime(duration[postKey] || 0)}</span>
-                  </div>
-                </div>
+                )}
               </div>
             </div>
           )
