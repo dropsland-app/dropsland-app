@@ -34,9 +34,7 @@ export default function ProfileView({ username = "usuario" }: ProfileViewProps) 
   const userProfile = {
     name: displayName,
     handle: `${displayName}`,
-    bio: isArtist()
-      ? "iamjuampi is a DJ, producer, and founder of Best Drops Ever."
-      : "Music enthusiast and electronic music fan. Supporting my favorite artists on DROPSLAND.",
+    bio: isArtist() ? "iamjuampi is a DJ, producer, and founder." : "Music enthusiast and electronic music fan.",
     category: isArtist() ? "Techno / House" : "Fan",
     memberSince: "March 2025",
     isVerified: userData?.isVerified || false,
@@ -222,9 +220,7 @@ export default function ProfileView({ username = "usuario" }: ProfileViewProps) 
           <TabsContent value="artists" className="mt-4">
             <Card className="bg-white/5 border-white/10">
               <CardContent className="p-6 text-center">
-                <p className="text-gray-300 text-sm">
-                  Welcome to your feed. Here you'll see posts from artists you follow.
-                </p>
+                <p className="text-gray-300 text-sm">Welcome to your feed.</p>
               </CardContent>
             </Card>
           </TabsContent>
