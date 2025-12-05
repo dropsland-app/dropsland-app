@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from "react"
 import HomeView from "@/components/home-view"
 import ExploreScreen from "@/components/explore-screen"
+import UploadView from "@/components/upload-view"
 import WalletView from "@/components/wallet-view"
 import ActivityView from "@/components/activity-view"
 import ProfileView from "@/components/profile-view"
@@ -63,6 +64,10 @@ export default function MainApp() {
         </div>
 
         <div className="min-w-full h-full flex-shrink-0 overflow-y-auto snap-start">
+          <UploadView />
+        </div>
+
+        <div className="min-w-full h-full flex-shrink-0 overflow-y-auto snap-start">
           <WalletView />
         </div>
 
@@ -76,7 +81,7 @@ export default function MainApp() {
       </div>
 
       <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-2 z-50 pointer-events-none">
-        {[0, 1, 2, 3, 4].map((index) => (
+        {[0, 1, 2, 3, 4, 5].map((index) => (
           <div
             key={index}
             className={`h-1 transition-all duration-300 rounded-full ${

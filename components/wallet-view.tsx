@@ -25,7 +25,7 @@ export default function WalletView() {
   return (
     <div className="pb-6 bg-gray-950 h-full overflow-y-auto">
       {/* Balance Card */}
-      <div className="px-4 py-6 bg-gradient-to-r from-black/60 to-gray-800/60 backdrop-blur-xl text-white border-b border-white/10">
+      <div className="px-4 pt-12 pb-6 bg-gradient-to-r from-black/60 to-gray-800/60 backdrop-blur-xl text-white border-b border-white/10">
         <h1 className="text-xl font-bold mb-2">Wallet</h1>
         <h2 className="text-sm font-medium opacity-90">Your Balance</h2>
         <div className="flex items-center mt-1">

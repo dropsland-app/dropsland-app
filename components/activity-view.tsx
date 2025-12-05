@@ -26,7 +26,7 @@ export default function ActivityView({ onSelectArtist }: ActivityViewProps) {
 
   return (
     <div className="w-full max-w-full bg-black h-full overflow-y-auto overflow-x-hidden">
-      <div className="sticky top-0 bg-black z-10 border-b border-gray-800 px-4 py-3">
+      <div className="sticky top-0 bg-black z-10 border-b border-gray-800 px-4 pt-12 pb-3">
         <h1 className="text-xl font-bold text-white">Activity</h1>
       </div>
 
