@@ -57,18 +57,29 @@ const featuredArtists = [
   },
 ]
 
+const artistImages = [
+  "/images/explore/dnb-tech-house.jpg",
+  "/images/explore/tech-house.jpg",
+  "/images/explore/riddim.jpg",
+  "/images/explore/dubstep.jpg",
+  "/images/explore/trap.jpg",
+  "/images/explore/dubstep-2.jpg",
+  "/images/explore/electro.jpg",
+  "/images/explore/tech-house-2.jpg",
+]
+
 export default function ExploreScreen({ onSelectArtist }: ExploreScreenProps) {
-  const explorePosts = featuredArtists.map((artist) => ({
+  const explorePosts = featuredArtists.map((artist, index) => ({
     id: artist.id,
     name: artist.name,
     avatar: artist.avatar,
     content: `${artist.genre} artist with amazing tracks. Follow for exclusive content!`,
     time: "Featured",
     artistId: artist.id,
-    image: `/placeholder.svg?height=800&width=600&query=${artist.genre} music artist performing`,
+    image: artistImages[index],
     likes: Math.floor(Math.random() * 500) + 100,
     comments: Math.floor(Math.random() * 80) + 20,
-    audioUrl: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/dropsland%20intro%20-zLJ8jWsSzQtpbfyFxg7ZRU5O6DnNec.mp3",
+    audioUrl: "/images/dropsland-20intro-20.mp3",
   }))
 
   return <TikTokFeed onSelectArtist={onSelectArtist} posts={explorePosts} type="explore" />

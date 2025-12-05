@@ -63,7 +63,7 @@ export default function ProfileView({ username = "usuario" }: ProfileViewProps) 
   // Find the userProfile object and update the bio for artists
   const userProfile = {
     name: userData?.username || "musicfan",
-    handle: `@${userData?.username || "musicfan"}`,
+    handle: `${userData?.username || "musicfan"}`,
     bio: isArtist()
       ? "iamjuampi is a DJ, producer, and founder of Best Drops Ever."
       : "Music enthusiast and electronic music fan. Supporting my favorite artists on DROPSLAND.",
