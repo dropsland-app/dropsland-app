@@ -23,17 +23,6 @@ export default function HomeView({ onSelectArtist }: HomeViewProps) {
       likes: 0,
       comments: 0,
     },
-    {
-      id: "youtube-1",
-      name: "iamjuampi",
-      avatar: "/avatars/juampi.jpg",
-      content: "New track 🔥",
-      time: "Just now",
-      artistId: "iamjuampi",
-      videoUrl: "https://www.youtube.com/watch?v=uPPM_fHpNqM",
-      likes: 0,
-      comments: 0,
-    },
     // User posts
     ...userPosts.map((post, index) => ({
       ...post,

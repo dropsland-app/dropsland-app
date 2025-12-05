@@ -325,19 +325,20 @@ export default function TikTokFeed({ onSelectArtist, posts, type = "home" }: Tik
                     if (el) youtubeRefs[postKey] = el
                   }}
                   src={getYouTubeEmbedUrl(videoUrl)}
-                  className="absolute inset-0 z-0"
+                  className="absolute inset-0 w-full h-full z-0"
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                   style={{
                     pointerEvents: "none",
                     border: "none",
-                    width: "177.78vh",
-                    height: "100vh",
+                    width: "100%",
                     minWidth: "100%",
-                    minHeight: "100%",
+                    height: "100%",
+                    minHeight: "100vh",
                     position: "absolute",
                     top: "50%",
                     left: "50%",
                     transform: "translate(-50%, -50%)",
+                    objectFit: "cover",
                   }}
                 />
               ) : isVideo ? (
