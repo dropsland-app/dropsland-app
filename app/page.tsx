@@ -13,7 +13,7 @@ export default function BeansApp() {
   }, [isAuthenticated, login])
 
   return (
-    <div className="flex flex-col h-screen max-w-md mx-auto bg-gray-50 overflow-hidden">
+    <div className="flex flex-col h-screen max-w-lg mx-auto bg-gray-50 overflow-hidden">
       <MainApp />
     </div>
   )
