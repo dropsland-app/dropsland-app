@@ -72,11 +72,10 @@ export default function MainApp() {
   return (
     <div className="h-screen flex flex-col bg-black relative">
       <header
-        className={`absolute top-0 left-0 right-0 z-50 h-16 pointer-events-none ${
-          isLightMode
-            ? "bg-gradient-to-b from-white via-white/80 to-transparent"
-            : "bg-gradient-to-b from-black via-black/80 to-transparent"
-        }`}
+        className={`absolute top-0 left-0 right-0 z-50 h-16 pointer-events-none ${isLightMode
+          ? "bg-gradient-to-b from-white via-white/80 to-transparent"
+          : "bg-gradient-to-b from-black via-black/80 to-transparent"
+          }`}
       >
         <div className="flex items-center justify-start h-12 px-2 pointer-events-auto">
           <Image
@@ -159,10 +158,9 @@ export default function MainApp() {
             flex items-center gap-1 px-2 py-1.5 rounded-full
             backdrop-blur-xl border shadow-2xl
             transition-all duration-500 ease-out
-            ${
-              isLightMode
-                ? "bg-white/60 border-white/50 shadow-black/5 text-gray-800"
-                : "bg-black/30 border-white/10 shadow-black/20 text-white"
+            ${isLightMode
+              ? "bg-white/60 border-white/50 shadow-black/5 text-gray-800"
+              : "bg-black/30 border-white/10 shadow-black/20 text-white"
             }
           `}
         >
@@ -182,38 +180,27 @@ export default function MainApp() {
                 onClick={() => handleNavigate(index)}
                 className={`
                   relative p-2 rounded-full transition-all duration-300 group
-                  ${
-                    isActive
-                      ? isLightMode
-                        ? "bg-black/5"
-                        : "bg-white/10"
-                      : "hover:bg-black/5 dark:hover:bg-white/5"
+                  ${isActive
+                    ? isLightMode
+                      ? "bg-black/5"
+                      : "bg-white/10"
+                    : "hover:bg-black/5 dark:hover:bg-white/5"
                   }
                 `}
               >
                 <Icon
                   className={`
                     h-5 w-5 transition-all duration-300
-                    ${
-                      isActive
-                        ? isLightMode
-                          ? "text-black scale-105"
-                          : "text-yellow-400 scale-105 drop-shadow-[0_0_8px_rgba(250,204,21,0.5)]"
-                        : isLightMode
-                          ? "text-gray-500 group-hover:text-black"
-                          : "text-white/60 group-hover:text-white"
+                    ${isActive
+                      ? isLightMode
+                        ? "text-black scale-105"
+                        : "text-yellow-400 scale-105 drop-shadow-[0_0_8px_rgba(250,204,21,0.5)]"
+                      : isLightMode
+                        ? "text-gray-500 group-hover:text-black"
+                        : "text-white/60 group-hover:text-white"
                     }
                   `}
                 />
-
-                {isActive && (
-                  <span
-                    className={`
-                    absolute bottom-1 left-1/2 -translate-x-1/2 w-0.5 h-0.5 rounded-full
-                    ${isLightMode ? "bg-black" : "bg-yellow-400"}
-                  `}
-                  />
-                )}
               </button>
             );
           })}
