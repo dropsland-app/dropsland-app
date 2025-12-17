@@ -299,9 +299,8 @@ export default function TikTokFeed({ onSelectArtist, posts, type = "home" }: Tik
     <>
       <div
         ref={containerRef}
-        className="overflow-y-scroll snap-y snap-mandatory scrollbar-hide w-full"
+        className="overflow-y-scroll snap-y snap-mandatory scrollbar-hide w-full h-[100dvh]"
         style={{
-          height: "calc(100vh - 2.5rem)",
           scrollbarWidth: "none",
           msOverflowStyle: "none",
         }}
@@ -325,8 +324,7 @@ export default function TikTokFeed({ onSelectArtist, posts, type = "home" }: Tik
           return (
             <div
               key={postKey}
-              className="snap-start relative bg-black flex items-center justify-center w-full"
-              style={{ height: "calc(100vh - 2.5rem)" }}
+              className="snap-start relative bg-black flex items-center justify-center w-full h-[100dvh]"
             >
               {isYouTubeVideo && youtubeVideoId ? (
                 <iframe
@@ -418,7 +416,7 @@ export default function TikTokFeed({ onSelectArtist, posts, type = "home" }: Tik
                 <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-black/50 z-[5]" />
               )}
 
-              <div className="absolute inset-0 z-10 flex flex-col justify-end p-4 pb-3">
+              <div className="absolute inset-0 z-10 flex flex-col justify-end p-4 pb-24 safe-bottom">
                 <div className="flex items-end gap-4 mb-2">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-3">
