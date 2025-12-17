@@ -61,17 +61,17 @@ export default function ProfileView({ username = "usuario" }: ProfileViewProps) 
   }
 
   return (
-    <div className="w-full h-full overflow-y-auto overflow-x-hidden bg-gray-950">
+    <div className="w-full h-full overflow-y-auto overflow-x-hidden bg-white">
       <div className="relative h-40">
         {coverSrc && <img src={coverSrc || "/placeholder.svg"} alt="Cover" className="w-full h-full object-cover" />}
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent to-gray-950/50" />
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent to-white/50" />
       </div>
 
       <div className="px-4 pb-20">
         <div className="flex justify-center -mt-16 mb-4">
-          <Avatar className="w-28 h-28 border-4 border-gray-950 ring-2 ring-yellow-400/30">
+          <Avatar className="w-28 h-28 border-4 border-white ring-2 ring-[#F2B705]/30">
             <AvatarImage src={avatarSrc || undefined} alt={displayName} />
-            <AvatarFallback className="bg-gradient-to-br from-yellow-400 to-yellow-600 text-gray-950 text-3xl font-bold">
+            <AvatarFallback className="bg-gradient-to-br from-[#F2B705] to-[#F2B705]/80 text-[#1E1E1E] text-3xl font-bold">
               {displayName.charAt(0).toUpperCase()}
             </AvatarFallback>
           </Avatar>
@@ -79,15 +79,15 @@ export default function ProfileView({ username = "usuario" }: ProfileViewProps) 
 
         <div className="text-center mb-6">
           <div className="flex items-center gap-2 justify-center mb-2">
-            <h1 className="text-2xl font-bold text-white break-words max-w-full">{userProfile.name}</h1>
-            {userProfile.isVerified && <Star className="h-5 w-5 text-bright-yellow fill-bright-yellow flex-shrink-0" />}
+            <h1 className="text-2xl font-bold text-[#1E1E1E] break-words max-w-full">{userProfile.name}</h1>
+            {userProfile.isVerified && <Star className="h-5 w-5 text-[#F2B705] fill-[#F2B705] flex-shrink-0" />}
           </div>
-          <p className="text-gray-400 text-base mb-3 break-words">@{userProfile.handle}</p>
+          <p className="text-[#3A3A3A] text-base mb-3 break-words">@{userProfile.handle}</p>
           <div className="flex items-center gap-2 justify-center flex-wrap mb-4">
-            <Badge variant="outline" className="bg-gray-800 text-gray-300 border-gray-700 text-xs">
+            <Badge variant="outline" className="bg-[#3A3A3A]/10 text-[#1E1E1E] border-[#3A3A3A]/30 text-xs">
               {userProfile.category}
             </Badge>
-            <span className="text-xs text-gray-500">Member since {userProfile.memberSince}</span>
+            <span className="text-xs text-[#3A3A3A]">Member since {userProfile.memberSince}</span>
           </div>
 
           {isEditingBio ? (
@@ -95,19 +95,19 @@ export default function ProfileView({ username = "usuario" }: ProfileViewProps) 
               <Textarea
                 value={editedBio}
                 onChange={(e) => setEditedBio(e.target.value)}
-                className="bg-black/50 border-gray-700 w-full text-sm"
+                className="bg-[#3A3A3A]/5 border-[#3A3A3A]/30 text-[#1E1E1E] w-full text-sm"
                 rows={3}
               />
               <div className="flex gap-2 justify-center">
                 <button
                   onClick={handleSaveBio}
-                  className="bg-white/10 backdrop-blur-md px-4 py-1.5 rounded-full border border-white/20 text-white text-xs hover:bg-white/20"
+                  className="bg-[#1FA9D6] px-4 py-1.5 rounded-full text-white text-xs hover:bg-[#1FA9D6]/90 font-medium"
                 >
                   Save
                 </button>
                 <button
                   onClick={() => setIsEditingBio(false)}
-                  className="bg-white/10 backdrop-blur-md px-4 py-1.5 rounded-full border border-white/20 text-white text-xs hover:bg-white/20"
+                  className="bg-[#3A3A3A]/10 px-4 py-1.5 rounded-full border border-[#3A3A3A]/30 text-[#1E1E1E] text-xs hover:bg-[#3A3A3A]/20"
                 >
                   Cancel
                 </button>
@@ -115,10 +115,10 @@ export default function ProfileView({ username = "usuario" }: ProfileViewProps) 
             </div>
           ) : (
             <div>
-              <p className="text-gray-400 text-sm leading-relaxed break-words max-w-full mb-2">{userProfile.bio}</p>
+              <p className="text-[#3A3A3A] text-sm leading-relaxed break-words max-w-full mb-2">{userProfile.bio}</p>
               <button
                 onClick={handleEditBio}
-                className="bg-white/10 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/20 text-white text-xs hover:bg-white/20 inline-flex items-center gap-1"
+                className="bg-[#3A3A3A]/10 px-3 py-1.5 rounded-full border border-[#3A3A3A]/30 text-[#1E1E1E] text-xs hover:bg-[#3A3A3A]/20 inline-flex items-center gap-1"
               >
                 <Pencil className="w-3 h-3" />
                 Edit Bio
@@ -127,40 +127,40 @@ export default function ProfileView({ username = "usuario" }: ProfileViewProps) 
           )}
         </div>
 
-        <div className="grid grid-cols-3 gap-2 py-4 mb-4 border-y border-white/10">
+        <div className="grid grid-cols-3 gap-2 py-4 mb-4 border-y border-gray-200">
           <div className="text-center">
-            <p className="text-xl font-bold text-white">{balance}</p>
-            <p className="text-xs text-gray-400">Balance</p>
+            <p className="text-xl font-bold text-[#1E1E1E]">{balance}</p>
+            <p className="text-xs text-[#3A3A3A]">Balance</p>
           </div>
           <div className="text-center">
-            <p className="text-xl font-bold text-white">{donated}</p>
-            <p className="text-xs text-gray-400">Purchased</p>
+            <p className="text-xl font-bold text-[#1E1E1E]">{donated}</p>
+            <p className="text-xs text-[#3A3A3A]">Purchased</p>
           </div>
           <div className="text-center">
-            <p className="text-xl font-bold text-white">8</p>
-            <p className="text-xs text-gray-400">Artists</p>
+            <p className="text-xl font-bold text-[#1E1E1E]">8</p>
+            <p className="text-xs text-[#3A3A3A]">Artists</p>
           </div>
         </div>
 
         <Tabs defaultValue={isArtist() ? "posts" : "artists"} className="w-full">
-          <TabsList className="w-full bg-transparent h-auto p-0 gap-4 border-b border-white/10 justify-start">
+          <TabsList className="w-full bg-transparent h-auto p-0 gap-4 border-b border-gray-200 justify-start">
             {isArtist() ? (
               <>
                 <TabsTrigger
                   value="posts"
-                  className="bg-transparent data-[state=active]:bg-transparent border-b-2 border-transparent data-[state=active]:border-bright-yellow rounded-none pb-3 text-gray-400 data-[state=active]:text-white text-sm"
+                  className="bg-transparent data-[state=active]:bg-transparent border-b-2 border-transparent data-[state=active]:border-[#1FA9D6] rounded-none pb-3 text-[#3A3A3A] data-[state=active]:text-[#1FA9D6] text-sm font-medium"
                 >
                   Posts
                 </TabsTrigger>
                 <TabsTrigger
                   value="rewards"
-                  className="bg-transparent data-[state=active]:bg-transparent border-b-2 border-transparent data-[state=active]:border-bright-yellow rounded-none pb-3 text-gray-400 data-[state=active]:text-white text-sm"
+                  className="bg-transparent data-[state=active]:bg-transparent border-b-2 border-transparent data-[state=active]:border-[#1FA9D6] rounded-none pb-3 text-[#3A3A3A] data-[state=active]:text-[#1FA9D6] text-sm font-medium"
                 >
                   Rewards
                 </TabsTrigger>
                 <TabsTrigger
                   value="certs"
-                  className="bg-transparent data-[state=active]:bg-transparent border-b-2 border-transparent data-[state=active]:border-bright-yellow rounded-none pb-3 text-gray-400 data-[state=active]:text-white text-sm"
+                  className="bg-transparent data-[state=active]:bg-transparent border-b-2 border-transparent data-[state=active]:border-[#1FA9D6] rounded-none pb-3 text-[#3A3A3A] data-[state=active]:text-[#1FA9D6] text-sm font-medium"
                 >
                   Certs
                 </TabsTrigger>
@@ -169,13 +169,13 @@ export default function ProfileView({ username = "usuario" }: ProfileViewProps) 
               <>
                 <TabsTrigger
                   value="artists"
-                  className="bg-transparent data-[state=active]:bg-transparent border-b-2 border-transparent data-[state=active]:border-bright-yellow rounded-none pb-3 text-gray-400 data-[state=active]:text-white text-sm"
+                  className="bg-transparent data-[state=active]:bg-transparent border-b-2 border-transparent data-[state=active]:border-[#1FA9D6] rounded-none pb-3 text-[#3A3A3A] data-[state=active]:text-[#1FA9D6] text-sm font-medium"
                 >
                   Following
                 </TabsTrigger>
                 <TabsTrigger
                   value="rewards"
-                  className="bg-transparent data-[state=active]:bg-transparent border-b-2 border-transparent data-[state=active]:border-bright-yellow rounded-none pb-3 text-gray-400 data-[state=active]:text-white text-sm"
+                  className="bg-transparent data-[state=active]:bg-transparent border-b-2 border-transparent data-[state=active]:border-[#1FA9D6] rounded-none pb-3 text-[#3A3A3A] data-[state=active]:text-[#1FA9D6] text-sm font-medium"
                 >
                   Rewards
                 </TabsTrigger>
@@ -184,7 +184,7 @@ export default function ProfileView({ username = "usuario" }: ProfileViewProps) 
           </TabsList>
 
           <TabsContent value="posts" className="mt-4">
-            <div className="bg-black/40 rounded-lg p-3 border border-white/5">
+            <div className="bg-[#3A3A3A]/10 rounded-lg p-3 border border-[#3A3A3A]/20">
               <div className="flex items-start gap-2 mb-2">
                 <Avatar className="h-8 w-8 flex-shrink-0">
                   <AvatarImage src={avatarSrc || "/placeholder.svg"} />
@@ -192,25 +192,23 @@ export default function ProfileView({ username = "usuario" }: ProfileViewProps) 
                 </Avatar>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-1 mb-0.5">
-                    <span className="font-semibold text-sm text-white truncate">{userProfile.name}</span>
-                    {userProfile.isVerified && (
-                      <Star className="h-3 w-3 text-bright-yellow fill-bright-yellow flex-shrink-0" />
-                    )}
+                    <span className="font-semibold text-sm text-[#1E1E1E] truncate">{userProfile.name}</span>
+                    {userProfile.isVerified && <Star className="h-3 w-3 text-[#F2B705] fill-[#F2B705] flex-shrink-0" />}
                   </div>
-                  <p className="text-xs text-gray-400">2h ago</p>
+                  <p className="text-xs text-[#3A3A3A]">2h ago</p>
                 </div>
               </div>
-              <p className="text-white text-sm break-words mb-2">New EP out now! #NewRelease</p>
-              <div className="flex items-center gap-4 text-gray-400">
-                <button className="flex items-center gap-1 hover:text-white text-xs">
+              <p className="text-[#1E1E1E] text-sm break-words mb-2">New EP out now! #NewRelease</p>
+              <div className="flex items-center gap-4 text-[#3A3A3A]">
+                <button className="flex items-center gap-1 hover:text-[#1FA9D6] text-xs">
                   <Heart className="w-4 h-4" />
                   <span>124</span>
                 </button>
-                <button className="flex items-center gap-1 hover:text-white text-xs">
+                <button className="flex items-center gap-1 hover:text-[#1FA9D6] text-xs">
                   <MessageCircle className="w-4 h-4" />
                   <span>32</span>
                 </button>
-                <button className="hover:text-white">
+                <button className="hover:text-[#1FA9D6]">
                   <Share2 className="w-4 h-4" />
                 </button>
               </div>
@@ -218,55 +216,64 @@ export default function ProfileView({ username = "usuario" }: ProfileViewProps) 
           </TabsContent>
 
           <TabsContent value="artists" className="mt-4">
-            <Card className="bg-white/5 border-white/10">
+            <Card className="bg-[#3A3A3A]/10 border-[#3A3A3A]/20">
               <CardContent className="p-6 text-center">
-                <p className="text-gray-300 text-sm">Welcome to your feed.</p>
+                <p className="text-[#1E1E1E] text-sm">Welcome to your feed.</p>
               </CardContent>
             </Card>
           </TabsContent>
 
           <TabsContent value="rewards" className="mt-4">
-            <Card className="bg-white/5 border-white/10">
+            <Card className="bg-[#3A3A3A]/10 border-[#3A3A3A]/20">
               <CardContent className="p-6 text-center">
-                <p className="text-gray-300 text-sm">Your rewards will appear here.</p>
+                <p className="text-[#1E1E1E] text-sm">Your rewards will appear here.</p>
               </CardContent>
             </Card>
           </TabsContent>
 
           <TabsContent value="certs" className="mt-4">
-            <Card className="bg-white/5 border-white/10">
+            <Card className="bg-[#3A3A3A]/10 border-[#3A3A3A]/20">
               <CardContent className="p-6 text-center">
-                <p className="text-gray-300 text-sm">Your certifications will appear here.</p>
+                <p className="text-[#1E1E1E] text-sm">Your certifications will appear here.</p>
               </CardContent>
             </Card>
           </TabsContent>
         </Tabs>
 
         <div className="mt-8">
-          <h2 className="text-xl font-bold mb-4 text-white">Settings</h2>
+          <h2 className="text-xl font-bold mb-4 text-[#1E1E1E]">Settings</h2>
           <Dialog>
             <DialogTrigger asChild>
-              <Button variant="outline" className="w-full justify-start bg-gray-800 text-white border-gray-700 h-12">
+              <Button
+                variant="outline"
+                className="w-full justify-start bg-[#3A3A3A]/10 text-[#1E1E1E] border-[#3A3A3A]/30 h-12 hover:bg-[#3A3A3A]/20"
+              >
                 <Settings className="h-4 w-4 mr-2" />
                 Account Settings
               </Button>
             </DialogTrigger>
-            <DialogContent className="bg-gray-800 text-white border-gray-700">
+            <DialogContent className="bg-white text-[#1E1E1E] border-[#3A3A3A]/30">
               <DialogHeader>
                 <DialogTitle>Account Settings</DialogTitle>
               </DialogHeader>
               <div className="space-y-3 mt-4">
-                <Button variant="outline" className="w-full justify-start bg-gray-700 border-gray-600 h-10">
+                <Button
+                  variant="outline"
+                  className="w-full justify-start bg-[#3A3A3A]/10 border-[#3A3A3A]/30 h-10 hover:bg-[#3A3A3A]/20"
+                >
                   <Settings className="h-4 w-4 mr-2" />
                   Profile Settings
                 </Button>
-                <Button variant="outline" className="w-full justify-start bg-gray-700 border-gray-600 h-10">
+                <Button
+                  variant="outline"
+                  className="w-full justify-start bg-[#3A3A3A]/10 border-[#3A3A3A]/30 h-10 hover:bg-[#3A3A3A]/20"
+                >
                   <Banknote className="h-4 w-4 mr-2" />
                   Payment Methods
                 </Button>
                 <Button
                   variant="outline"
-                  className="w-full justify-start bg-gray-700 border-gray-600 h-10"
+                  className="w-full justify-start bg-[#3A3A3A]/10 border-[#3A3A3A]/30 h-10 hover:bg-[#3A3A3A]/20"
                   onClick={logout}
                 >
                   <LogOut className="h-4 w-4 mr-2" />
@@ -277,17 +284,17 @@ export default function ProfileView({ username = "usuario" }: ProfileViewProps) 
           </Dialog>
 
           {!isArtist() && (
-            <Card className="bg-bright-yellow/10 border-bright-yellow/30 mt-4">
+            <Card className="bg-[#F2B705]/10 border-[#F2B705]/30 mt-4">
               <CardContent className="p-4">
                 <div className="flex items-center justify-between gap-3">
                   <div className="flex items-center gap-2 min-w-0">
-                    <Lock className="h-5 w-5 text-bright-yellow flex-shrink-0" />
+                    <Lock className="h-5 w-5 text-[#F2B705] flex-shrink-0" />
                     <div className="min-w-0">
-                      <h3 className="text-white font-medium text-sm">Become an Artist</h3>
-                      <p className="text-xs text-gray-400 truncate">Apply to become verified</p>
+                      <h3 className="text-[#1E1E1E] font-medium text-sm">Become an Artist</h3>
+                      <p className="text-xs text-[#3A3A3A] truncate">Apply to become verified</p>
                     </div>
                   </div>
-                  <Button className="bg-bright-yellow hover:bg-bright-yellow/90 text-black font-medium h-9 px-4 flex-shrink-0 text-sm">
+                  <Button className="bg-[#F2B705] hover:bg-[#F2B705]/90 text-[#1E1E1E] font-medium h-9 px-4 flex-shrink-0 text-sm">
                     Apply
                   </Button>
                 </div>
@@ -298,7 +305,7 @@ export default function ProfileView({ username = "usuario" }: ProfileViewProps) 
       </div>
 
       <Dialog open={showCommentDialog} onOpenChange={setShowCommentDialog}>
-        <DialogContent className="bg-white/5 backdrop-blur-md text-white border-white/10">
+        <DialogContent className="bg-white text-[#1E1E1E] border-[#3A3A3A]/30">
           <DialogHeader>
             <DialogTitle>Comments</DialogTitle>
           </DialogHeader>
@@ -314,20 +321,20 @@ export default function ProfileView({ username = "usuario" }: ProfileViewProps) 
                     />
                     <AvatarFallback>{comment.author.substring(0, 2).toUpperCase()}</AvatarFallback>
                   </Avatar>
-                  <div className="flex-1 bg-gray-700 p-2 rounded-lg min-w-0">
-                    <p className="text-xs font-medium truncate">{comment.author}</p>
-                    <p className="text-xs text-gray-300 break-words">{comment.text}</p>
+                  <div className="flex-1 bg-gray-100 p-2 rounded-lg min-w-0">
+                    <p className="text-xs font-medium truncate text-gray-900">{comment.author}</p>
+                    <p className="text-xs text-gray-700 break-words">{comment.text}</p>
                   </div>
                 </div>
               ))
             ) : (
-              <p className="text-center text-gray-400 py-6 text-sm">No comments yet</p>
+              <p className="text-center text-gray-600 py-6 text-sm">No comments yet</p>
             )}
           </div>
           <div className="flex gap-2">
             <Input
               placeholder="Add a comment..."
-              className="bg-gray-700 border-gray-600 text-white text-sm"
+              className="bg-gray-50 border-gray-300 text-gray-900 text-sm"
               value={commentText}
               onChange={(e) => setCommentText(e.target.value)}
               onKeyDown={(e) => {
@@ -338,7 +345,7 @@ export default function ProfileView({ username = "usuario" }: ProfileViewProps) 
               }}
             />
             <Button
-              className="bg-bright-yellow hover:bg-bright-yellow/90 text-black flex-shrink-0"
+              className="bg-yellow-600 hover:bg-yellow-700 text-white flex-shrink-0"
               onClick={handleSendComment}
               disabled={!commentText.trim()}
             >

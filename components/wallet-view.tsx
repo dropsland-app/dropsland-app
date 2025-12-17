@@ -23,9 +23,8 @@ export default function WalletView() {
   }
 
   return (
-    <div className="pb-6 bg-gray-950 h-full overflow-y-auto">
-      {/* Balance Card */}
-      <div className="px-4 pt-12 pb-6 bg-gradient-to-r from-black/60 to-gray-800/60 backdrop-blur-xl text-white border-b border-white/10">
+    <div className="pb-6 bg-white h-full overflow-y-auto">
+      <div className="px-4 pt-12 pb-6 bg-gradient-to-r from-[#1FA9D6]/10 to-[#1FA9D6]/5 backdrop-blur-xl text-[#1E1E1E] border-b border-gray-200">
         <h1 className="text-xl font-bold mb-2">Wallet</h1>
         <h2 className="text-sm font-medium opacity-90">Your Balance</h2>
         <div className="flex items-center mt-1">
@@ -35,23 +34,25 @@ export default function WalletView() {
           <Button
             size="sm"
             variant="outline"
-            className="border-white/30 text-white hover:bg-white/20 bg-white/10 backdrop-blur-md"
+            className="border-black text-black bg-white hover:bg-[#1FA9D6] hover:text-white active:bg-[#1FA9D6] active:text-white"
             onClick={handleReceive}
           >
             Receive
           </Button>
+
           <Button
             size="sm"
             variant="outline"
-            className="border-white/30 text-white hover:bg-white/20 bg-white/10 backdrop-blur-md"
+            className="border-black text-black bg-transparent hover:bg-[#1FA9D6] hover:text-white active:bg-[#1FA9D6] active:text-white"
             onClick={handleBuy}
           >
             Buy
           </Button>
+
           <Button
             size="sm"
             variant="outline"
-            className="border-white/30 text-white hover:bg-white/20 bg-white/10 backdrop-blur-md"
+            className="border-black text-black bg-transparent hover:bg-[#1FA9D6] hover:text-white active:bg-[#1FA9D6] active:text-white"
             onClick={handleSend}
           >
             Send
@@ -61,30 +62,30 @@ export default function WalletView() {
 
       {/* Stats Cards */}
       <div className="grid grid-cols-3 gap-2 px-4 mt-4">
-        <Card className="bg-white/5 backdrop-blur-md shadow-sm border-white/10">
+        <Card className="bg-[#3A3A3A]/10 shadow-sm border-[#3A3A3A]/20">
           <CardContent className="p-3">
             <div className="flex flex-col items-center">
-              <BanknoteIcon className="h-6 w-6 text-bright-yellow mb-1" />
-              <p className="text-xs text-gray-400">Purchased</p>
-              <p className="font-semibold text-white">{donated} $DROPS</p>
+              <BanknoteIcon className="h-6 w-6 text-[#F2B705] mb-1" />
+              <p className="text-xs text-[#3A3A3A]">Purchased</p>
+              <p className="font-semibold text-[#1E1E1E]">{donated} $DROPS</p>
             </div>
           </CardContent>
         </Card>
-        <Card className="bg-white/5 backdrop-blur-md shadow-sm border-white/10">
+        <Card className="bg-[#3A3A3A]/10 shadow-sm border-[#3A3A3A]/20">
           <CardContent className="p-3">
             <div className="flex flex-col items-center">
-              <Users className="h-6 w-6 text-bright-yellow mb-1" />
-              <p className="text-xs text-gray-400">Artists</p>
-              <p className="font-semibold text-white">8</p>
+              <Users className="h-6 w-6 text-[#F2B705] mb-1" />
+              <p className="text-xs text-[#3A3A3A]">Artists</p>
+              <p className="font-semibold text-[#1E1E1E]">8</p>
             </div>
           </CardContent>
         </Card>
-        <Card className="bg-white/5 backdrop-blur-md shadow-sm border-white/10">
+        <Card className="bg-[#3A3A3A]/10 shadow-sm border-[#3A3A3A]/20">
           <CardContent className="p-3">
             <div className="flex flex-col items-center">
-              <TrendingUp className="h-6 w-6 text-bright-yellow mb-1" />
-              <p className="text-xs text-gray-400">Value</p>
-              <p className="font-semibold text-white">$1.00</p>
+              <TrendingUp className="h-6 w-6 text-[#F2B705] mb-1" />
+              <p className="text-xs text-[#3A3A3A]">Value</p>
+              <p className="font-semibold text-[#1E1E1E]">$1.00</p>
             </div>
           </CardContent>
         </Card>
@@ -92,10 +93,10 @@ export default function WalletView() {
 
       {/* Artist Tokens */}
       <div className="mt-6 px-4">
-        <h2 className="text-lg font-semibold mb-3 text-white">Artist Tokens</h2>
+        <h2 className="text-lg font-semibold mb-3 text-[#1E1E1E]">Artist Tokens</h2>
         <div className="space-y-3">
           {artistTokens.map((token) => (
-            <Card key={token.id} className="bg-white/5 backdrop-blur-md shadow-sm border-white/10">
+            <Card key={token.id} className="bg-[#3A3A3A]/10 shadow-sm border-[#3A3A3A]/20">
               <CardContent className="p-3">
                 <div className="flex items-center gap-3">
                   <Avatar className="h-10 w-10">
@@ -104,16 +105,16 @@ export default function WalletView() {
                   </Avatar>
                   <div className="flex-1">
                     <div className="flex items-center justify-between">
-                      <p className="font-medium text-white">${token.symbol}</p>
-                      <div className="flex items-center text-bright-yellow font-medium">
+                      <p className="font-medium text-[#1E1E1E]">${token.symbol}</p>
+                      <div className="flex items-center text-[#F2B705] font-medium">
                         <BanknoteIcon className="h-5 w-5 mr-1" />
                         <span>{token.amount}</span>
                       </div>
                     </div>
-                    <p className="text-xs text-gray-400">{token.name}</p>
+                    <p className="text-xs text-[#3A3A3A]">{token.name}</p>
                     <div className="flex items-center justify-between mt-1">
-                      <p className="text-xs text-gray-500">Current value: ${token.value}</p>
-                      <p className="text-xs text-green-500">+{token.change}%</p>
+                      <p className="text-xs text-[#3A3A3A]">Current value: ${token.value}</p>
+                      <p className="text-xs text-green-600">+{token.change}%</p>
                     </div>
                   </div>
                 </div>
@@ -122,12 +123,14 @@ export default function WalletView() {
           ))}
 
           {artistTokens.length === 0 && (
-            <div className="text-center py-6 bg-white/5 backdrop-blur-md rounded-lg border border-white/10">
-              <p className="text-gray-300">No tienes tokens de artistas aún</p>
-              <p className="text-gray-400 text-sm mt-1">
+            <div className="text-center py-6 bg-[#3A3A3A]/10 rounded-lg border border-[#3A3A3A]/20">
+              <p className="text-[#1E1E1E]">No tienes tokens de artistas aún</p>
+              <p className="text-[#3A3A3A] text-sm mt-1">
                 Compra tokens para apoyar a tus artistas favoritos y recibir recompensas exclusivas
               </p>
-              <Button className="mt-3 bg-yellow-600 hover:bg-yellow-700 text-white">Explorar Artistas</Button>
+              <Button className="mt-3 bg-[#F2B705] hover:bg-[#F2B705]/90 text-[#1E1E1E] font-medium">
+                Explorar Artistas
+              </Button>
             </div>
           )}
         </div>
@@ -135,30 +138,30 @@ export default function WalletView() {
 
       {/* Transaction History */}
       <div className="mt-6 px-4">
-        <h2 className="text-lg font-semibold mb-3 text-white">Transaction History</h2>
+        <h2 className="text-lg font-semibold mb-3 text-[#1E1E1E]">Transaction History</h2>
         <div className="space-y-3">
           {transactions.map((transaction) => (
-            <Card key={transaction.id} className="bg-white/5 backdrop-blur-md shadow-sm border-white/10">
+            <Card key={transaction.id} className="bg-[#3A3A3A]/10 shadow-sm border-[#3A3A3A]/20">
               <CardContent className="p-3">
                 <div className="flex items-center gap-3">
                   <div
                     className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                      transaction.type === "sent" ? "bg-red-500/20" : "bg-green-500/20"
+                      transaction.type === "sent" ? "bg-[#3A3A3A]/20" : "bg-[#1FA9D6]/20"
                     }`}
                   >
                     <BanknoteIcon
-                      className={`h-5 w-5 ${transaction.type === "sent" ? "text-red-500" : "text-green-500"}`}
+                      className={`h-5 w-5 ${transaction.type === "sent" ? "text-[#3A3A3A]" : "text-[#1FA9D6]"}`}
                     />
                   </div>
                   <div className="flex-1">
                     <div className="flex items-center justify-between">
-                      <p className="font-medium text-white">{transaction.description}</p>
-                      <p className={`font-medium ${transaction.type === "sent" ? "text-red-500" : "text-green-500"}`}>
+                      <p className="font-medium text-[#1E1E1E]">{transaction.description}</p>
+                      <p className={`font-medium ${transaction.type === "sent" ? "text-[#3A3A3A]" : "text-[#1FA9D6]"}`}>
                         {transaction.type === "sent" ? "-" : "+"}
                         {transaction.amount} $DROPS
                       </p>
                     </div>
-                    <p className="text-xs text-gray-400">{transaction.date}</p>
+                    <p className="text-xs text-[#3A3A3A]">{transaction.date}</p>
                   </div>
                 </div>
               </CardContent>

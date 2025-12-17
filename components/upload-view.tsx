@@ -85,9 +85,8 @@ export default function UploadView() {
   }
 
   return (
-    <div className="pb-6 bg-gray-950 h-full overflow-y-auto">
-      {/* Header */}
-      <div className="px-4 pt-12 pb-6 bg-gradient-to-r from-black/60 to-gray-800/60 backdrop-blur-xl text-white border-b border-white/10">
+    <div className="pb-6 bg-white h-full overflow-y-auto">
+      <div className="px-4 pt-12 pb-6 bg-gradient-to-r from-[#1FA9D6]/10 to-[#1FA9D6]/5 backdrop-blur-xl text-[#1E1E1E] border-b border-gray-200">
         <h1 className="text-xl font-bold mb-1">Upload</h1>
         <p className="text-sm opacity-90">Share your music with the world</p>
       </div>
@@ -95,40 +94,40 @@ export default function UploadView() {
       <div className="px-4 mt-6 space-y-6">
         {/* Audio File Drag & Drop */}
         <div>
-          <Label className="text-white text-sm mb-2 block">Audio File *</Label>
+          <Label className="text-[#1E1E1E] text-sm mb-2 block">Audio File *</Label>
           <div
             onDragOver={handleDragOver}
             onDragLeave={handleDragLeave}
             onDrop={handleDrop}
             className={`relative border-2 border-dashed rounded-lg p-8 text-center transition-colors ${
-              isDragging ? "border-yellow-400 bg-yellow-400/10" : "border-white/20 bg-white/5"
+              isDragging ? "border-[#F2B705] bg-[#F2B705]/10" : "border-[#3A3A3A]/30 bg-[#3A3A3A]/5"
             }`}
           >
             {!audioFile ? (
               <>
-                <Music className="h-12 w-12 mx-auto mb-3 text-gray-400" />
-                <p className="text-white mb-2">Drag & drop your audio file here</p>
-                <p className="text-sm text-gray-400 mb-4">or</p>
+                <Music className="h-12 w-12 mx-auto mb-3 text-[#3A3A3A]" />
+                <p className="text-[#1E1E1E] mb-2">Drag & drop your audio file here</p>
+                <p className="text-sm text-[#3A3A3A] mb-4">or</p>
                 <label htmlFor="audio-input">
                   <Button
                     type="button"
                     size="sm"
-                    className="bg-yellow-600 hover:bg-yellow-700 text-white"
+                    className="bg-[#F2B705] hover:bg-[#F2B705]/90 text-[#1E1E1E] font-medium"
                     onClick={() => document.getElementById("audio-input")?.click()}
                   >
                     Browse Files
                   </Button>
                 </label>
                 <input id="audio-input" type="file" accept="audio/*" onChange={handleAudioChange} className="hidden" />
-                <p className="text-xs text-gray-500 mt-3">MP3, WAV, FLAC up to 200MB</p>
+                <p className="text-xs text-[#3A3A3A] mt-3">MP3, WAV, FLAC up to 200MB</p>
               </>
             ) : (
-              <div className="flex items-center justify-between bg-white/10 p-3 rounded-lg">
+              <div className="flex items-center justify-between bg-[#3A3A3A]/10 p-3 rounded-lg">
                 <div className="flex items-center gap-3">
-                  <Music className="h-8 w-8 text-yellow-400" />
+                  <Music className="h-8 w-8 text-[#F2B705]" />
                   <div className="text-left">
-                    <p className="text-white font-medium text-sm">{audioFile.name}</p>
-                    <p className="text-xs text-gray-400">{(audioFile.size / 1024 / 1024).toFixed(2)} MB</p>
+                    <p className="text-[#1E1E1E] font-medium text-sm">{audioFile.name}</p>
+                    <p className="text-xs text-[#3A3A3A]">{(audioFile.size / 1024 / 1024).toFixed(2)} MB</p>
                   </div>
                 </div>
                 <Button
@@ -136,7 +135,7 @@ export default function UploadView() {
                   size="sm"
                   variant="ghost"
                   onClick={removeAudio}
-                  className="text-red-400 hover:text-red-300 hover:bg-red-400/10"
+                  className="text-red-600 hover:text-red-700 hover:bg-red-50"
                 >
                   <X className="h-4 w-4" />
                 </Button>
@@ -147,13 +146,13 @@ export default function UploadView() {
 
         {/* Artwork Upload */}
         <div>
-          <Label className="text-white text-sm mb-2 block">Artwork</Label>
+          <Label className="text-[#1E1E1E] text-sm mb-2 block">Artwork</Label>
           {!artworkPreview ? (
             <label htmlFor="artwork-input">
-              <div className="border-2 border-dashed border-white/20 bg-white/5 rounded-lg p-6 text-center cursor-pointer hover:border-yellow-400/50 transition-colors">
-                <ImageIcon className="h-10 w-10 mx-auto mb-2 text-gray-400" />
-                <p className="text-white text-sm mb-1">Upload cover art</p>
-                <p className="text-xs text-gray-500">JPG, PNG up to 10MB (Square recommended)</p>
+              <div className="border-2 border-dashed border-[#3A3A3A]/30 bg-[#3A3A3A]/5 rounded-lg p-6 text-center cursor-pointer hover:border-[#F2B705] transition-colors">
+                <ImageIcon className="h-10 w-10 mx-auto mb-2 text-[#3A3A3A]" />
+                <p className="text-[#1E1E1E] text-sm mb-1">Upload cover art</p>
+                <p className="text-xs text-[#3A3A3A]">JPG, PNG up to 10MB (Square recommended)</p>
               </div>
               <input
                 id="artwork-input"
@@ -175,7 +174,7 @@ export default function UploadView() {
                 size="sm"
                 variant="ghost"
                 onClick={removeArtwork}
-                className="absolute top-2 right-2 bg-black/50 text-white hover:bg-black/70"
+                className="absolute top-2 right-2 bg-white/80 text-gray-900 hover:bg-white"
               >
                 <X className="h-4 w-4" />
               </Button>
@@ -186,7 +185,7 @@ export default function UploadView() {
         {/* Track Information */}
         <div className="space-y-4">
           <div>
-            <Label htmlFor="track-name" className="text-white text-sm mb-2 block">
+            <Label htmlFor="track-name" className="text-[#1E1E1E] text-sm mb-2 block">
               Track Name *
             </Label>
             <Input
@@ -195,12 +194,12 @@ export default function UploadView() {
               value={trackName}
               onChange={(e) => setTrackName(e.target.value)}
               placeholder="Enter track name"
-              className="bg-white/5 border-white/20 text-white placeholder:text-gray-500"
+              className="bg-white border-[#3A3A3A]/30 text-[#1E1E1E] placeholder:text-[#3A3A3A] focus:border-[#1FA9D6]"
             />
           </div>
 
           <div>
-            <Label htmlFor="artist-name" className="text-white text-sm mb-2 block">
+            <Label htmlFor="artist-name" className="text-[#1E1E1E] text-sm mb-2 block">
               Artist Name *
             </Label>
             <Input
@@ -209,16 +208,16 @@ export default function UploadView() {
               value={artistName}
               onChange={(e) => setArtistName(e.target.value)}
               placeholder="Enter artist name"
-              className="bg-white/5 border-white/20 text-white placeholder:text-gray-500"
+              className="bg-white border-[#3A3A3A]/30 text-[#1E1E1E] placeholder:text-[#3A3A3A] focus:border-[#1FA9D6]"
             />
           </div>
 
           <div>
-            <Label htmlFor="genre" className="text-white text-sm mb-2 block">
+            <Label htmlFor="genre" className="text-[#1E1E1E] text-sm mb-2 block">
               Genre *
             </Label>
             <Select value={genre} onValueChange={setGenre}>
-              <SelectTrigger className="bg-white/5 border-white/20 text-white">
+              <SelectTrigger className="bg-white border-[#3A3A3A]/30 text-[#1E1E1E]">
                 <SelectValue placeholder="Select genre" />
               </SelectTrigger>
               <SelectContent>
@@ -236,11 +235,10 @@ export default function UploadView() {
           </div>
         </div>
 
-        {/* Upload Button */}
         <Button
           onClick={handleUpload}
           disabled={!audioFile || !trackName || !artistName || !genre}
-          className="w-full bg-yellow-600 hover:bg-yellow-700 text-white disabled:opacity-50 disabled:cursor-not-allowed py-6 text-lg font-semibold"
+          className="w-full bg-[#F2B705] hover:bg-[#F2B705]/90 text-[#1E1E1E] disabled:opacity-50 disabled:cursor-not-allowed py-6 text-lg font-semibold"
         >
           <Upload className="h-5 w-5 mr-2" />
           Upload Track

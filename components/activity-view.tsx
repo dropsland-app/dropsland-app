@@ -25,13 +25,13 @@ export default function ActivityView({ onSelectArtist }: ActivityViewProps) {
   })
 
   return (
-    <div className="w-full max-w-full bg-black h-full overflow-y-auto overflow-x-hidden">
-      <div className="sticky top-0 bg-black z-10 border-b border-gray-800 px-4 pt-12 pb-3">
-        <h1 className="text-xl font-bold text-white">Activity</h1>
+    <div className="w-full max-w-full bg-white h-full overflow-y-auto overflow-x-hidden">
+      <div className="sticky top-0 bg-white z-10 border-b border-gray-200 px-4 pt-12 pb-3">
+        <h1 className="text-xl font-bold text-[#1E1E1E]">Activity</h1>
       </div>
 
       {filteredActivity.length > 0 ? (
-        <div className="divide-y divide-gray-800">
+        <div className="divide-y divide-gray-200">
           {filteredActivity.map((activity) => (
             <ActivityCard key={activity.id} activity={activity} onSelectArtist={handleSelectArtist} />
           ))}
@@ -39,7 +39,7 @@ export default function ActivityView({ onSelectArtist }: ActivityViewProps) {
       ) : (
         <div className="px-4 py-8">
           <div className="text-center py-12">
-            <p className="text-gray-400 font-medium">No notifications yet</p>
+            <p className="text-gray-600 font-medium">No notifications yet</p>
             <p className="text-gray-500 text-sm mt-2">
               {isArtist()
                 ? "Interactions with your followers will appear here"
@@ -60,15 +60,15 @@ function ActivityCard({
   onSelectArtist: (artistId: string) => void
 }) {
   return (
-    <div className="px-4 py-3 hover:bg-white/5 transition-colors">
+    <div className="px-4 py-3 hover:bg-[#3A3A3A]/5 transition-colors">
       <div className="flex items-start gap-3">
         {/* Avatar */}
         <Avatar
-          className="h-11 w-11 cursor-pointer flex-shrink-0 ring-1 ring-white/10"
+          className="h-11 w-11 cursor-pointer flex-shrink-0 ring-1 ring-[#3A3A3A]/20"
           onClick={() => onSelectArtist(activity.artistId)}
         >
           <AvatarImage src={activity.avatar || "/placeholder.svg"} alt={activity.name} />
-          <AvatarFallback className="bg-gray-800 text-white">
+          <AvatarFallback className="bg-[#3A3A3A]/10 text-[#1E1E1E]">
             {activity.name.substring(0, 2).toUpperCase()}
           </AvatarFallback>
         </Avatar>
@@ -77,14 +77,14 @@ function ActivityCard({
         <div className="flex-1 min-w-0">
           <div className="flex items-baseline gap-1.5">
             <span
-              className="font-semibold text-white hover:text-gray-300 cursor-pointer text-sm"
+              className="font-semibold text-[#1E1E1E] hover:text-[#1FA9D6] cursor-pointer text-sm"
               onClick={() => onSelectArtist(activity.artistId)}
             >
               {activity.name}
             </span>
-            <span className="text-gray-400 text-sm">{activity.action}</span>
+            <span className="text-[#3A3A3A] text-sm">{activity.action}</span>
             {activity.type === "purchase" && activity.amount && (
-              <div className="flex items-center text-bright-yellow text-sm font-semibold ml-1">
+              <div className="flex items-center text-[#F2B705] text-sm font-semibold ml-1">
                 <BanknoteIcon className="h-3.5 w-3.5 mr-0.5" />
                 <span>
                   {activity.amount} ${activity.tokenName}
@@ -94,16 +94,16 @@ function ActivityCard({
           </div>
 
           {activity.message && (
-            <p className="text-gray-400 text-sm mt-1 leading-relaxed break-words">{activity.message}</p>
+            <p className="text-[#3A3A3A] text-sm mt-1 leading-relaxed break-words">{activity.message}</p>
           )}
 
-          <p className="text-gray-500 text-xs mt-1.5">{activity.time}</p>
+          <p className="text-[#3A3A3A]/70 text-xs mt-1.5">{activity.time}</p>
         </div>
 
         {/* Optional action icon for different types */}
         {activity.type === "purchase" && (
-          <div className="flex-shrink-0 w-8 h-8 rounded-full bg-bright-yellow/10 flex items-center justify-center">
-            <BanknoteIcon className="h-4 w-4 text-bright-yellow" />
+          <div className="flex-shrink-0 w-8 h-8 rounded-full bg-[#F2B705]/10 flex items-center justify-center">
+            <BanknoteIcon className="h-4 w-4 text-[#F2B705]" />
           </div>
         )}
       </div>

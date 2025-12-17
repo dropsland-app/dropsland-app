@@ -85,16 +85,21 @@ export default function TikTokFeed({ onSelectArtist, posts, type = "home" }: Tik
           }
         }
       } else if (currentPost?.videoUrl && videoRefs[postKey]) {
-        const playPromise = videoRefs[postKey].play()
+        const video = videoRefs[postKey]
+        video.muted = true
+
+        const playPromise = video.play()
         if (playPromise !== undefined) {
           playPromise
             .then(() => {
               setIsPlaying((prev) => ({ ...prev, [postKey]: true }))
             })
             .catch((error) => {
-              if (error.name !== "AbortError") {
+              if (error.name !== "AbortError" && error.name !== "NotAllowedError") {
                 console.error("Video play error:", error)
               }
+              // Silently handle NotAllowedError as it's expected when autoplay is blocked
+              setIsPlaying((prev) => ({ ...prev, [postKey]: false }))
             })
         }
       }
@@ -206,6 +211,10 @@ export default function TikTokFeed({ onSelectArtist, posts, type = "home" }: Tik
       mediaElement.pause()
       setIsPlaying((prev) => ({ ...prev, [postKey]: false }))
     } else {
+      if (video) {
+        video.muted = true
+      }
+
       const playPromise = mediaElement.play()
       if (playPromise !== undefined) {
         playPromise
@@ -213,7 +222,7 @@ export default function TikTokFeed({ onSelectArtist, posts, type = "home" }: Tik
             setIsPlaying((prev) => ({ ...prev, [postKey]: true }))
           })
           .catch((error) => {
-            if (error.name !== "AbortError") {
+            if (error.name !== "AbortError" && error.name !== "NotAllowedError") {
               console.error("Media play error:", error)
             }
           })
@@ -350,6 +359,7 @@ export default function TikTokFeed({ onSelectArtist, posts, type = "home" }: Tik
                   className="absolute inset-0 w-full h-full object-cover z-0"
                   playsInline
                   loop
+                  muted
                   preload="metadata"
                   onLoadedData={(e) => {
                     const video = e.currentTarget
