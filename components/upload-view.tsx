@@ -100,7 +100,7 @@ export default function UploadView() {
             onDragLeave={handleDragLeave}
             onDrop={handleDrop}
             className={`relative border-2 border-dashed rounded-lg p-8 text-center transition-colors ${
-              isDragging ? "border-[#F2B705] bg-[#F2B705]/10" : "border-[#3A3A3A]/30 bg-[#3A3A3A]/5"
+              isDragging ? "border-[#1FA9D6] bg-[#1FA9D6]/10" : "border-[#3A3A3A]/30 bg-[#3A3A3A]/5"
             }`}
           >
             {!audioFile ? (
@@ -112,7 +112,7 @@ export default function UploadView() {
                   <Button
                     type="button"
                     size="sm"
-                    className="bg-[#F2B705] hover:bg-[#F2B705]/90 text-[#1E1E1E] font-medium"
+                    className="bg-[#1FA9D6] hover:bg-[#1FA9D6]/90 text-white font-medium"
                     onClick={() => document.getElementById("audio-input")?.click()}
                   >
                     Browse Files
@@ -124,7 +124,7 @@ export default function UploadView() {
             ) : (
               <div className="flex items-center justify-between bg-[#3A3A3A]/10 p-3 rounded-lg">
                 <div className="flex items-center gap-3">
-                  <Music className="h-8 w-8 text-[#F2B705]" />
+                  <Music className="h-8 w-8 text-[#1FA9D6]" />
                   <div className="text-left">
                     <p className="text-[#1E1E1E] font-medium text-sm">{audioFile.name}</p>
                     <p className="text-xs text-[#3A3A3A]">{(audioFile.size / 1024 / 1024).toFixed(2)} MB</p>
@@ -149,7 +149,7 @@ export default function UploadView() {
           <Label className="text-[#1E1E1E] text-sm mb-2 block">Artwork</Label>
           {!artworkPreview ? (
             <label htmlFor="artwork-input">
-              <div className="border-2 border-dashed border-[#3A3A3A]/30 bg-[#3A3A3A]/5 rounded-lg p-6 text-center cursor-pointer hover:border-[#F2B705] transition-colors">
+              <div className="border-2 border-dashed border-[#3A3A3A]/30 bg-[#3A3A3A]/5 rounded-lg p-6 text-center cursor-pointer hover:border-[#1FA9D6] transition-colors">
                 <ImageIcon className="h-10 w-10 mx-auto mb-2 text-[#3A3A3A]" />
                 <p className="text-[#1E1E1E] text-sm mb-1">Upload cover art</p>
                 <p className="text-xs text-[#3A3A3A]">JPG, PNG up to 10MB (Square recommended)</p>
@@ -238,7 +238,7 @@ export default function UploadView() {
         <Button
           onClick={handleUpload}
           disabled={!audioFile || !trackName || !artistName || !genre}
-          className="w-full bg-[#F2B705] hover:bg-[#F2B705]/90 text-[#1E1E1E] disabled:opacity-50 disabled:cursor-not-allowed py-6 text-lg font-semibold"
+          className="w-full bg-[#1FA9D6] hover:bg-[#1FA9D6]/90 text-white disabled:opacity-50 disabled:cursor-not-allowed py-6 text-lg font-semibold"
         >
           <Upload className="h-5 w-5 mr-2" />
           Upload Track
