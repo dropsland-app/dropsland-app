@@ -84,7 +84,7 @@ function ActivityCard({
             </span>
             <span className="text-[#3A3A3A] text-sm">{activity.action}</span>
             {activity.type === "purchase" && activity.amount && (
-              <div className="flex items-center text-[#F2B705] text-sm font-semibold ml-1">
+              <div className="flex items-center text-[#1FA9D6] text-sm font-semibold ml-1">
                 <BanknoteIcon className="h-3.5 w-3.5 mr-0.5" />
                 <span>
                   {activity.amount} ${activity.tokenName}
@@ -102,8 +102,8 @@ function ActivityCard({
 
         {/* Optional action icon for different types */}
         {activity.type === "purchase" && (
-          <div className="flex-shrink-0 w-8 h-8 rounded-full bg-[#F2B705]/10 flex items-center justify-center">
-            <BanknoteIcon className="h-4 w-4 text-[#F2B705]" />
+          <div className="flex-shrink-0 w-8 h-8 rounded-full bg-[#1FA9D6]/10 flex items-center justify-center">
+            <BanknoteIcon className="h-4 w-4 text-[#1FA9D6]" />
           </div>
         )}
       </div>

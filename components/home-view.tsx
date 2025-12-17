@@ -30,7 +30,7 @@ export default function HomeView({ onSelectArtist }: HomeViewProps) {
       name: "iamjuampi",
       avatar: "/avatars/juampi.jpg",
       artistId: "iamjuampi",
-      audioUrl: "/images/dropsland-20intro-20.mp3",
+      audioUrl: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/git-blob/prj_hMsSjyCuaCBEyDq2U7vGQxcyRsbL/t9Xk774WGI7haIDyGupOeb/public/images/dropsland-20intro-20.mp3",
     })),
     {
       id: "video-3",
@@ -137,7 +137,7 @@ const recentActivity = [
     image: "/crypto-tokens-glowing.jpg",
     likes: 89,
     comments: 12,
-    audioUrl: "/images/dropsland-20intro-20.mp3",
+    audioUrl: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/git-blob/prj_hMsSjyCuaCBEyDq2U7vGQxcyRsbL/t9Xk774WGI7haIDyGupOeb/public/images/dropsland-20intro-20.mp3",
   },
   {
     id: "a2",
@@ -152,7 +152,7 @@ const recentActivity = [
     image: "/music-producer-studio.png",
     likes: 123,
     comments: 23,
-    audioUrl: "/images/dropsland-20intro-20.mp3",
+    audioUrl: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/git-blob/prj_hMsSjyCuaCBEyDq2U7vGQxcyRsbL/t9Xk774WGI7haIDyGupOeb/public/images/dropsland-20intro-20.mp3",
   },
   {
     id: "a3",
@@ -167,6 +167,6 @@ const recentActivity = [
     image: "/neon-crypto-visualization.jpg",
     likes: 198,
     comments: 34,
-    audioUrl: "/images/dropsland-20intro-20.mp3",
+    audioUrl: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/git-blob/prj_hMsSjyCuaCBEyDq2U7vGQxcyRsbL/t9Xk774WGI7haIDyGupOeb/public/images/dropsland-20intro-20.mp3",
   },
 ]

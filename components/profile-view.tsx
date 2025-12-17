@@ -69,9 +69,9 @@ export default function ProfileView({ username = "usuario" }: ProfileViewProps) 
 
       <div className="px-4 pb-20">
         <div className="flex justify-center -mt-16 mb-4">
-          <Avatar className="w-28 h-28 border-4 border-white ring-2 ring-[#F2B705]/30">
+          <Avatar className="w-28 h-28 border-4 border-white ring-2 ring-[#1FA9D6]/30">
             <AvatarImage src={avatarSrc || undefined} alt={displayName} />
-            <AvatarFallback className="bg-gradient-to-br from-[#F2B705] to-[#F2B705]/80 text-[#1E1E1E] text-3xl font-bold">
+            <AvatarFallback className="bg-gradient-to-br from-[#1FA9D6] to-[#1FA9D6]/80 text-white text-3xl font-bold">
               {displayName.charAt(0).toUpperCase()}
             </AvatarFallback>
           </Avatar>
@@ -80,7 +80,7 @@ export default function ProfileView({ username = "usuario" }: ProfileViewProps) 
         <div className="text-center mb-6">
           <div className="flex items-center gap-2 justify-center mb-2">
             <h1 className="text-2xl font-bold text-[#1E1E1E] break-words max-w-full">{userProfile.name}</h1>
-            {userProfile.isVerified && <Star className="h-5 w-5 text-[#F2B705] fill-[#F2B705] flex-shrink-0" />}
+            {userProfile.isVerified && <Star className="h-5 w-5 text-[#1FA9D6] fill-[#1FA9D6] flex-shrink-0" />}
           </div>
           <p className="text-[#3A3A3A] text-base mb-3 break-words">@{userProfile.handle}</p>
           <div className="flex items-center gap-2 justify-center flex-wrap mb-4">
@@ -193,7 +193,7 @@ export default function ProfileView({ username = "usuario" }: ProfileViewProps) 
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-1 mb-0.5">
                     <span className="font-semibold text-sm text-[#1E1E1E] truncate">{userProfile.name}</span>
-                    {userProfile.isVerified && <Star className="h-3 w-3 text-[#F2B705] fill-[#F2B705] flex-shrink-0" />}
+                    {userProfile.isVerified && <Star className="h-3 w-3 text-[#1FA9D6] fill-[#1FA9D6] flex-shrink-0" />}
                   </div>
                   <p className="text-xs text-[#3A3A3A]">2h ago</p>
                 </div>
@@ -284,17 +284,17 @@ export default function ProfileView({ username = "usuario" }: ProfileViewProps) 
           </Dialog>
 
           {!isArtist() && (
-            <Card className="bg-[#F2B705]/10 border-[#F2B705]/30 mt-4">
+            <Card className="bg-[#1FA9D6]/10 border-[#1FA9D6]/30 mt-4">
               <CardContent className="p-4">
                 <div className="flex items-center justify-between gap-3">
                   <div className="flex items-center gap-2 min-w-0">
-                    <Lock className="h-5 w-5 text-[#F2B705] flex-shrink-0" />
+                    <Lock className="h-5 w-5 text-[#1FA9D6] flex-shrink-0" />
                     <div className="min-w-0">
                       <h3 className="text-[#1E1E1E] font-medium text-sm">Become an Artist</h3>
                       <p className="text-xs text-[#3A3A3A] truncate">Apply to become verified</p>
                     </div>
                   </div>
-                  <Button className="bg-[#F2B705] hover:bg-[#F2B705]/90 text-[#1E1E1E] font-medium h-9 px-4 flex-shrink-0 text-sm">
+                  <Button className="bg-[#1FA9D6] hover:bg-[#1FA9D6]/90 text-white font-medium h-9 px-4 flex-shrink-0 text-sm">
                     Apply
                   </Button>
                 </div>
@@ -345,7 +345,7 @@ export default function ProfileView({ username = "usuario" }: ProfileViewProps) 
               }}
             />
             <Button
-              className="bg-yellow-600 hover:bg-yellow-700 text-white flex-shrink-0"
+              className="bg-[#1FA9D6] hover:bg-[#1FA9D6]/90 text-white flex-shrink-0"
               onClick={handleSendComment}
               disabled={!commentText.trim()}
             >

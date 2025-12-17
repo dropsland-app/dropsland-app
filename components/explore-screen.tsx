@@ -79,7 +79,7 @@ export default function ExploreScreen({ onSelectArtist }: ExploreScreenProps) {
     image: artistImages[index],
     likes: Math.floor(Math.random() * 500) + 100,
     comments: Math.floor(Math.random() * 80) + 20,
-    audioUrl: "/images/dropsland-20intro-20.mp3",
+    audioUrl: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/git-blob/prj_hMsSjyCuaCBEyDq2U7vGQxcyRsbL/t9Xk774WGI7haIDyGupOeb/public/images/dropsland-20intro-20.mp3",
   }))
 
   return <TikTokFeed onSelectArtist={onSelectArtist} posts={explorePosts} type="explore" />

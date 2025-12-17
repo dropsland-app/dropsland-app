@@ -1,69 +1,68 @@
-"use client";
+"use client"
 
-import { useState, useRef, useEffect } from "react";
-import HomeView from "@/components/home-view";
-import ExploreScreen from "@/components/explore-screen";
-import UploadView from "@/components/upload-view";
-import WalletView from "@/components/wallet-view";
-import ActivityView from "@/components/activity-view";
-import ProfileView from "@/components/profile-view";
-import { useAuth } from "@/hooks/use-auth";
-import Image from "next/image";
-import {
-  Home,
-  Search,
-  Upload,
-  Wallet,
-  Bell,
-  User,
-  Activity,
-} from "lucide-react";
+import { useState, useRef, useEffect } from "react"
+import HomeView from "@/components/home-view"
+import ExploreScreen from "@/components/explore-screen"
+import UploadView from "@/components/upload-view"
+import WalletView from "@/components/wallet-view"
+import ActivityView from "@/components/activity-view"
+import ProfileView from "@/components/profile-view"
+import { useAuth } from "@/hooks/use-auth"
+import Image from "next/image"
+import { Home, Search, Upload, Wallet, Bell, User } from "lucide-react"
 
 export default function MainApp() {
-  const [activeScreen, setActiveScreen] = useState(0);
-  const containerRef = useRef<HTMLDivElement>(null);
-  const { user } = useAuth();
+  const [activeScreen, setActiveScreen] = useState(0)
+  const [scrollProgress, setScrollProgress] = useState(0)
+  const containerRef = useRef<HTMLDivElement>(null)
+  const { user } = useAuth()
 
-  const isLightMode = activeScreen >= 2;
+  const isLightMode = scrollProgress > 1.5
+  const transitionOpacity = scrollProgress >= 1 && scrollProgress <= 2 ? scrollProgress - 1 : scrollProgress < 1 ? 0 : 1
 
   const handleScroll = () => {
     if (containerRef.current) {
-      const scrollLeft = containerRef.current.scrollLeft;
-      const screenWidth = containerRef.current.offsetWidth;
-      const newScreen = Math.round(scrollLeft / screenWidth);
+      const scrollLeft = containerRef.current.scrollLeft
+      const screenWidth = containerRef.current.offsetWidth
+      const progress = scrollLeft / screenWidth
+      setScrollProgress(progress)
+
+      const newScreen = Math.round(progress)
       if (newScreen !== activeScreen) {
-        setActiveScreen(newScreen);
+        setActiveScreen(newScreen)
       }
     }
-  };
+  }
 
   const handleNavigate = (screenIndex: number) => {
     if (containerRef.current) {
-      const screenWidth = containerRef.current.offsetWidth;
+      const screenWidth = containerRef.current.offsetWidth
       containerRef.current.scrollTo({
         left: screenWidth * screenIndex,
         behavior: "smooth",
-      });
+      })
     }
-  };
+  }
 
   useEffect(() => {
     // Pause all audio elements whenever the screen changes
-    const allAudio = document.querySelectorAll("audio");
+    const allAudio = document.querySelectorAll("audio")
     allAudio.forEach((audio) => {
-      audio.pause();
-      audio.currentTime = 0;
-    });
-  }, [activeScreen]);
+      audio.pause()
+      audio.currentTime = 0
+    })
+  }, [activeScreen])
 
   return (
     <div className="h-screen flex flex-col bg-black relative">
       <header
-        className={`absolute top-0 left-0 right-0 z-50 h-16 ${
-          isLightMode
-            ? "bg-gradient-to-b from-white via-white/80 to-transparent"
-            : "bg-gradient-to-b from-black via-black/80 to-transparent"
-        }`}
+        className="absolute top-0 left-0 right-0 z-50 h-16"
+        style={{
+          background:
+            scrollProgress >= 2
+              ? `linear-gradient(to bottom, rgba(255, 255, 255, 1), rgba(255, 255, 255, 0.8), transparent)`
+              : `linear-gradient(to bottom, rgba(0, 0, 0, ${1 - transitionOpacity}), rgba(0, 0, 0, ${0.8 - transitionOpacity * 0.8}), transparent), linear-gradient(to bottom, rgba(255, 255, 255, ${transitionOpacity}), rgba(255, 255, 255, ${transitionOpacity * 0.8}), transparent)`,
+        }}
       >
         <div className="flex items-center justify-start h-12 px-2">
           <Image
@@ -71,7 +70,10 @@ export default function MainApp() {
             alt="Dropsland"
             width={80}
             height={20}
-            className={`h-5 w-auto ${isLightMode ? "invert" : ""}`}
+            className="h-5 w-auto"
+            style={{
+              filter: `invert(${transitionOpacity})`,
+            }}
             priority
           />
         </div>
@@ -126,10 +128,10 @@ export default function MainApp() {
             { index: 1, Icon: Search },
             { index: 2, Icon: Upload },
             { index: 3, Icon: Wallet },
-            { index: 4, Icon: Bell }, // Changed from Activity to Bell to match your imports
+            { index: 4, Icon: Bell },
             { index: 5, Icon: User },
           ].map(({ index, Icon }) => {
-            const isActive = activeScreen === index;
+            const isActive = activeScreen === index
 
             return (
               <button
@@ -153,7 +155,7 @@ export default function MainApp() {
                             isActive
                               ? isLightMode
                                 ? "text-black scale-105"
-                                : "text-yellow-400 scale-105 drop-shadow-[0_0_8px_rgba(250,204,21,0.5)]"
+                                : "text-[#1FA9D6] scale-105 drop-shadow-[0_0_8px_rgba(31,169,214,0.5)]"
                               : isLightMode
                                 ? "text-gray-500 group-hover:text-black"
                                 : "text-white/60 group-hover:text-white"
@@ -161,10 +163,10 @@ export default function MainApp() {
                         `}
                 />
               </button>
-            );
+            )
           })}
         </div>
       </div>
     </div>
-  );
+  )
 }
