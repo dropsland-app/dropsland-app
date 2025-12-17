@@ -562,7 +562,7 @@ export default function TikTokFeed({
                 {!isYouTubeVideo && (
                   <div className="w-full mb-2">
                     <div
-                      className="bg-white/20 backdrop-blur-sm rounded-full h-2 overflow-hidden cursor-pointer relative"
+                      className="group relative h-4 w-full flex items-center cursor-pointer touch-none"
                       onClick={(e) => handleProgressClick(e, postKey)}
                       onTouchStart={() => handleSeekStart(postKey)}
                       onTouchEnd={() => handleSeekEnd(postKey)}
@@ -573,14 +573,27 @@ export default function TikTokFeed({
                         }
                       }}
                     >
+                      {/* Track Background */}
+                      <div className="absolute inset-0 h-0.5 group-hover:h-1 group-active:h-1 my-auto w-full bg-white/20 rounded-full backdrop-blur-sm overflow-hidden transition-all duration-200">
+                        {/* Progress Fill */}
+                        <div
+                          className="bg-white h-full transition-all duration-100 ease-linear shadow-[0_0_10px_rgba(255,255,255,0.5)]"
+                          style={{
+                            width: `${((currentTime[postKey] || 0) / (duration[postKey] || 1)) * 100}%`,
+                          }}
+                        />
+                      </div>
+
+                      {/* Playhead Handle */}
                       <div
-                        className="bg-bright-yellow h-full transition-all duration-100"
+                        className="absolute h-3 w-3 bg-white rounded-full shadow-md transform -translate-x-1/2 scale-0 opacity-0 group-hover:scale-100 group-hover:opacity-100 group-active:scale-100 group-active:opacity-100 transition-all duration-200 ease-out"
                         style={{
-                          width: `${((currentTime[postKey] || 0) / (duration[postKey] || 1)) * 100}%`,
+                          left: `${((currentTime[postKey] || 0) / (duration[postKey] || 1)) * 100}%`,
                         }}
                       />
                     </div>
-                    <div className="flex justify-between text-white text-xs mt-1 px-1 text-shadow">
+                    {/* Timestamps - Only visible on interaction */}
+                    <div className="flex justify-between text-white text-xs mt-1 px-1 text-shadow opacity-0 group-hover:opacity-100 group-active:opacity-100 transition-opacity duration-200">
                       <span>{formatTime(currentTime[postKey] || 0)}</span>
                       <span>{formatTime(duration[postKey] || 0)}</span>
                     </div>
