@@ -67,16 +67,16 @@ export default function MainApp() {
 
   // Common wrapper style for "snap-stop" behavior
   const sectionClass = "min-w-full h-full flex-shrink-0 snap-start";
-  // 2. ADDED style for scrollSnapStop
   const snapStyle = { scrollSnapStop: "always" as const };
 
   return (
-    <div className="h-[100dvh] flex flex-col bg-black relative">
+    <div className="h-screen flex flex-col bg-black relative">
       <header
-        className={`absolute top-0 left-0 right-0 z-50 h-16 pointer-events-none ${isLightMode
+        className={`absolute top-0 left-0 right-0 z-50 h-16 pointer-events-none ${
+          isLightMode
             ? "bg-gradient-to-b from-white via-white/80 to-transparent"
             : "bg-gradient-to-b from-black via-black/80 to-transparent"
-          }`}
+        }`}
       >
         <div className="flex items-center justify-start h-12 px-2 pointer-events-auto">
           <Image
@@ -92,7 +92,6 @@ export default function MainApp() {
 
       <div
         ref={containerRef}
-        // REMOVED onScroll={handleScroll} to prevent re-render jank
         className="flex-1 flex overflow-x-scroll overflow-y-hidden scrollbar-hide snap-x snap-mandatory"
       >
         {/* Added data-index, ref, and scrollSnapStop style to all sections */}
@@ -118,7 +117,7 @@ export default function MainApp() {
         <div
           ref={(el) => setSectionRef(el, 2)}
           data-index="2"
-          className={`${sectionClass} overflow-y-auto pb-[env(safe-area-inset-bottom)]`}
+          className={`${sectionClass} overflow-y-auto`}
           style={snapStyle}
         >
           <UploadView />
@@ -127,7 +126,7 @@ export default function MainApp() {
         <div
           ref={(el) => setSectionRef(el, 3)}
           data-index="3"
-          className={`${sectionClass} overflow-y-auto pb-[env(safe-area-inset-bottom)]`}
+          className={`${sectionClass} overflow-y-auto`}
           style={snapStyle}
         >
           <WalletView />
@@ -136,7 +135,7 @@ export default function MainApp() {
         <div
           ref={(el) => setSectionRef(el, 4)}
           data-index="4"
-          className={`${sectionClass} overflow-y-auto pb-[env(safe-area-inset-bottom)]`}
+          className={`${sectionClass} overflow-y-auto`}
           style={snapStyle}
         >
           <ActivityView onSelectArtist={(id) => console.log("Artist:", id)} />
@@ -145,7 +144,7 @@ export default function MainApp() {
         <div
           ref={(el) => setSectionRef(el, 5)}
           data-index="5"
-          className={`${sectionClass} overflow-y-auto pb-[env(safe-area-inset-bottom)]`}
+          className={`${sectionClass} overflow-y-auto`}
           style={snapStyle}
         >
           <ProfileView />
@@ -153,18 +152,17 @@ export default function MainApp() {
       </div>
 
       {/* COMPACT GLASS DOCK (No changes needed here from previous step) */}
-      {/* CHANGED: Dock position adapts to safe area + explicit margin */}
-      <div className="absolute left-0 right-0 flex justify-center items-center z-50 pointer-events-none"
-        style={{ bottom: "calc(1.5rem + env(safe-area-inset-bottom))" }}>
+      <div className="absolute bottom-6 left-0 right-0 flex justify-center items-center z-50 pointer-events-none">
         <div
           className={`
             pointer-events-auto
             flex items-center gap-1 px-2 py-1.5 rounded-full
             backdrop-blur-xl border shadow-2xl
             transition-all duration-500 ease-out
-            ${isLightMode
-              ? "bg-white/60 border-white/50 shadow-black/5 text-gray-800"
-              : "bg-black/30 border-white/10 shadow-black/20 text-white"
+            ${
+              isLightMode
+                ? "bg-white/60 border-white/50 shadow-black/5 text-gray-800"
+                : "bg-black/30 border-white/10 shadow-black/20 text-white"
             }
           `}
         >
@@ -184,24 +182,26 @@ export default function MainApp() {
                 onClick={() => handleNavigate(index)}
                 className={`
                   relative p-2 rounded-full transition-all duration-300 group
-                  ${isActive
-                    ? isLightMode
-                      ? "bg-black/5"
-                      : "bg-white/10"
-                    : "hover:bg-black/5 dark:hover:bg-white/5"
+                  ${
+                    isActive
+                      ? isLightMode
+                        ? "bg-black/5"
+                        : "bg-white/10"
+                      : "hover:bg-black/5 dark:hover:bg-white/5"
                   }
                 `}
               >
                 <Icon
                   className={`
                     h-5 w-5 transition-all duration-300
-                    ${isActive
-                      ? isLightMode
-                        ? "text-black scale-105"
-                        : "text-yellow-400 scale-105 drop-shadow-[0_0_8px_rgba(250,204,21,0.5)]"
-                      : isLightMode
-                        ? "text-gray-500 group-hover:text-black"
-                        : "text-white/60 group-hover:text-white"
+                    ${
+                      isActive
+                        ? isLightMode
+                          ? "text-black scale-105"
+                          : "text-yellow-400 scale-105 drop-shadow-[0_0_8px_rgba(250,204,21,0.5)]"
+                        : isLightMode
+                          ? "text-gray-500 group-hover:text-black"
+                          : "text-white/60 group-hover:text-white"
                     }
                   `}
                 />
