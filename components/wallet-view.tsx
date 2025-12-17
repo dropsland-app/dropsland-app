@@ -1,26 +1,26 @@
-"use client"
+"use client";
 
-import { TrendingUp, Users } from "lucide-react"
-import { Card, CardContent } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { useAuth } from "@/hooks/use-auth"
-import { BanknoteIcon } from "@/components/icons/banknote-icon"
+import { TrendingUp, Users } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useAuth } from "@/hooks/use-auth";
+import { BanknoteIcon } from "@/components/icons/banknote-icon";
 
 export default function WalletView() {
-  const { balance, donated } = useAuth()
+  const { balance, donated } = useAuth();
 
   const handleBuy = () => {
-    alert("Buy tokens feature coming soon!")
-  }
+    alert("Buy tokens feature coming soon!");
+  };
 
   const handleSend = () => {
-    alert("Send tokens feature coming soon!")
-  }
+    alert("Send tokens feature coming soon!");
+  };
 
   const handleReceive = () => {
-    alert("Receive tokens feature coming soon!")
-  }
+    alert("Receive tokens feature coming soon!");
+  };
 
   return (
     <div className="pb-6 bg-white h-full overflow-y-auto">
@@ -34,7 +34,7 @@ export default function WalletView() {
           <Button
             size="sm"
             variant="outline"
-            className="border-black text-black bg-white hover:bg-[#1FA9D6] hover:text-white active:bg-[#1FA9D6] active:text-white"
+            className="border-black bg-transparent text-black hover:bg-[#1FA9D6] hover:text-white active:bg-[#1FA9D6] active:text-white"
             onClick={handleReceive}
           >
             Receive
@@ -93,19 +93,31 @@ export default function WalletView() {
 
       {/* Artist Tokens */}
       <div className="mt-6 px-4">
-        <h2 className="text-lg font-semibold mb-3 text-[#1E1E1E]">Artist Tokens</h2>
+        <h2 className="text-lg font-semibold mb-3 text-[#1E1E1E]">
+          Artist Tokens
+        </h2>
         <div className="space-y-3">
           {artistTokens.map((token) => (
-            <Card key={token.id} className="bg-[#3A3A3A]/10 shadow-sm border-[#3A3A3A]/20">
+            <Card
+              key={token.id}
+              className="bg-[#3A3A3A]/10 shadow-sm border-[#3A3A3A]/20"
+            >
               <CardContent className="p-3">
                 <div className="flex items-center gap-3">
                   <Avatar className="h-10 w-10">
-                    <AvatarImage src={token.avatar || "/placeholder.svg"} alt={token.name} />
-                    <AvatarFallback>{token.name.substring(0, 2).toUpperCase()}</AvatarFallback>
+                    <AvatarImage
+                      src={token.avatar || "/placeholder.svg"}
+                      alt={token.name}
+                    />
+                    <AvatarFallback>
+                      {token.name.substring(0, 2).toUpperCase()}
+                    </AvatarFallback>
                   </Avatar>
                   <div className="flex-1">
                     <div className="flex items-center justify-between">
-                      <p className="font-medium text-[#1E1E1E]">${token.symbol}</p>
+                      <p className="font-medium text-[#1E1E1E]">
+                        ${token.symbol}
+                      </p>
                       <div className="flex items-center text-[#F2B705] font-medium">
                         <BanknoteIcon className="h-5 w-5 mr-1" />
                         <span>{token.amount}</span>
@@ -113,7 +125,9 @@ export default function WalletView() {
                     </div>
                     <p className="text-xs text-[#3A3A3A]">{token.name}</p>
                     <div className="flex items-center justify-between mt-1">
-                      <p className="text-xs text-[#3A3A3A]">Current value: ${token.value}</p>
+                      <p className="text-xs text-[#3A3A3A]">
+                        Current value: ${token.value}
+                      </p>
                       <p className="text-xs text-green-600">+{token.change}%</p>
                     </div>
                   </div>
@@ -126,7 +140,8 @@ export default function WalletView() {
             <div className="text-center py-6 bg-[#3A3A3A]/10 rounded-lg border border-[#3A3A3A]/20">
               <p className="text-[#1E1E1E]">No tienes tokens de artistas aún</p>
               <p className="text-[#3A3A3A] text-sm mt-1">
-                Compra tokens para apoyar a tus artistas favoritos y recibir recompensas exclusivas
+                Compra tokens para apoyar a tus artistas favoritos y recibir
+                recompensas exclusivas
               </p>
               <Button className="mt-3 bg-[#F2B705] hover:bg-[#F2B705]/90 text-[#1E1E1E] font-medium">
                 Explorar Artistas
@@ -138,15 +153,22 @@ export default function WalletView() {
 
       {/* Transaction History */}
       <div className="mt-6 px-4">
-        <h2 className="text-lg font-semibold mb-3 text-[#1E1E1E]">Transaction History</h2>
+        <h2 className="text-lg font-semibold mb-3 text-[#1E1E1E]">
+          Transaction History
+        </h2>
         <div className="space-y-3">
           {transactions.map((transaction) => (
-            <Card key={transaction.id} className="bg-[#3A3A3A]/10 shadow-sm border-[#3A3A3A]/20">
+            <Card
+              key={transaction.id}
+              className="bg-[#3A3A3A]/10 shadow-sm border-[#3A3A3A]/20"
+            >
               <CardContent className="p-3">
                 <div className="flex items-center gap-3">
                   <div
                     className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                      transaction.type === "sent" ? "bg-[#3A3A3A]/20" : "bg-[#1FA9D6]/20"
+                      transaction.type === "sent"
+                        ? "bg-[#3A3A3A]/20"
+                        : "bg-[#1FA9D6]/20"
                     }`}
                   >
                     <BanknoteIcon
@@ -155,8 +177,12 @@ export default function WalletView() {
                   </div>
                   <div className="flex-1">
                     <div className="flex items-center justify-between">
-                      <p className="font-medium text-[#1E1E1E]">{transaction.description}</p>
-                      <p className={`font-medium ${transaction.type === "sent" ? "text-[#3A3A3A]" : "text-[#1FA9D6]"}`}>
+                      <p className="font-medium text-[#1E1E1E]">
+                        {transaction.description}
+                      </p>
+                      <p
+                        className={`font-medium ${transaction.type === "sent" ? "text-[#3A3A3A]" : "text-[#1FA9D6]"}`}
+                      >
                         {transaction.type === "sent" ? "-" : "+"}
                         {transaction.amount} $DROPS
                       </p>
@@ -170,7 +196,7 @@ export default function WalletView() {
         </div>
       </div>
     </div>
-  )
+  );
 }
 
 // Artist tokens data
@@ -211,7 +237,7 @@ const artistTokens = [
     value: "2.25",
     change: "0.9",
   },
-]
+];
 
 // Sample transaction data
 const transactions = [
@@ -250,4 +276,4 @@ const transactions = [
     amount: 5,
     date: "Mar 1, 2025",
   },
-]
+];
