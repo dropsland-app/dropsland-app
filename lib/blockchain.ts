@@ -1,149 +1,225 @@
-// This file would contain the actual blockchain interactions
-// For this demo, we're using mock implementations
+import {
+  createWalletClient,
+  createPublicClient,
+  custom,
+  http,
+  parseEther,
+  formatEther,
+  type WalletClient,
+  type PublicClient,
+} from "viem";
+import { worldchain } from "viem/chains"; // Or worldchainSepolia for dev
 
-import { ethers } from "ethers"
+// ------------------------------------------------------------------
+// CONFIGURATION
+// ------------------------------------------------------------------
 
-// ABI for the DROPS Token contract
+const BEANS_TOKEN_ADDRESS = "0x..."; // Replace with real address
+const BEANS_PLATFORM_ADDRESS = "0x..."; // Replace with real address
+
+// Define ABIs as const to get Type Safety/Autocompletion in Viem
 const BEANS_TOKEN_ABI = [
-  // This would be the actual ABI for the DROPS token contract
-  "function transfer(address to, uint256 amount) returns (bool)",
-  "function balanceOf(address account) view returns (uint256)",
-  "function approve(address spender, uint256 amount) returns (bool)",
-]
+  {
+    inputs: [{ name: "account", type: "address" }],
+    name: "balanceOf",
+    outputs: [{ name: "", type: "uint256" }],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      { name: "spender", type: "address" },
+      { name: "amount", type: "uint256" },
+    ],
+    name: "approve",
+    outputs: [{ name: "", type: "bool" }],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+] as const;
 
-// ABI for the Beans Platform contract
 const BEANS_PLATFORM_ABI = [
-  // This would be the actual ABI for the Beans platform contract
-  "function donateToCreator(string creatorId, uint256 amount, string message, bool isAnonymous) returns (bool)",
-  "function getCreatorInfo(string creatorId) view returns (address walletAddress, uint256 totalReceived, uint256 supportersCount)",
-  "function registerAsCreator(string name, string handle, string category, string description) returns (string creatorId)",
-]
+  {
+    inputs: [
+      { name: "creatorId", type: "string" },
+      { name: "amount", type: "uint256" },
+      { name: "message", type: "string" },
+      { name: "isAnonymous", type: "bool" },
+    ],
+    name: "donateToCreator",
+    outputs: [{ name: "", type: "bool" }],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      { name: "name", type: "string" },
+      { name: "handle", type: "string" },
+      { name: "category", type: "string" },
+      { name: "description", type: "string" },
+    ],
+    name: "registerAsCreator",
+    outputs: [{ name: "creatorId", type: "string" }],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [{ name: "creatorId", type: "string" }],
+    name: "getCreatorInfo",
+    outputs: [
+      { name: "walletAddress", type: "address" },
+      { name: "totalReceived", type: "uint256" },
+      { name: "supportersCount", type: "uint256" },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+] as const;
 
-// Contract addresses (these would be the actual addresses on World Chain)
-const BEANS_TOKEN_ADDRESS = "0x1234567890123456789012345678901234567890"
-const BEANS_PLATFORM_ADDRESS = "0x0987654321098765432109876543210987654321"
+// ------------------------------------------------------------------
+// HELPERS
+// ------------------------------------------------------------------
 
-// Connect to provider (in a real app, this would connect to World Chain)
-const getProvider = () => {
-  // In a real app, this would connect to the World Chain network
-  // For now, we'll just return a mock provider
-  return new ethers.JsonRpcProvider("https://worldchain-rpc.example.com")
-}
+// Helper to get a Viem Wallet Client (Authenticated Actions)
+const getWalletClient = async (wallets: any[]): Promise<WalletClient> => {
+  const embeddedWallet = wallets.find((w) => w.walletClientType === "privy");
+  if (!embeddedWallet) throw new Error("No Privy wallet connected");
 
-// Get signer (in a real app, this would get the user's wallet)
-const getSigner = async () => {
-  const provider = getProvider()
+  await embeddedWallet.switchChain(worldchain.id);
+  const provider = await embeddedWallet.getEthereumProvider();
 
-  // In a real app, this would connect to the user's wallet
-  // For now, we'll just return a mock signer
-  return new ethers.Wallet("0xmockprivatekey", provider)
-}
+  return createWalletClient({
+    account: embeddedWallet.address as `0x${string}`,
+    chain: worldchain,
+    transport: custom(provider),
+  });
+};
 
-// Get BEANS token contract
-const getBEANSTokenContract = async () => {
-  const signer = await getSigner()
-  return new ethers.Contract(BEANS_TOKEN_ADDRESS, BEANS_TOKEN_ABI, signer)
-}
+// Helper to get a Viem Public Client (Read-Only Actions)
+// We use a public RPC for reads so we don't need the user's wallet for basic data
+const getPublicClient = (): PublicClient => {
+  return createPublicClient({
+    chain: worldchain,
+    transport: http(), // Uses default public RPC, or add your Alchemy/Infura URL here
+  });
+};
 
-// Get Beans platform contract
-const getBeansPlatformContract = async () => {
-  const signer = await getSigner()
-  return new ethers.Contract(BEANS_PLATFORM_ADDRESS, BEANS_PLATFORM_ABI, signer)
-}
+// ------------------------------------------------------------------
+// PUBLIC ACTIONS
+// ------------------------------------------------------------------
 
-// Check DROPS balance
-export const checkBEANSBalance = async (): Promise<number> => {
+export const checkBEANSBalance = async (wallets: any[]): Promise<number> => {
   try {
-    const blgToken = await getBEANSTokenContract()
-    const signer = await getSigner()
-    const balance = await blgToken.balanceOf(await signer.getAddress())
-    return Number(ethers.formatUnits(balance, 18))
-  } catch (error) {
-    console.error("Error checking DROPS balance:", error)
-    // For demo purposes, return a mock balance
-    return 100
-  }
-}
+    const walletClient = await getWalletClient(wallets);
+    const [address] = await walletClient.getAddresses();
+    const publicClient = getPublicClient();
 
-// Buy DROPS tokens with WLD
-export const buyBEANSWithWLD = async (wldAmount: number): Promise<boolean> => {
-  try {
-    // In a real app, this would interact with a DEX or swap contract
-    console.log(`Buying DROPS with ${wldAmount} WLD`)
-    // Mock successful purchase
-    return true
-  } catch (error) {
-    console.error("Error buying DROPS:", error)
-    return false
-  }
-}
+    // Viem Read Contract
+    const balance = await publicClient.readContract({
+      address: BEANS_TOKEN_ADDRESS,
+      abi: BEANS_TOKEN_ABI,
+      functionName: "balanceOf",
+      args: [address],
+    });
 
-// Donate DROPS to creator
+    return Number(formatEther(balance));
+  } catch (error) {
+    console.error("Error checking balance:", error);
+    return 0;
+  }
+};
+
 export const donateToCreator = async (
+  wallets: any[],
   creatorId: string,
   amount: number,
   message: string,
   isAnonymous: boolean,
 ): Promise<boolean> => {
   try {
-    // In a real app, this would:
-    // 1. Approve the Beans platform to spend DROPS tokens
-    // 2. Call the donateToCreator function on the Beans platform contract
+    const walletClient = await getWalletClient(wallets);
+    const publicClient = getPublicClient();
+    const [account] = await walletClient.getAddresses();
+    const amountWei = parseEther(amount.toString());
 
-    console.log(`Donating ${amount} DROPS to creator ${creatorId}`)
-    console.log(`Message: ${message}`)
-    console.log(`Anonymous: ${isAnonymous}`)
+    // 1. Approve Logic
+    console.log("Approving tokens...");
+    const approveHash = await walletClient.writeContract({
+      address: BEANS_TOKEN_ADDRESS,
+      abi: BEANS_TOKEN_ABI,
+      functionName: "approve",
+      args: [BEANS_PLATFORM_ADDRESS, amountWei],
+      account,
+    });
+    // Wait for approval to be mined
+    await publicClient.waitForTransactionReceipt({ hash: approveHash });
 
-    // Mock successful donation
-    // Add a delay to simulate blockchain transaction
-    await new Promise((resolve) => setTimeout(resolve, 2000))
+    // 2. Donate Logic
+    console.log("Executing donation...");
+    const donateHash = await walletClient.writeContract({
+      address: BEANS_PLATFORM_ADDRESS,
+      abi: BEANS_PLATFORM_ABI,
+      functionName: "donateToCreator",
+      args: [creatorId, amountWei, message, isAnonymous],
+      account,
+    });
+    // Wait for donation to be mined
+    await publicClient.waitForTransactionReceipt({ hash: donateHash });
 
-    return true
+    return true;
   } catch (error) {
-    console.error("Error donating to creator:", error)
-    throw error
+    console.error("Donation failed:", error);
+    throw error;
   }
-}
+};
 
-// Register as creator
 export const registerAsCreator = async (
+  wallets: any[],
   name: string,
   handle: string,
   category: string,
   description: string,
 ): Promise<string> => {
   try {
-    const beansPlatform = await getBeansPlatformContract()
-    const tx = await beansPlatform.registerAsCreator(name, handle, category, description)
-    await tx.wait()
+    const walletClient = await getWalletClient(wallets);
+    const publicClient = getPublicClient();
+    const [account] = await walletClient.getAddresses();
 
-    // In a real app, this would return the creator ID from the transaction receipt
-    // For now, we'll just return a mock ID
-    return "creator_" + Math.random().toString(36).substring(2, 10)
+    const hash = await walletClient.writeContract({
+      address: BEANS_PLATFORM_ADDRESS,
+      abi: BEANS_PLATFORM_ABI,
+      functionName: "registerAsCreator",
+      args: [name, handle, category, description],
+      account,
+    });
+
+    const receipt = await publicClient.waitForTransactionReceipt({ hash });
+    // In a real app, you'd decode logs here to find the creatorId
+    return handle;
   } catch (error) {
-    console.error("Error registering as creator:", error)
-    throw error
+    console.error("Registration failed:", error);
+    throw error;
   }
-}
+};
 
-// Get creator info
 export const getCreatorInfo = async (creatorId: string) => {
   try {
-    const beansPlatform = await getBeansPlatformContract()
-    const [walletAddress, totalReceived, supportersCount] = await beansPlatform.getCreatorInfo(creatorId)
+    const publicClient = getPublicClient();
+
+    const result = await publicClient.readContract({
+      address: BEANS_PLATFORM_ADDRESS,
+      abi: BEANS_PLATFORM_ABI,
+      functionName: "getCreatorInfo",
+      args: [creatorId],
+    });
 
     return {
-      walletAddress,
-      totalReceived: Number(ethers.formatUnits(totalReceived, 18)),
-      supportersCount: Number(supportersCount),
-    }
+      walletAddress: result[0],
+      totalReceived: Number(formatEther(result[1])),
+      supportersCount: Number(result[2]),
+    };
   } catch (error) {
-    console.error("Error getting creator info:", error)
-    // For demo purposes, return mock data
-    return {
-      walletAddress: "0x1234...5678",
-      totalReceived: 8750,
-      supportersCount: 1245,
-    }
+    console.error("Error fetching creator info:", error);
+    return null;
   }
-}
+};
