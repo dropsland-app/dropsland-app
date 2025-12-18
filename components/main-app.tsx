@@ -66,7 +66,7 @@ export default function MainApp() {
   const snapStyle = { scrollSnapStop: "always" as const };
 
   return (
-    <div className="h-screen flex flex-col bg-black relative">
+    <div className="h-screen flex flex-col bg-white relative">
       <header
         className="absolute top-0 left-0 right-0 z-50 h-16 pointer-events-none"
         style={{
@@ -96,7 +96,11 @@ export default function MainApp() {
         className="flex-1 flex overflow-x-scroll overflow-y-hidden scrollbar-hide snap-x snap-mandatory"
         onScroll={handleScroll}
       >
-        <div data-index="0" className={sectionClass} style={snapStyle}>
+        <div
+          data-index="0"
+          className={`${sectionClass} dark bg-black text-white`}
+          style={snapStyle}
+        >
           <HomeView onSelectArtist={(id) => console.log("Artist:", id)} />
         </div>
 
@@ -183,7 +187,7 @@ export default function MainApp() {
                       isActive
                         ? isLightMode
                           ? "text-black scale-105"
-                          : "text-yellow-400 scale-105 drop-shadow-[0_0_8px_rgba(250,204,21,0.5)]" // Kept HEAD style (Yellow)
+                          : "text-primary scale-105 drop-shadow-[0_0_8px_rgba(250,204,21,0.5)]" // Kept HEAD style (Yellow)
                         : isLightMode
                           ? "text-gray-500 group-hover:text-black"
                           : "text-white/60 group-hover:text-white"

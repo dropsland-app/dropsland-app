@@ -30,43 +30,43 @@ export default function ArtistDashboard({ onBack }: ArtistDashboardProps) {
   }
 
   return (
-    <div className="flex flex-col h-full bg-gray-950">
+    <div className="flex flex-col h-full bg-white">
       {/* Header */}
-      <header className="bg-gray-900 px-4 py-3 border-b border-gray-800 flex items-center">
-        <button onClick={onBack} className="flex items-center text-gray-300">
+      <header className="px-4 py-3 bg-gradient-to-r from-[#1FA9D6]/10 to-[#1FA9D6]/5 backdrop-blur-xl border-b border-gray-100 flex items-center">
+        <button onClick={onBack} className="flex items-center text-[#1E1E1E] hover:bg-black/5 p-2 -ml-2 rounded-full transition-colors">
           <ArrowLeft className="h-4 w-4 mr-1" />
-          <span>Back</span>
+          <span className="font-medium">Back</span>
         </button>
-        <h1 className="flex-1 text-center font-semibold text-white">Artist Dashboard</h1>
+        <h1 className="flex-1 text-center font-semibold text-[#1E1E1E]">Artist Dashboard</h1>
         <div className="w-16"></div> {/* Spacer for centering */}
       </header>
 
       {/* Main Content */}
-      <div className="flex-1 overflow-auto p-4">
+      <div className="flex-1 overflow-auto p-4 content-bg">
         {/* Artist Stats */}
         <div className="grid grid-cols-2 gap-4 mb-6">
-          <Card className="bg-gray-800 border-gray-700">
+          <Card className="bg-white border-gray-100 shadow-sm">
             <CardContent className="p-4">
               <div className="flex flex-col">
-                <p className="text-sm text-gray-400">Total Supporters</p>
-                <div className="flex items-center justify-between">
-                  <p className="text-2xl font-bold text-white">{artistData.supporters}</p>
-                  <Users className="h-5 w-5 text-bright-yellow" />
+                <p className="text-sm text-gray-500 font-medium">Total Supporters</p>
+                <div className="flex items-center justify-between mt-1">
+                  <p className="text-2xl font-bold text-[#1E1E1E]">{artistData.supporters}</p>
+                  <Users className="h-5 w-5 text-[#1FA9D6]" />
                 </div>
-                <p className="text-xs text-green-500 mt-1">{artistData.growth} this month</p>
+                <p className="text-xs text-green-600 mt-2 font-medium bg-green-50 inline-block px-1.5 py-0.5 rounded">{artistData.growth} this month</p>
               </div>
             </CardContent>
           </Card>
 
-          <Card className="bg-gray-800 border-gray-700">
+          <Card className="bg-white border-gray-100 shadow-sm">
             <CardContent className="p-4">
               <div className="flex flex-col">
-                <p className="text-sm text-gray-400">Total Received</p>
-                <div className="flex items-center justify-between">
-                  <p className="text-2xl font-bold text-white">{artistData.totalReceived}</p>
-                  <BanknoteIcon className="h-5 w-5 text-bright-yellow" />
+                <p className="text-sm text-gray-500 font-medium">Total Received</p>
+                <div className="flex items-center justify-between mt-1">
+                  <p className="text-2xl font-bold text-[#1E1E1E]">{artistData.totalReceived}</p>
+                  <BanknoteIcon className="h-5 w-5 text-[#1FA9D6]" />
                 </div>
-                <p className="text-xs text-green-500 mt-1">+{artistData.newSupporters} new supporters</p>
+                <p className="text-xs text-green-600 mt-2 font-medium bg-green-50 inline-block px-1.5 py-0.5 rounded">+{artistData.newSupporters} new</p>
               </div>
             </CardContent>
           </Card>
@@ -74,11 +74,11 @@ export default function ArtistDashboard({ onBack }: ArtistDashboardProps) {
 
         {/* Quick Actions */}
         <div className="grid grid-cols-2 gap-4 mb-6">
-          <Button className="h-auto py-3 bg-bright-yellow hover:bg-bright-yellow-700 text-black">
+          <Button className="h-auto py-3 bg-[#1FA9D6] hover:bg-[#1FA9D6]/90 text-white shadow-lg shadow-[#1FA9D6]/20 border-none rounded-xl">
             <PlusCircle className="h-4 w-4 mr-2" />
             New Post
           </Button>
-          <Button variant="outline" className="h-auto py-3 bg-gray-700 text-white border-gray-600">
+          <Button variant="outline" className="h-auto py-3 bg-white text-[#1E1E1E] border-gray-200 hover:bg-gray-50 rounded-xl">
             <Music className="h-4 w-4 mr-2" />
             Add Reward
           </Button>
@@ -86,56 +86,65 @@ export default function ArtistDashboard({ onBack }: ArtistDashboardProps) {
 
         {/* Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="mt-6">
-          <TabsList className="grid w-full grid-cols-3 bg-gray-800">
-            <TabsTrigger value="overview" className="data-[state=active]:bg-gray-700">
+          <TabsList className="grid w-full grid-cols-3 bg-gray-100 p-1 rounded-xl">
+            <TabsTrigger
+              value="overview"
+              className="data-[state=active]:bg-white data-[state=active]:text-[#1FA9D6] data-[state=active]:shadow-sm rounded-lg text-gray-500"
+            >
               Overview
             </TabsTrigger>
-            <TabsTrigger value="content" className="data-[state=active]:bg-gray-700">
+            <TabsTrigger
+              value="content"
+              className="data-[state=active]:bg-white data-[state=active]:text-[#1FA9D6] data-[state=active]:shadow-sm rounded-lg text-gray-500"
+            >
               Content
             </TabsTrigger>
-            <TabsTrigger value="supporters" className="data-[state=active]:bg-gray-700">
+            <TabsTrigger
+              value="supporters"
+              className="data-[state=active]:bg-white data-[state=active]:text-[#1FA9D6] data-[state=active]:shadow-sm rounded-lg text-gray-500"
+            >
               Supporters
             </TabsTrigger>
           </TabsList>
 
           {/* Overview Tab */}
           <TabsContent value="overview" className="mt-4 space-y-4">
-            <Card className="bg-gray-800 border-gray-700">
+            <Card className="bg-white border-gray-100 shadow-sm">
               <CardHeader className="pb-2">
-                <CardTitle className="text-white text-lg">Activity Summary</CardTitle>
+                <CardTitle className="text-[#1E1E1E] text-lg">Activity Summary</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-3 gap-4">
-                  <div className="text-center">
-                    <p className="text-2xl font-bold text-white">{artistData.posts}</p>
-                    <p className="text-xs text-gray-400">Posts</p>
+                  <div className="text-center p-2 bg-gray-50 rounded-xl">
+                    <p className="text-2xl font-bold text-[#1E1E1E]">{artistData.posts}</p>
+                    <p className="text-xs text-gray-500 font-medium">Posts</p>
                   </div>
-                  <div className="text-center">
-                    <p className="text-2xl font-bold text-white">{artistData.rewards}</p>
-                    <p className="text-xs text-gray-400">Rewards</p>
+                  <div className="text-center p-2 bg-gray-50 rounded-xl">
+                    <p className="text-2xl font-bold text-[#1E1E1E]">{artistData.rewards}</p>
+                    <p className="text-xs text-gray-500 font-medium">Rewards</p>
                   </div>
-                  <div className="text-center">
-                    <p className="text-2xl font-bold text-white">$0.45</p>
-                    <p className="text-xs text-gray-400">Token Price</p>
+                  <div className="text-center p-2 bg-gray-50 rounded-xl">
+                    <p className="text-2xl font-bold text-[#1E1E1E]">$0.45</p>
+                    <p className="text-xs text-gray-500 font-medium">Token Price</p>
                   </div>
                 </div>
               </CardContent>
             </Card>
 
-            <Card className="bg-gray-800 border-gray-700">
+            <Card className="bg-white border-gray-100 shadow-sm">
               <CardHeader className="pb-2">
-                <CardTitle className="text-white text-lg">Upcoming Events</CardTitle>
+                <CardTitle className="text-[#1E1E1E] text-lg">Upcoming Events</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
                   {events.map((event) => (
-                    <div key={event.id} className="flex items-center">
-                      <div className="w-10 h-10 rounded-full bg-gray-700 flex items-center justify-center mr-3">
-                        <Calendar className="h-5 w-5 text-bright-yellow" />
+                    <div key={event.id} className="flex items-center p-2 hover:bg-gray-50 rounded-lg transition-colors">
+                      <div className="w-10 h-10 rounded-full bg-[#1FA9D6]/10 flex items-center justify-center mr-3">
+                        <Calendar className="h-5 w-5 text-[#1FA9D6]" />
                       </div>
                       <div className="flex-1">
-                        <p className="font-medium text-white">{event.title}</p>
-                        <p className="text-xs text-gray-400">{event.date}</p>
+                        <p className="font-medium text-[#1E1E1E]">{event.title}</p>
+                        <p className="text-xs text-gray-500">{event.date}</p>
                       </div>
                     </div>
                   ))}
@@ -147,26 +156,26 @@ export default function ArtistDashboard({ onBack }: ArtistDashboardProps) {
           {/* Content Tab */}
           <TabsContent value="content" className="mt-4 space-y-4">
             <div className="flex justify-between items-center">
-              <h3 className="text-white font-medium">Your Posts</h3>
-              <Button size="sm" className="bg-bright-yellow hover:bg-bright-yellow-700 text-black">
+              <h3 className="text-[#1E1E1E] font-medium">Your Posts</h3>
+              <Button size="sm" className="bg-[#1FA9D6] hover:bg-[#1FA9D6]/90 text-white border-none shadow-sm rounded-lg">
                 New Post
               </Button>
             </div>
 
             {posts.map((post) => (
-              <Card key={post.id} className="bg-gray-800 border-gray-700">
+              <Card key={post.id} className="bg-white border-gray-100 shadow-sm">
                 <CardContent className="p-3">
                   <div className="flex items-center gap-3">
                     <div className="flex-1">
-                      <p className="text-sm text-white font-medium">{post.content.substring(0, 60)}...</p>
-                      <div className="flex items-center mt-1">
-                        <Badge variant="outline" className="text-xs bg-gray-700 text-gray-300 border-gray-600">
+                      <p className="text-sm text-[#1E1E1E] font-medium leading-relaxed">{post.content.substring(0, 60)}...</p>
+                      <div className="flex items-center mt-2">
+                        <Badge variant="outline" className="text-xs bg-gray-50 text-gray-600 border-gray-200">
                           {post.likes} likes
                         </Badge>
-                        <p className="text-xs text-gray-500 ml-2">{post.time}</p>
+                        <p className="text-xs text-gray-400 ml-2">{post.time}</p>
                       </div>
                     </div>
-                    <Button size="sm" variant="outline" className="h-8 bg-gray-700 text-white border-gray-600">
+                    <Button size="sm" variant="outline" className="h-8 bg-white text-gray-600 border-gray-200 hover:bg-gray-50 rounded-lg">
                       Edit
                     </Button>
                   </div>
@@ -175,27 +184,27 @@ export default function ArtistDashboard({ onBack }: ArtistDashboardProps) {
             ))}
 
             <div className="flex justify-between items-center mt-6">
-              <h3 className="text-white font-medium">Your Rewards</h3>
-              <Button size="sm" className="bg-bright-yellow hover:bg-bright-yellow-700 text-black">
+              <h3 className="text-[#1E1E1E] font-medium">Your Rewards</h3>
+              <Button size="sm" className="bg-[#1FA9D6] hover:bg-[#1FA9D6]/90 text-white border-none shadow-sm rounded-lg">
                 Add Reward
               </Button>
             </div>
 
             {rewards.map((reward) => (
-              <Card key={reward.id} className="bg-gray-800 border-gray-700">
+              <Card key={reward.id} className="bg-white border-gray-100 shadow-sm">
                 <CardContent className="p-3">
                   <div className="flex items-center gap-3">
                     <div className="flex-1">
-                      <p className="text-sm text-white font-medium">{reward.title}</p>
-                      <p className="text-xs text-gray-400 mt-1">{reward.description}</p>
-                      <div className="flex items-center mt-1">
-                        <Badge variant="outline" className="text-xs bg-gray-700 text-gray-300 border-gray-600">
+                      <p className="text-sm text-[#1E1E1E] font-medium">{reward.title}</p>
+                      <p className="text-xs text-gray-500 mt-1">{reward.description}</p>
+                      <div className="flex items-center mt-2">
+                        <Badge variant="outline" className="text-xs bg-[#1FA9D6]/10 text-[#1FA9D6] border-[#1FA9D6]/20">
                           {reward.minTokens} $DROPS required
                         </Badge>
-                        <p className="text-xs text-gray-500 ml-2">{reward.subscribers} subscribers</p>
+                        <p className="text-xs text-gray-400 ml-2">{reward.subscribers} subscribers</p>
                       </div>
                     </div>
-                    <Button size="sm" variant="outline" className="h-8 bg-gray-700 text-white border-gray-600">
+                    <Button size="sm" variant="outline" className="h-8 bg-white text-gray-600 border-gray-200 hover:bg-gray-50 rounded-lg">
                       Edit
                     </Button>
                   </div>
@@ -206,25 +215,25 @@ export default function ArtistDashboard({ onBack }: ArtistDashboardProps) {
 
           {/* Supporters Tab */}
           <TabsContent value="supporters" className="mt-4 space-y-4">
-            <Card className="bg-gray-800 border-gray-700">
+            <Card className="bg-white border-gray-100 shadow-sm">
               <CardHeader className="pb-2">
-                <CardTitle className="text-white text-lg">Top Supporters</CardTitle>
+                <CardTitle className="text-[#1E1E1E] text-lg">Top Supporters</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
                   {supporters.map((supporter) => (
-                    <div key={supporter.id} className="flex items-center">
-                      <Avatar className="h-10 w-10 mr-3">
+                    <div key={supporter.id} className="flex items-center p-2 hover:bg-gray-50 rounded-lg transition-colors">
+                      <Avatar className="h-10 w-10 mr-3 ring-2 ring-white shadow-sm">
                         <AvatarImage src={supporter.avatar} alt={supporter.name} />
-                        <AvatarFallback>{supporter.name.substring(0, 2).toUpperCase()}</AvatarFallback>
+                        <AvatarFallback className="bg-gray-100 text-gray-600 font-medium">{supporter.name.substring(0, 2).toUpperCase()}</AvatarFallback>
                       </Avatar>
                       <div className="flex-1">
-                        <p className="font-medium text-white">{supporter.name}</p>
-                        <p className="text-xs text-gray-400">{supporter.since}</p>
+                        <p className="font-medium text-[#1E1E1E]">{supporter.name}</p>
+                        <p className="text-xs text-gray-500">{supporter.since}</p>
                       </div>
-                      <div className="flex items-center text-bright-yellow font-medium">
+                      <div className="flex items-center text-[#1FA9D6] font-bold bg-[#1FA9D6]/5 px-2 py-1 rounded-md">
                         <BanknoteIcon className="h-3 w-3 mr-1" />
-                        <span>{supporter.tokens} $DROPS</span>
+                        <span className="text-sm">{supporter.tokens}</span>
                       </div>
                     </div>
                   ))}
@@ -235,9 +244,9 @@ export default function ArtistDashboard({ onBack }: ArtistDashboardProps) {
         </Tabs>
 
         {/* Settings */}
-        <div className="mt-6">
-          <Button variant="outline" className="w-full justify-start bg-gray-800 text-white border-gray-700">
-            <Settings className="h-4 w-4 mr-2" />
+        <div className="mt-6 mb-8">
+          <Button variant="outline" className="w-full justify-start bg-white text-[#1E1E1E] border-gray-200 hover:bg-gray-50 h-12 rounded-xl">
+            <Settings className="h-4 w-4 mr-2 text-gray-500" />
             Artist Settings
           </Button>
         </div>
