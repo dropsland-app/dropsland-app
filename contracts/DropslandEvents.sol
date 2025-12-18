@@ -1,84 +1,89 @@
 // SPDX-License-Identifier: MIT
-
 pragma solidity ^0.8.20;
 
 import "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
-
 import "@openzeppelin/contracts/access/Ownable.sol";
-
 import "@openzeppelin/contracts/token/ERC1155/extensions/ERC1155Burnable.sol";
 
-/**
-
-* @title DropslandEvents
-
-* @dev The primitive layer for Event Access and Perks.
-
-* Validates ownership on-chain. Redemption is handled off-chain.
-
-*/
-
 contract DropslandEvents is ERC1155, Ownable, ERC1155Burnable {
-    // Name and Symbol for explorers (not standard in 1155, but useful)
-
     string public name = "Dropsland Events";
-
     string public symbol = "DROP";
 
-    constructor()
-        ERC1155("https://api.dropsland.com/metadata/{id}.json")
-        Ownable(msg.sender)
-    {}
+    uint256 private _nextId = 0;
+
+    // Mappings
+    mapping(uint256 => string) private _tokenURIs;
+    mapping(uint256 => address) public creators;
+
+    // Events
+    event ItemCreated(
+        uint256 indexed id,
+        address indexed creator,
+        uint256 supply,
+        string uri
+    );
+
+    constructor() ERC1155("") Ownable(msg.sender) {}
 
     /**
-
-* @notice Mints new assets (Tickets, Perks, Proofs of Attendance).
-
-* @dev Only the owner (Dropsland Backend) can mint.
-
-* @param account The address of the attendee/user.
-
-* @param id The unique ID of the event asset (e.g., 1001 = Event A Ticket).
-
-* @param amount The quantity (e.g., 1 for ticket, 2 for drink tokens).
-
-* @param data Optional data to pass to the receiver.
-
-*/
-
-    function mint(
-        address account,
-        uint256 id,
+     * @notice Creates a single item.
+     */
+    function createItem(
         uint256 amount,
+        string memory tokenUri,
         bytes memory data
-    ) public onlyOwner {
-        _mint(account, id, amount, data);
+    ) public {
+        uint256 newItemId = _nextId++;
+        _setupItem(newItemId, msg.sender, tokenUri);
+        _mint(msg.sender, newItemId, amount, data);
+        emit ItemCreated(newItemId, msg.sender, amount, tokenUri);
     }
 
     /**
-
-* @notice Mints a batch of different assets to a user at once.
-
-* @dev Useful for bundles (e.g., Ticket + 2 Drinks + 1 Merch).
-
-*/
-
-    function mintBatch(
-        address account,
-        uint256[] memory ids,
+     * @notice Creates multiple different items in ONE transaction.
+     * @param amounts Array of supplies (e.g. [100, 50])
+     * @param tokenUris Array of IPFS CIDs (e.g. ["ipfs://A", "ipfs://B"])
+     * @param data Optional data passed to wallet
+     */
+    function createBatchItems(
         uint256[] memory amounts,
+        string[] memory tokenUris,
         bytes memory data
-    ) public onlyOwner {
-        _mintBatch(account, ids, amounts, data);
+    ) public {
+        require(amounts.length == tokenUris.length, "Lengths mismatch");
+
+        uint256 count = amounts.length;
+        uint256[] memory ids = new uint256[](count);
+
+        for (uint256 i = 0; i < count; i++) {
+            uint256 newItemId = _nextId++;
+            ids[i] = newItemId;
+
+            // Set up metadata and ownership mappings
+            _setupItem(newItemId, msg.sender, tokenUris[i]);
+
+            // Emit individual creation events for Indexers (The Graph)
+            emit ItemCreated(newItemId, msg.sender, amounts[i], tokenUris[i]);
+        }
+
+        // Single Gas-Efficient Mint Transfer
+        _mintBatch(msg.sender, ids, amounts, data);
     }
 
-    /**
+    // Helper to keep code clean
+    function _setupItem(
+        uint256 id,
+        address creator,
+        string memory tokenUri
+    ) internal {
+        creators[id] = creator;
+        _tokenURIs[id] = tokenUri;
+    }
 
-* @notice Updates the metadata base URI if the backend changes.
-
-*/
-
-    function setURI(string memory newuri) public onlyOwner {
-        _setURI(newuri);
+    function uri(
+        uint256 tokenId
+    ) public view virtual override returns (string memory) {
+        string memory tokenUri = _tokenURIs[tokenId];
+        return bytes(tokenUri).length > 0 ? tokenUri : super.uri(tokenId);
     }
 }
