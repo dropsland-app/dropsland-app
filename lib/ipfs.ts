@@ -3,7 +3,7 @@ import {
   PINATA_JWT,
   PINATA_GATEWAY_URL,
   PINATA_GROUP_ID,
-} from "@/util/constants";
+} from "@/config/app";
 
 /**
  * Uploads a File (Image/Video) to IPFS via Pinata

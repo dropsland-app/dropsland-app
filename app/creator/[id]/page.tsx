@@ -1,12 +1,18 @@
-import Image from "next/image"
-import Link from "next/link"
-import { ArrowLeft, Banknote, Share2, Star, Users } from "lucide-react"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import DonateForm from "@/components/donate-form"
+import Image from "next/image";
+import Link from "next/link";
+import { ArrowLeft, Banknote, Share2, Star, Users } from "lucide-react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import DonateForm from "@/components/donate-form";
 
 // Mock data for a single creator
 const CREATOR = {
@@ -21,6 +27,7 @@ const CREATOR = {
   supporters: 1245,
   blgReceived: 8750,
   featured: true,
+  walletAddress: "0x1234567890123456789012345678901234567890", // Placeholder ETH address
   socialLinks: {
     twitter: "https://twitter.com/elenadraws",
     instagram: "https://instagram.com/elenadraws",
@@ -35,24 +42,37 @@ const CREATOR = {
     {
       level: "Coffee Bean",
       amount: 20,
-      benefits: ["All previous rewards", "Name in credits", "Early access to new art"],
+      benefits: [
+        "All previous rewards",
+        "Name in credits",
+        "Early access to new art",
+      ],
     },
     {
       level: "Coffee Cup",
       amount: 50,
-      benefits: ["All previous rewards", "Digital art print (monthly)", "Vote on future projects"],
+      benefits: [
+        "All previous rewards",
+        "Digital art print (monthly)",
+        "Vote on future projects",
+      ],
     },
     {
       level: "Coffee Pot",
       amount: 100,
-      benefits: ["All previous rewards", "Custom digital portrait", "1-on-1 virtual coffee chat"],
+      benefits: [
+        "All previous rewards",
+        "Custom digital portrait",
+        "1-on-1 virtual coffee chat",
+      ],
     },
   ],
   recentPosts: [
     {
       id: "p1",
       title: "New Fantasy Series Preview",
-      preview: "I'm excited to share a sneak peek of my upcoming fantasy series...",
+      preview:
+        "I'm excited to share a sneak peek of my upcoming fantasy series...",
       date: "2 days ago",
       image: "/posts/elena-post1.jpg",
     },
@@ -71,12 +91,12 @@ const CREATOR = {
       image: "/posts/elena-post3.jpg",
     },
   ],
-}
+};
 
 export default function CreatorPage({ params }: { params: { id: string } }) {
-  // In a real app, we would fetch the creator data based on the ID
+  // TODO! fetch the creator data based on the ID
   // const creator = await getCreator(params.id)
-  const creator = CREATOR
+  const creator = CREATOR;
 
   return (
     <div className="min-h-screen bg-background">
@@ -89,7 +109,12 @@ export default function CreatorPage({ params }: { params: { id: string } }) {
           priority
         />
         <div className="absolute inset-0 bg-gradient-to-t from-background to-transparent" />
-        <Button asChild variant="outline" size="sm" className="absolute top-4 left-4 bg-background/80 backdrop-blur-sm">
+        <Button
+          asChild
+          variant="outline"
+          size="sm"
+          className="absolute top-4 left-4 bg-background/80 backdrop-blur-sm"
+        >
           <Link href="/">
             <ArrowLeft className="mr-2 h-4 w-4" />
             Back
@@ -116,7 +141,9 @@ export default function CreatorPage({ params }: { params: { id: string } }) {
           <div className="mt-4 flex items-center gap-6 text-sm">
             <div className="flex items-center">
               <Banknote className="mr-1 h-4 w-4 text-primary" />
-              <span>{creator.blgReceived.toLocaleString()} $DROPS received</span>
+              <span>
+                {creator.blgReceived.toLocaleString()} $DROPS received
+              </span>
             </div>
             <div className="flex items-center">
               <Users className="mr-1 h-4 w-4" />
@@ -143,13 +170,24 @@ export default function CreatorPage({ params }: { params: { id: string } }) {
               <CardContent>
                 <p>{creator.description}</p>
                 <div className="mt-4 flex gap-2">
-                  {Object.entries(creator.socialLinks).map(([platform, url]) => (
-                    <Button key={platform} variant="outline" size="sm" asChild>
-                      <Link href={url} target="_blank" rel="noopener noreferrer">
-                        {platform.charAt(0).toUpperCase() + platform.slice(1)}
-                      </Link>
-                    </Button>
-                  ))}
+                  {Object.entries(creator.socialLinks).map(
+                    ([platform, url]) => (
+                      <Button
+                        key={platform}
+                        variant="outline"
+                        size="sm"
+                        asChild
+                      >
+                        <Link
+                          href={url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          {platform.charAt(0).toUpperCase() + platform.slice(1)}
+                        </Link>
+                      </Button>
+                    ),
+                  )}
                 </div>
               </CardContent>
             </Card>
@@ -171,7 +209,10 @@ export default function CreatorPage({ params }: { params: { id: string } }) {
                         <p className="text-sm">{post.preview}</p>
                         <div className="relative h-24 sm:h-full rounded-md overflow-hidden">
                           <Image
-                            src={post.image || "/placeholder.svg?height=150&width=200"}
+                            src={
+                              post.image ||
+                              "/placeholder.svg?height=150&width=200"
+                            }
                             alt={post.title}
                             fill
                             className="object-cover"
@@ -191,7 +232,9 @@ export default function CreatorPage({ params }: { params: { id: string } }) {
                     <Card key={index}>
                       <CardHeader className="pb-2">
                         <div className="flex items-center justify-between">
-                          <CardTitle className="text-lg">{reward.level}</CardTitle>
+                          <CardTitle className="text-lg">
+                            {reward.level}
+                          </CardTitle>
                           <div className="flex items-center text-primary font-bold">
                             <Banknote className="mr-1 h-4 w-4" />
                             {reward.amount} $DROPS
@@ -214,10 +257,14 @@ export default function CreatorPage({ params }: { params: { id: string } }) {
           </div>
 
           <div>
-            <DonateForm creatorId={creator.id} creatorName={creator.name} />
+            <DonateForm
+              creatorId={creator.id}
+              creatorName={creator.name}
+              creatorAddress={creator.walletAddress}
+            />
           </div>
         </div>
       </div>
     </div>
-  )
+  );
 }

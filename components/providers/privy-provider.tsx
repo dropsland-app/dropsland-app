@@ -1,6 +1,6 @@
 "use client";
 
-import { PRIVY_APP_ID, PRIVY_CLIENT_ID } from "@/util/constants";
+import { PRIVY_APP_ID, PRIVY_CLIENT_ID } from "@/config/app.ts/constants";
 import { PrivyProvider } from "@privy-io/react-auth";
 
 export default function PrivyProviderWrapper({

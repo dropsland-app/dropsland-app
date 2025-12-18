@@ -59,11 +59,38 @@ NFT ownership is used to:
 *NFTs are not spent by default; redemption state is tracked off-chain for speed and reliability during events.*
 
 ### 3. IRL Redemption Flow
+
 At events:
 1.  Users open the Dropsland app and display their NFT.
 2.  A QR code or wallet proof is scanned by staff.
 3.  The backend verifies ownership and redemption status.
 4.  The perk is delivered.
+
+```mermaid
+sequenceDiagram
+    participant Org as Organizer
+    participant Contract as Smart Contract
+    participant User as Attendee (Fan)
+    participant Staff as Bar Staff
+
+    Note over Org, Contract: Phase 1: Creation
+    Org->>Contract: createItem(Supply: 500)
+    Contract-->>Org: Mints 500 Tokens to Org
+
+    Note over User, Org: Phase 2: Distribution (Claim)
+    Org->>User: Displays "Claim" QR at Entry
+    User->>Contract: Transfer 1 Token (Org -> User)
+    Contract-->>User: User Balance: 1
+
+    Note over User, Staff: Phase 3: Redemption (Burn)
+    User->>Staff: Shows "Redeem" QR Code
+    Staff->>Contract: Reads verify ownership (1 Token)
+    
+    Staff->>Contract: burn(UserAddress, TokenID, 1)
+    Contract-->>Contract: Token Destroyed (Supply -1)
+    Contract-->>User: User Balance: 0
+    Staff-->>User: Hands over Merch/Drink
+```
 
 *This design avoids on-chain transactions at the point of sale, ensuring fast throughput and low friction.*
 

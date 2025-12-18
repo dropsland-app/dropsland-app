@@ -17,18 +17,18 @@ import {
 
 // === Core Hooks & Utils ===
 import { useAuth } from "@/hooks/use-auth";
+import { useWallets } from "@privy-io/react-auth"; // Required for wallet switching
 import { uploadFileToIPFS, uploadJSONToIPFS } from "@/lib/ipfs";
 import { createWalletClient, custom } from "viem";
-import { usePrivy, useWallets } from "@privy-io/react-auth";
 
 // === Configuration & Constants ===
-import { CHAIN, DROPSLAND_EVENTS_CONTRACT } from "@/util/constants";
+import { CHAIN, DROPSLAND_EVENTS_CONTRACT } from "@/config/chain";
 import { DROPSLAND_EVENTS_ABI } from "@/util/abis";
 
 export default function CreateMerchPage() {
   const router = useRouter();
   const { user } = useAuth();
-  const { wallets } = useWallets();
+  const { wallets } = useWallets(); // Get active wallet interface
 
   // State
   const [isLoading, setIsLoading] = useState(false);
@@ -79,21 +79,25 @@ export default function CreateMerchPage() {
       const metadataUri = await uploadJSONToIPFS(metadata);
 
       // 3. Blockchain Transaction
-      setStep("Confirming in Wallet...");
+      setStep("Check Wallet...");
 
+      // --- WALLET & CHAIN FIX ---
       const activeWallet = wallets.find(
         (w) => w.address === user.wallet?.address,
       );
-      if (!activeWallet) {
-        throw new Error("Active wallet not found");
-      }
+      if (!activeWallet) throw new Error("Active wallet not found");
+
+      // Force chain switch if needed
       const currentChainId = Number(activeWallet.chainId.split(":")[1]);
       if (currentChainId !== CHAIN.id) {
         setStep("Switching Network...");
         await activeWallet.switchChain(CHAIN.id);
       }
 
+      // Get provider AFTER ensuring correct chain
       const provider = await activeWallet.getEthereumProvider();
+
+      setStep("Confirming...");
 
       const walletClient = createWalletClient({
         account: user.wallet.address as `0x${string}`,
@@ -102,7 +106,8 @@ export default function CreateMerchPage() {
       });
 
       const hash = await walletClient.writeContract({
-        address: DROPSLAND_EVENTS_CONTRACT as `0x${string}`,
+        chain: CHAIN,
+        address: DROPSLAND_EVENTS_CONTRACT,
         abi: DROPSLAND_EVENTS_ABI,
         functionName: "createItem",
         args: [BigInt(supply), metadataUri, "0x"],
@@ -111,7 +116,6 @@ export default function CreateMerchPage() {
       console.log("Tx Hash:", hash);
       setStep("Done!");
 
-      // Optional: Add a success toast here
       router.push("/profile");
     } catch (error) {
       console.error("Creation failed:", error);
@@ -123,6 +127,7 @@ export default function CreateMerchPage() {
   };
 
   return (
+    // LIGHT MODE: bg-background (white), text-foreground (dark)
     <div className="min-h-screen bg-background text-foreground p-6 pb-24 safe-top flex flex-col">
       {/* Header */}
       <div className="flex items-center gap-4 mb-8">
@@ -134,13 +139,15 @@ export default function CreateMerchPage() {
         >
           <ArrowLeft className="w-6 h-6" />
         </Button>
-        <h1 className="text-xl font-bold tracking-tight">New Item</h1>
+        <h1 className="text-xl font-bold tracking-tight text-foreground">
+          New Item
+        </h1>
       </div>
 
       <div className="flex-1 max-w-md mx-auto w-full space-y-8 animate-in slide-in-from-bottom-4 duration-500">
         {/* Image Upload Area */}
         <div className="flex justify-center">
-          <label className="relative w-48 h-48 rounded-2xl border-2 border-dashed border-border flex flex-col items-center justify-center cursor-pointer hover:border-primary hover:bg-primary/5 transition-all group overflow-hidden bg-muted/20">
+          <label className="relative w-48 h-48 rounded-2xl border-2 border-dashed border-border bg-muted/20 flex flex-col items-center justify-center cursor-pointer hover:border-primary hover:bg-primary/5 transition-all group overflow-hidden">
             {imagePreview ? (
               <img
                 src={imagePreview}
@@ -149,8 +156,8 @@ export default function CreateMerchPage() {
               />
             ) : (
               <div className="flex flex-col items-center text-muted-foreground group-hover:text-primary transition-colors">
-                <div className="p-3 bg-background rounded-full shadow-sm mb-3 group-hover:shadow-md transition-all">
-                  <Upload className="w-6 h-6" />
+                <div className="p-3 bg-white shadow-sm rounded-full mb-3 group-hover:shadow-md transition-all border border-border">
+                  <Upload className="w-6 h-6 text-primary" />
                 </div>
                 <span className="text-xs font-medium">Upload Image</span>
               </div>
@@ -173,7 +180,8 @@ export default function CreateMerchPage() {
             <Input
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="h-12 bg-transparent border-input focus:border-primary focus:ring-primary/20 text-lg"
+              // Transparent input with border that focuses to Primary Blue
+              className="h-12 bg-transparent border-input focus:border-primary focus:ring-primary/20 text-lg text-foreground placeholder:text-muted-foreground/50"
               placeholder="e.g. VIP Backstage Pass"
             />
           </div>
@@ -185,7 +193,7 @@ export default function CreateMerchPage() {
             <Textarea
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              className="min-h-[100px] bg-transparent border-input focus:border-primary focus:ring-primary/20 resize-none"
+              className="min-h-[100px] bg-transparent border-input focus:border-primary focus:ring-primary/20 resize-none text-foreground placeholder:text-muted-foreground/50"
               placeholder="What utility does this item provide?"
             />
           </div>
@@ -199,7 +207,7 @@ export default function CreateMerchPage() {
                 type="number"
                 value={supply}
                 onChange={(e) => setSupply(e.target.value)}
-                className="h-12 bg-transparent border-input focus:border-primary focus:ring-primary/20"
+                className="h-12 bg-transparent border-input focus:border-primary focus:ring-primary/20 text-foreground"
               />
             </div>
             <div className="space-y-2">
@@ -207,10 +215,10 @@ export default function CreateMerchPage() {
                 Category
               </Label>
               <Select value={type} onValueChange={setType}>
-                <SelectTrigger className="h-12 bg-transparent border-input focus:ring-primary/20">
+                <SelectTrigger className="h-12 bg-transparent border-input focus:ring-primary/20 text-foreground">
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="bg-background border-border">
                   <SelectItem value="merch">Merchandise</SelectItem>
                   <SelectItem value="drink">Beverage</SelectItem>
                   <SelectItem value="ticket">Ticket / Access</SelectItem>
@@ -223,7 +231,8 @@ export default function CreateMerchPage() {
 
       {/* Footer / Action Area */}
       <div className="mt-8 space-y-4">
-        <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground bg-muted/30 py-2 rounded-lg">
+        {/* Network Indicator */}
+        <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground bg-muted/40 py-2 rounded-lg border border-border/50">
           <span>Network:</span>
           <span className="font-semibold text-primary flex items-center gap-1">
             {CHAIN.name}
@@ -231,8 +240,9 @@ export default function CreateMerchPage() {
           </span>
         </div>
 
+        {/* Primary Action Button (Dropsland Blue) */}
         <Button
-          className="w-full h-14 text-base font-semibold shadow-lg shadow-primary/20 rounded-xl"
+          className="w-full h-14 text-base font-semibold shadow-lg shadow-primary/20 rounded-xl bg-primary text-primary-foreground hover:bg-primary/90"
           size="lg"
           onClick={handleCreate}
           disabled={isLoading || !imageFile || !name}
