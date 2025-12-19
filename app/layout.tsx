@@ -12,6 +12,11 @@ export const metadata = {
   title: "DROPSLAND - Support Artists with Music-Backed Tokens",
   description: "Buy $DROPS tokens for your favorite artists on World Chain",
   generator: "v0.dev",
+  manifest: "/manifest.json",
+  icons: {
+    apple: "/icon.png",
+  },
+  themeColor: "#ffffff",
 };
 
 export default function RootLayout({
