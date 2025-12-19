@@ -1,69 +1,154 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Settings, Banknote, Heart, MessageCircle, Share2, Lock, Send, LogOut, Star, Pencil } from "lucide-react"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Badge } from "@/components/ui/badge"
-import { Textarea } from "@/components/ui/textarea"
-import { Input } from "@/components/ui/input"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { useState, useEffect } from "react";
+import {
+  Settings,
+  Banknote,
+  Heart,
+  MessageCircle,
+  Share2,
+  Lock,
+  Send,
+  LogOut,
+  Star,
+  Pencil,
+  Loader2,
+  Plus,
+} from "lucide-react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
+import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { useAuth } from "@/hooks/use-auth";
+import { useWallets } from "@privy-io/react-auth";
+import { getUserRewards, type RewardItem } from "@/lib/alchemy";
+import { useRouter } from "next/navigation";
 
-// Import the useAuth hook
-import { useAuth } from "@/hooks/use-auth"
+// User posts
+export const userPosts = [
+  {
+    content: "New EP 'Techno Dimensions' out now! 🎵 #NewRelease",
+    time: "2 hours ago",
+    likes: 87,
+    comments: 14,
+    image: "/images/dj-mixer.png",
+  },
+];
 
 interface ProfileViewProps {
-  username?: string
+  username?: string;
 }
 
-export default function ProfileView({ username = "usuario" }: ProfileViewProps) {
-  const [isEditingBio, setIsEditingBio] = useState(false)
-  const [editedBio, setEditedBio] = useState("")
-  const [commentText, setCommentText] = useState("")
-  const [showCommentDialog, setShowCommentDialog] = useState(false)
-  const [currentPostIndex, setCurrentPostIndex] = useState<number | null>(null)
-  const [postComments, setPostComments] = useState<{ [key: string]: { author: string; text: string }[] }>({})
-  const { balance, donated, userData, isArtist, logout } = useAuth() // Get user data and check if artist
+export default function ProfileView({
+  username = "usuario",
+}: ProfileViewProps) {
+  const router = useRouter();
 
-  const avatarSrc = username === "juampi" ? "/images/profile/iamjuampi-avatar.jpg" : "/avatars/user.jpg"
-  const coverSrc = username === "juampi" ? "/images/profile/iamjuampi-cover.jpg" : ""
-  const displayName = userData?.username || "musicfan"
+  const [isEditingBio, setIsEditingBio] = useState(false);
+  const [editedBio, setEditedBio] = useState("");
+  const [commentText, setCommentText] = useState("");
+  const [showCommentDialog, setShowCommentDialog] = useState(false);
+  const [currentPostIndex, setCurrentPostIndex] = useState<number | null>(null);
+  const [postComments, setPostComments] = useState<{
+    [key: string]: { author: string; text: string }[];
+  }>({});
+
+  // --- STATE FOR REWARDS ---
+  const [rewards, setRewards] = useState<RewardItem[]>([]);
+  const [loadingRewards, setLoadingRewards] = useState(false);
+  const { wallets } = useWallets(); // Get direct wallet access for blockchain calls
+
+  const { balance, donated, userData, isArtist, logout } = useAuth();
+
+  const avatarSrc =
+    username === "juampi"
+      ? "/images/profile/iamjuampi-avatar.jpg"
+      : "/avatars/user.jpg";
+  const coverSrc =
+    username === "juampi" ? "/images/profile/iamjuampi-cover.jpg" : "";
+  const displayName = userData?.username || "musicfan";
 
   const userProfile = {
     name: displayName,
     handle: `${displayName}`,
-    bio: isArtist() ? "iamjuampi is a DJ, producer, and founder." : "Music enthusiast and electronic music fan.",
+    bio: isArtist()
+      ? "iamjuampi is a DJ, producer, and founder."
+      : "Music enthusiast and electronic music fan.",
     category: isArtist() ? "Techno / House" : "Fan",
     memberSince: "March 2025",
     isVerified: userData?.isVerified || false,
-  }
+  };
+
+  const primaryWallet =
+    wallets.find((w) => w.walletClientType === "privy") || wallets[0];
+  const walletAddress = primaryWallet?.address;
+
+  // --- FETCH REWARDS ---
+  useEffect(() => {
+    if (!walletAddress) return;
+
+    const fetchRewards = async () => {
+      console.log("🔍 Starting fetch for:", walletAddress);
+      setLoadingRewards(true);
+
+      try {
+        const data = await getUserRewards(walletAddress);
+        console.log("✅ Rewards fetched:", data);
+        setRewards(data);
+      } catch (error) {
+        console.error("❌ Error in component fetch:", error);
+      } finally {
+        // ALWAYS turn off loading, even if it fails
+        setLoadingRewards(false);
+      }
+    };
+
+    fetchRewards();
+  }, [walletAddress]);
 
   const handleEditBio = () => {
-    setEditedBio(userProfile.bio)
-    setIsEditingBio(true)
-  }
+    setEditedBio(userProfile.bio);
+    setIsEditingBio(true);
+  };
 
   const handleSaveBio = () => {
-    alert("Profile updated successfully!")
-    setIsEditingBio(false)
-  }
+    alert("Profile updated successfully!");
+    setIsEditingBio(false);
+  };
 
   const handleSendComment = () => {
-    if (!commentText.trim() || currentPostIndex === null) return
-    const postKey = `profile-${currentPostIndex}`
+    if (!commentText.trim() || currentPostIndex === null) return;
+    const postKey = `profile-${currentPostIndex}`;
     setPostComments((prev) => ({
       ...prev,
-      [postKey]: [...(prev[postKey] || []), { author: displayName, text: commentText }],
-    }))
-    setCommentText("")
-  }
+      [postKey]: [
+        ...(prev[postKey] || []),
+        { author: displayName, text: commentText },
+      ],
+    }));
+    setCommentText("");
+  };
 
   return (
     <div className="w-full h-full overflow-y-auto overflow-x-hidden bg-white">
       <div className="relative h-40">
-        {coverSrc && <img src={coverSrc || "/placeholder.svg"} alt="Cover" className="w-full h-full object-cover" />}
+        {coverSrc && (
+          <img
+            src={coverSrc || "/placeholder.svg"}
+            alt="Cover"
+            className="w-full h-full object-cover"
+          />
+        )}
         <div className="absolute inset-0 bg-gradient-to-b from-transparent to-white/50" />
       </div>
 
@@ -77,17 +162,29 @@ export default function ProfileView({ username = "usuario" }: ProfileViewProps) 
           </Avatar>
         </div>
 
+        {/* ... Profile Info Section (Unchanged) ... */}
         <div className="text-center mb-6">
           <div className="flex items-center gap-2 justify-center mb-2">
-            <h1 className="text-2xl font-bold text-[#1E1E1E] break-words max-w-full">{userProfile.name}</h1>
-            {userProfile.isVerified && <Star className="h-5 w-5 text-[#1FA9D6] fill-[#1FA9D6] flex-shrink-0" />}
+            <h1 className="text-2xl font-bold text-[#1E1E1E] break-words max-w-full">
+              {userProfile.name}
+            </h1>
+            {userProfile.isVerified && (
+              <Star className="h-5 w-5 text-[#1FA9D6] fill-[#1FA9D6] flex-shrink-0" />
+            )}
           </div>
-          <p className="text-[#3A3A3A] text-base mb-3 break-words">@{userProfile.handle}</p>
+          <p className="text-[#3A3A3A] text-base mb-3 break-words">
+            @{userProfile.handle}
+          </p>
           <div className="flex items-center gap-2 justify-center flex-wrap mb-4">
-            <Badge variant="outline" className="bg-[#3A3A3A]/10 text-[#1E1E1E] border-[#3A3A3A]/30 text-xs">
+            <Badge
+              variant="outline"
+              className="bg-[#3A3A3A]/10 text-[#1E1E1E] border-[#3A3A3A]/30 text-xs"
+            >
               {userProfile.category}
             </Badge>
-            <span className="text-xs text-[#3A3A3A]">Member since {userProfile.memberSince}</span>
+            <span className="text-xs text-[#3A3A3A]">
+              Member since {userProfile.memberSince}
+            </span>
           </div>
 
           {isEditingBio ? (
@@ -115,14 +212,30 @@ export default function ProfileView({ username = "usuario" }: ProfileViewProps) 
             </div>
           ) : (
             <div>
-              <p className="text-[#3A3A3A] text-sm leading-relaxed break-words max-w-full mb-2">{userProfile.bio}</p>
-              <button
-                onClick={handleEditBio}
-                className="bg-[#3A3A3A]/10 px-3 py-1.5 rounded-full border border-[#3A3A3A]/30 text-[#1E1E1E] text-xs hover:bg-[#3A3A3A]/20 inline-flex items-center gap-1"
-              >
-                <Pencil className="w-3 h-3" />
-                Edit Bio
-              </button>
+              <p className="text-[#3A3A3A] text-sm leading-relaxed break-words max-w-full mb-2">
+                {userProfile.bio}
+              </p>
+
+              <div className="flex items-center gap-2 justify-center">
+                {/*Edit Bio Button */}
+                <button
+                  onClick={handleEditBio}
+                  className="bg-[#3A3A3A]/10 px-3 py-1.5 rounded-full border border-[#3A3A3A]/30 text-[#1E1E1E] text-xs hover:bg-[#3A3A3A]/20 inline-flex items-center gap-1"
+                >
+                  <Pencil className="w-3 h-3" />
+                  Edit Bio
+                </button>
+
+                {/* Create Merch Button */}
+                <button
+                  onClick={() => router.push("/create-merch")}
+                  className="bg-[#3A3A3A]/10 px-3 py-1.5 rounded-full border border-[#3A3A3A]/30 text-[#1E1E1E] text-xs hover:bg-[#3A3A3A]/20 inline-flex items-center gap-1"
+                >
+                  <Plus className="w-3 h-3" />
+                  Create Merch
+                </button>
+              </div>
+              {/* ------------------------------- */}
             </div>
           )}
         </div>
@@ -137,12 +250,18 @@ export default function ProfileView({ username = "usuario" }: ProfileViewProps) 
             <p className="text-xs text-[#3A3A3A]">Purchased</p>
           </div>
           <div className="text-center">
-            <p className="text-xl font-bold text-[#1E1E1E]">8</p>
-            <p className="text-xs text-[#3A3A3A]">Artists</p>
+            <p className="text-xl font-bold text-[#1E1E1E]">
+              {/* Dynamically show number of rewards owned */}
+              {rewards.length > 0 ? rewards.length : 0}
+            </p>
+            <p className="text-xs text-[#3A3A3A]">Rewards</p>
           </div>
         </div>
 
-        <Tabs defaultValue={isArtist() ? "posts" : "artists"} className="w-full">
+        <Tabs
+          defaultValue={isArtist() ? "posts" : "rewards"}
+          className="w-full"
+        >
           <TabsList className="w-full bg-transparent h-auto p-0 gap-4 border-b border-gray-200 justify-start">
             {isArtist() ? (
               <>
@@ -188,17 +307,25 @@ export default function ProfileView({ username = "usuario" }: ProfileViewProps) 
               <div className="flex items-start gap-2 mb-2">
                 <Avatar className="h-8 w-8 flex-shrink-0">
                   <AvatarImage src={avatarSrc || "/placeholder.svg"} />
-                  <AvatarFallback>{userProfile.name.substring(0, 2).toUpperCase()}</AvatarFallback>
+                  <AvatarFallback>
+                    {userProfile.name.substring(0, 2).toUpperCase()}
+                  </AvatarFallback>
                 </Avatar>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-1 mb-0.5">
-                    <span className="font-semibold text-sm text-[#1E1E1E] truncate">{userProfile.name}</span>
-                    {userProfile.isVerified && <Star className="h-3 w-3 text-[#1FA9D6] fill-[#1FA9D6] flex-shrink-0" />}
+                    <span className="font-semibold text-sm text-[#1E1E1E] truncate">
+                      {userProfile.name}
+                    </span>
+                    {userProfile.isVerified && (
+                      <Star className="h-3 w-3 text-[#1FA9D6] fill-[#1FA9D6] flex-shrink-0" />
+                    )}
                   </div>
                   <p className="text-xs text-[#3A3A3A]">2h ago</p>
                 </div>
               </div>
-              <p className="text-[#1E1E1E] text-sm break-words mb-2">New EP out now! #NewRelease</p>
+              <p className="text-[#1E1E1E] text-sm break-words mb-2">
+                New EP out now! #NewRelease
+              </p>
               <div className="flex items-center gap-4 text-[#3A3A3A]">
                 <button className="flex items-center gap-1 hover:text-[#1FA9D6] text-xs">
                   <Heart className="w-4 h-4" />
@@ -224,22 +351,64 @@ export default function ProfileView({ username = "usuario" }: ProfileViewProps) 
           </TabsContent>
 
           <TabsContent value="rewards" className="mt-4">
-            <Card className="bg-[#3A3A3A]/10 border-[#3A3A3A]/20">
-              <CardContent className="p-6 text-center">
-                <p className="text-[#1E1E1E] text-sm">Your rewards will appear here.</p>
-              </CardContent>
-            </Card>
-          </TabsContent>
+            {loadingRewards ? (
+              <div className="flex justify-center py-8">
+                <Loader2 className="w-6 h-6 animate-spin text-[#1FA9D6]" />
+              </div>
+            ) : rewards.length > 0 ? (
+              <div className="grid grid-cols-[repeat(auto-fill,minmax(110px,1fr))] gap-3">
+                {rewards.map((reward) => (
+                  <Card
+                    key={reward.id}
+                    // 1. min-w-0: Prevents the image from forcing the card wide (blowout)
+                    // 2. max-w-[140px]: Strictly caps the width so it never looks "huge"
+                    className="bg-[#3A3A3A]/5 border-[#3A3A3A]/10 overflow-hidden shadow-sm hover:shadow-md transition-all flex flex-col min-w-0 max-w-[140px]"
+                  >
+                    {/* Image Container */}
+                    <div className="aspect-square w-full relative bg-gray-200 overflow-hidden">
+                      <img
+                        src={reward.metadata.image}
+                        alt={reward.metadata.name}
+                        loading="lazy"
+                        className="w-full h-full object-cover block transition-transform hover:scale-105"
+                      />
+                      <div className="absolute top-1.5 right-1.5 bg-black/70 backdrop-blur-[2px] text-white text-[9px] px-1.5 py-0.5 rounded-full font-medium">
+                        x{reward.balance}
+                      </div>
+                    </div>
 
-          <TabsContent value="certs" className="mt-4">
-            <Card className="bg-[#3A3A3A]/10 border-[#3A3A3A]/20">
-              <CardContent className="p-6 text-center">
-                <p className="text-[#1E1E1E] text-sm">Your certifications will appear here.</p>
-              </CardContent>
-            </Card>
+                    {/* Content */}
+                    <CardContent className="p-2 flex flex-col gap-1 flex-1">
+                      <p className="font-semibold text-[#1E1E1E] text-[11px] truncate leading-tight">
+                        {reward.metadata.name}
+                      </p>
+                      <Button
+                        size="sm"
+                        className="w-full mt-auto h-6 text-[10px] font-medium bg-[#1FA9D6] hover:bg-[#1FA9D6]/90 text-white shadow-none rounded-sm"
+                      >
+                        Redeem
+                      </Button>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            ) : (
+              /* Empty state remains the same */
+              <Card className="bg-[#3A3A3A]/10 border-[#3A3A3A]/20 shadow-none">
+                <CardContent className="p-6 text-center">
+                  <p className="text-[#1E1E1E] text-sm font-medium">
+                    No rewards yet
+                  </p>
+                  <p className="text-xs text-gray-500 mt-1">
+                    Attend events to collect items!
+                  </p>
+                </CardContent>
+              </Card>
+            )}
           </TabsContent>
         </Tabs>
 
+        {/* ... Settings & Dialogs (Unchanged) ... */}
         <div className="mt-8">
           <h2 className="text-xl font-bold mb-4 text-[#1E1E1E]">Settings</h2>
           <Dialog>
@@ -290,8 +459,12 @@ export default function ProfileView({ username = "usuario" }: ProfileViewProps) 
                   <div className="flex items-center gap-2 min-w-0">
                     <Lock className="h-5 w-5 text-[#1FA9D6] flex-shrink-0" />
                     <div className="min-w-0">
-                      <h3 className="text-[#1E1E1E] font-medium text-sm">Become an Artist</h3>
-                      <p className="text-xs text-[#3A3A3A] truncate">Apply to become verified</p>
+                      <h3 className="text-[#1E1E1E] font-medium text-sm">
+                        Become an Artist
+                      </h3>
+                      <p className="text-xs text-[#3A3A3A] truncate">
+                        Apply to become verified
+                      </p>
                     </div>
                   </div>
                   <Button className="bg-[#1FA9D6] hover:bg-[#1FA9D6]/90 text-white font-medium h-9 px-4 flex-shrink-0 text-sm">
@@ -305,30 +478,42 @@ export default function ProfileView({ username = "usuario" }: ProfileViewProps) 
       </div>
 
       <Dialog open={showCommentDialog} onOpenChange={setShowCommentDialog}>
+        {/* ... Comments Dialog (Unchanged) ... */}
         <DialogContent className="bg-white text-[#1E1E1E] border-[#3A3A3A]/30">
           <DialogHeader>
             <DialogTitle>Comments</DialogTitle>
           </DialogHeader>
           <div className="max-h-80 overflow-y-auto space-y-2 my-4">
-            {currentPostIndex !== null && postComments[`profile-${currentPostIndex}`]?.length > 0 ? (
+            {currentPostIndex !== null &&
+            postComments[`profile-${currentPostIndex}`]?.length > 0 ? (
               postComments[`profile-${currentPostIndex}`].map((comment, i) => (
                 <div key={i} className="flex gap-2">
                   <Avatar className="h-7 w-7 flex-shrink-0">
                     <AvatarImage
                       src={
-                        comment.author === "iamjuampi" ? "/images/profile/iamjuampi-avatar.jpg" : "/avatars/user.jpg"
+                        comment.author === "iamjuampi"
+                          ? "/images/profile/iamjuampi-avatar.jpg"
+                          : "/avatars/user.jpg"
                       }
                     />
-                    <AvatarFallback>{comment.author.substring(0, 2).toUpperCase()}</AvatarFallback>
+                    <AvatarFallback>
+                      {comment.author.substring(0, 2).toUpperCase()}
+                    </AvatarFallback>
                   </Avatar>
                   <div className="flex-1 bg-gray-100 p-2 rounded-lg min-w-0">
-                    <p className="text-xs font-medium truncate text-gray-900">{comment.author}</p>
-                    <p className="text-xs text-gray-700 break-words">{comment.text}</p>
+                    <p className="text-xs font-medium truncate text-gray-900">
+                      {comment.author}
+                    </p>
+                    <p className="text-xs text-gray-700 break-words">
+                      {comment.text}
+                    </p>
                   </div>
                 </div>
               ))
             ) : (
-              <p className="text-center text-gray-600 py-6 text-sm">No comments yet</p>
+              <p className="text-center text-gray-600 py-6 text-sm">
+                No comments yet
+              </p>
             )}
           </div>
           <div className="flex gap-2">
@@ -339,8 +524,8 @@ export default function ProfileView({ username = "usuario" }: ProfileViewProps) 
               onChange={(e) => setCommentText(e.target.value)}
               onKeyDown={(e) => {
                 if (e.key === "Enter" && !e.shiftKey) {
-                  e.preventDefault()
-                  handleSendComment()
+                  e.preventDefault();
+                  handleSendComment();
                 }
               }}
             />
@@ -355,134 +540,5 @@ export default function ProfileView({ username = "usuario" }: ProfileViewProps) 
         </DialogContent>
       </Dialog>
     </div>
-  )
+  );
 }
-
-// User posts
-export const userPosts = [
-  {
-    content: "New EP 'Techno Dimensions' out now! 🎵 #NewRelease",
-    time: "2 hours ago",
-    likes: 87,
-    comments: 14,
-    image: "/images/dj-mixer.png",
-  },
-]
-
-// Certifications with artist achievements
-const certifications = [
-  {
-    id: "c1",
-    type: "gold",
-    title: "Gold Record",
-    description: "Techno Dimensions EP reached 500,000 streams",
-    date: "Mar 15, 2025",
-  },
-  {
-    id: "c2",
-    type: "platinum",
-    title: "Platinum Record",
-    description: "Midnight Pulse single reached 1,000,000 streams",
-    date: "Feb 20, 2025",
-  },
-  {
-    id: "c3",
-    type: "views",
-    title: "1M Views",
-    description: "Music video for 'Electronic Dreams' reached 1 million views",
-    date: "Jan 30, 2025",
-  },
-  {
-    id: "c4",
-    type: "soldout",
-    title: "Sold Out Event",
-    description: "Club Underground performance sold out in 24 hours",
-    date: "Jan 15, 2025",
-  },
-  {
-    id: "c5",
-    type: "award",
-    title: "Best New Artist",
-    description: "Electronic Music Awards 2025",
-    date: "Jan 5, 2025",
-  },
-]
-
-// Rewards with real artists
-const rewards = [
-  {
-    id: "r1",
-    title: "Exclusive Track - March",
-    artistName: "Banger",
-    artistAvatar: "/avatars/banger.jpg",
-    date: "Mar 15, 2025",
-  },
-  {
-    id: "r2",
-    title: "Unreleased Remix - Spring",
-    artistName: "Nicola Marti",
-    artistAvatar: "/avatars/nicola.jpg",
-    date: "Mar 10, 2025",
-  },
-  {
-    id: "r3",
-    title: "Advanced Production Tutorial",
-    artistName: "AXS",
-    artistAvatar: "/avatars/axs.jpg",
-    date: "Mar 5, 2025",
-  },
-]
-
-// Artist rewards (for artist view)
-const artistRewards = [
-  {
-    title: "Exclusive Monthly Track",
-    description: "Unreleased track available only to token holders",
-    minTokens: 10,
-    subscribers: 156,
-  },
-  {
-    title: "Production Masterclass",
-    description: "Monthly video tutorial on advanced production techniques",
-    minTokens: 25,
-    subscribers: 87,
-  },
-  {
-    title: "Stems & Project Files",
-    description: "Complete project files for selected tracks",
-    minTokens: 50,
-    subscribers: 42,
-  },
-]
-
-// Followed artists (for fan view)
-const followedArtists = [
-  {
-    id: "banger",
-    name: "Banger",
-    avatar: "/avatars/banger.jpg",
-    genre: "DNB y Tech-House",
-    tokens: 15,
-  },
-  {
-    id: "nicolamarti",
-    name: "Nicola Marti",
-    avatar: "/avatars/nicola.jpg",
-    genre: "Tech-House",
-    tokens: 10,
-  },
-  {
-    id: "axs",
-    name: "AXS",
-    avatar: "/avatars/axs.jpg",
-    genre: "Riddim",
-    tokens: 25,
-  },
-  {
-    id: "flush",
-    name: "FLUSH",
-    avatar: "/avatars/flush.jpg",
-    genre: "Dubstep",
-    tokens: 5,
-  },
-]
