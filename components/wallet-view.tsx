@@ -1,7 +1,16 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { TrendingUp, Users, Copy, RefreshCw, Check } from "lucide-react";
+import {
+  TrendingUp,
+  Users,
+  Copy,
+  RefreshCw,
+  Check,
+  Camera,
+  ArrowRightLeft,
+  Send,
+} from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -10,8 +19,12 @@ import { BanknoteIcon } from "@/components/icons/banknote-icon";
 import { useWallets } from "@privy-io/react-auth";
 import { createPublicClient, http, formatEther } from "viem";
 import { mainnet } from "viem/chains";
+
+// View Imports
 import SendView from "./send-view";
 import ReceiveView from "./receive-view";
+import ScanView from "./scan-view";
+import TransferAssetView from "@/components/transfer-asset-view";
 
 export default function WalletView() {
   const { balance, donated } = useAuth();
@@ -20,10 +33,13 @@ export default function WalletView() {
   const [nativeBalance, setNativeBalance] = useState("0.00");
   const [isLoadingBalance, setIsLoadingBalance] = useState(false);
   const [isCopied, setIsCopied] = useState(false);
-  const [showSend, setShowSend] = useState(false);
-  const [showReceive, setShowReceive] = useState(false);
 
-  // Get the active Privy wallet
+  // --- View State Management ---
+  const [view, setView] = useState<
+    "MAIN" | "SEND" | "RECEIVE" | "SCAN" | "TRANSFER"
+  >("MAIN");
+  const [scannedAddress, setScannedAddress] = useState<string>("");
+
   const wallet =
     wallets.find((w) => w.walletClientType === "privy") || wallets[0];
   const shortAddress = wallet
@@ -35,8 +51,9 @@ export default function WalletView() {
 
     setIsLoadingBalance(true);
     try {
+      // In a real app, use the configured chain (e.g. Base) instead of mainnet
       const client = createPublicClient({
-        chain: mainnet, // Replace with worldchain if available in your viem config
+        chain: mainnet,
         transport: http(),
       });
 
@@ -65,25 +82,41 @@ export default function WalletView() {
   }, [wallets]);
 
   const handleBuy = () => alert("Buy tokens feature coming soon!");
-  const handleReceive = () => alert("Receive tokens feature coming soon!");
 
-  // Conditional Rendering
-  if (showSend) {
-    return <SendView onBack={() => setShowSend(false)} />;
+  // --- View Switcher Logic ---
+  if (view === "SEND") return <SendView onBack={() => setView("MAIN")} />;
+  if (view === "RECEIVE") return <ReceiveView onBack={() => setView("MAIN")} />;
+
+  // New Scan Flow
+  if (view === "SCAN") {
+    return (
+      <ScanView
+        onBack={() => setView("MAIN")}
+        onScanSuccess={(address) => {
+          setScannedAddress(address);
+          setView("TRANSFER");
+        }}
+      />
+    );
   }
-  if (showReceive) {
-    return <ReceiveView onBack={() => setShowReceive(false)} />;
+
+  // New Asset Selection Flow
+  if (view === "TRANSFER") {
+    return (
+      <TransferAssetView
+        recipientAddress={scannedAddress}
+        onBack={() => setView("SCAN")} // Back goes to scanner
+        onComplete={() => setView("MAIN")}
+      />
+    );
   }
 
   return (
     <div className="pb-6 bg-white h-full overflow-y-auto">
-      {/* PROFESSIONAL HEADER SECTION */}
+      {/* HEADER SECTION */}
       <div className="px-4 pt-12 pb-8 bg-gradient-to-r from-[#1FA9D6]/10 to-[#1FA9D6]/5 backdrop-blur-xl text-[#1E1E1E] border-b border-gray-200">
-        {/* Title & Address Row */}
         <div className="flex justify-between items-start mb-6">
           <h1 className="text-xl font-bold">Wallet</h1>
-
-          {/* Address Badge */}
           <button
             onClick={copyAddress}
             className="flex items-center gap-2 px-3 py-1.5 bg-white/40 hover:bg-white/60 border border-black/5 rounded-full transition-all active:scale-95"
@@ -102,7 +135,6 @@ export default function WalletView() {
           </button>
         </div>
 
-        {/* Balance Display */}
         <div className="space-y-1">
           <div className="flex items-center gap-2 opacity-80 text-xs font-medium uppercase tracking-wider">
             Native Balance
@@ -113,76 +145,64 @@ export default function WalletView() {
               <RefreshCw className="w-3 h-3 opacity-50 hover:opacity-100" />
             </button>
           </div>
-
           <div className="flex items-baseline gap-1">
             <span className="text-4xl font-extrabold tracking-tight text-[#1FA9D6]">
               {nativeBalance}
             </span>
             <span className="text-lg font-bold opacity-60">ETH</span>
           </div>
-
-          {/* Secondary Drops Balance */}
           <div className="flex items-center gap-2 mt-2 px-3 py-2 bg-black/5 rounded-lg w-fit">
             <BanknoteIcon className="w-4 h-4 text-[#1FA9D6]" />
             <span className="text-sm font-semibold">{balance} $DROPS</span>
           </div>
         </div>
 
-        {/* Action Buttons */}
-        <div className="flex gap-3 mt-8">
-          <Button
-            className="flex-1 bg-[#1E1E1E] text-white hover:bg-black border-none h-10 shadow-sm"
-            onClick={() => setShowReceive(true)}
-          >
-            Receive
-          </Button>
-          <Button
-            className="flex-1 bg-white text-[#1E1E1E] border border-gray-200 hover:bg-gray-50 h-10 shadow-sm"
+        {/* UPDATED ACTION BUTTONS GRID */}
+        <div className="grid grid-cols-4 gap-3 mt-8">
+          <ActionBtn
+            icon={<ArrowRightLeft className="w-5 h-5" />}
+            label="Receive"
+            onClick={() => setView("RECEIVE")}
+            primary
+          />
+          <ActionBtn
+            icon={<Camera className="w-5 h-5" />}
+            label="Scan"
+            onClick={() => setView("SCAN")}
+          />
+          <ActionBtn
+            icon={<Send className="w-4 h-4" />}
+            label="Send"
+            onClick={() => setView("SEND")}
+          />
+          <ActionBtn
+            icon={<BanknoteIcon className="w-5 h-5" />}
+            label="Buy"
             onClick={handleBuy}
-          >
-            Buy
-          </Button>
-          <Button
-            className="flex-1 bg-white text-[#1E1E1E] border border-gray-200 hover:bg-gray-50 h-10 shadow-sm"
-            onClick={() => setShowSend(true)}
-          >
-            Send
-          </Button>
+          />
         </div>
       </div>
 
-      {/* Stats Cards (Unchanged) */}
+      {/* Stats Cards */}
       <div className="grid grid-cols-3 gap-3 px-4 mt-6">
-        <Card className="bg-[#3A3A3A]/5 shadow-none border border-black/5">
-          <CardContent className="p-4 flex flex-col items-center justify-center gap-1">
-            <BanknoteIcon className="h-5 w-5 text-[#1FA9D6] mb-1" />
-            <p className="text-[10px] uppercase font-bold text-gray-400">
-              Purchased
-            </p>
-            <p className="font-bold text-[#1E1E1E] text-sm">{donated}</p>
-          </CardContent>
-        </Card>
-        <Card className="bg-[#3A3A3A]/5 shadow-none border border-black/5">
-          <CardContent className="p-4 flex flex-col items-center justify-center gap-1">
-            <Users className="h-5 w-5 text-[#1FA9D6] mb-1" />
-            <p className="text-[10px] uppercase font-bold text-gray-400">
-              Artists
-            </p>
-            <p className="font-bold text-[#1E1E1E] text-sm">8</p>
-          </CardContent>
-        </Card>
-        <Card className="bg-[#3A3A3A]/5 shadow-none border border-black/5">
-          <CardContent className="p-4 flex flex-col items-center justify-center gap-1">
-            <TrendingUp className="h-5 w-5 text-[#1FA9D6] mb-1" />
-            <p className="text-[10px] uppercase font-bold text-gray-400">
-              Value
-            </p>
-            <p className="font-bold text-[#1E1E1E] text-sm">$1.00</p>
-          </CardContent>
-        </Card>
+        <StatCard
+          icon={<BanknoteIcon className="h-5 w-5 text-[#1FA9D6]" />}
+          label="Purchased"
+          value={donated}
+        />
+        <StatCard
+          icon={<Users className="h-5 w-5 text-[#1FA9D6]" />}
+          label="Artists"
+          value="8"
+        />
+        <StatCard
+          icon={<TrendingUp className="h-5 w-5 text-[#1FA9D6]" />}
+          label="Value"
+          value="$1.00"
+        />
       </div>
 
-      {/* Artist Tokens */}
+      {/* Artist Tokens Section */}
       <div className="mt-8 px-4">
         <h2 className="text-lg font-bold mb-4 text-[#1E1E1E]">Artist Tokens</h2>
         <div className="space-y-3">
@@ -194,10 +214,7 @@ export default function WalletView() {
               <CardContent className="p-3">
                 <div className="flex items-center gap-3">
                   <Avatar className="h-10 w-10 ring-2 ring-gray-50">
-                    <AvatarImage
-                      src={token.avatar || "/placeholder.svg"}
-                      alt={token.name}
-                    />
+                    <AvatarImage src={token.avatar} alt={token.name} />
                     <AvatarFallback>
                       {token.name.substring(0, 2).toUpperCase()}
                     </AvatarFallback>
@@ -225,52 +242,57 @@ export default function WalletView() {
           ))}
         </div>
       </div>
-
-      {/* Transaction History */}
-      <div className="mt-8 px-4">
-        <h2 className="text-lg font-bold mb-4 text-[#1E1E1E]">Activity</h2>
-        <div className="space-y-3">
-          {transactions.map((transaction) => (
-            <div
-              key={transaction.id}
-              className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-50 transition-colors"
-            >
-              <div
-                className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                  transaction.type === "sent"
-                    ? "bg-gray-100"
-                    : "bg-[#1FA9D6]/10"
-                }`}
-              >
-                <BanknoteIcon
-                  className={`h-5 w-5 ${transaction.type === "sent" ? "text-gray-500" : "text-[#1FA9D6]"}`}
-                />
-              </div>
-              <div className="flex-1">
-                <div className="flex items-center justify-between">
-                  <p className="font-medium text-[#1E1E1E] text-sm">
-                    {transaction.description}
-                  </p>
-                  <p
-                    className={`font-bold text-sm ${transaction.type === "sent" ? "text-gray-600" : "text-[#1FA9D6]"}`}
-                  >
-                    {transaction.type === "sent" ? "-" : "+"}
-                    {transaction.amount}
-                  </p>
-                </div>
-                <p className="text-xs text-gray-400 mt-0.5">
-                  {transaction.date}
-                </p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
     </div>
   );
 }
 
-// Artist tokens data
+// Helper Components & Data
+
+function ActionBtn({
+  icon,
+  label,
+  onClick,
+  primary = false,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  onClick: () => void;
+  primary?: boolean;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      className={`
+                flex flex-col items-center justify-center gap-1.5 p-3 rounded-xl transition-all active:scale-95
+                ${primary ? "bg-[#1E1E1E] text-white shadow-lg shadow-black/10" : "bg-white border border-gray-200 hover:bg-gray-50 shadow-sm"}
+            `}
+    >
+      <div className={primary ? "text-white" : "text-[#1E1E1E]"}>{icon}</div>
+      <span className="text-[11px] font-semibold">{label}</span>
+    </button>
+  );
+}
+
+function StatCard({
+  icon,
+  label,
+  value,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  value: string | number;
+}) {
+  return (
+    <Card className="bg-[#3A3A3A]/5 shadow-none border border-black/5">
+      <CardContent className="p-4 flex flex-col items-center justify-center gap-1">
+        <div className="mb-1">{icon}</div>
+        <p className="text-[10px] uppercase font-bold text-gray-400">{label}</p>
+        <p className="font-bold text-[#1E1E1E] text-sm">{value}</p>
+      </CardContent>
+    </Card>
+  );
+}
+
 const artistTokens = [
   {
     id: "1",
@@ -307,44 +329,5 @@ const artistTokens = [
     amount: 5,
     value: "2.25",
     change: "0.9",
-  },
-];
-
-// Sample transaction data
-const transactions = [
-  {
-    id: "1",
-    type: "sent",
-    description: "Sent to banger",
-    amount: 15,
-    date: "Mar 15, 2025",
-  },
-  {
-    id: "2",
-    type: "received",
-    description: "Received from AXS",
-    amount: 10,
-    date: "Mar 12, 2025",
-  },
-  {
-    id: "3",
-    type: "sent",
-    description: "Sent to Nicola Marti",
-    amount: 25,
-    date: "Mar 10, 2025",
-  },
-  {
-    id: "4",
-    type: "received",
-    description: "Purchased",
-    amount: 50,
-    date: "Mar 5, 2025",
-  },
-  {
-    id: "5",
-    type: "sent",
-    description: "Sent to FLUSH",
-    amount: 5,
-    date: "Mar 1, 2025",
   },
 ];
