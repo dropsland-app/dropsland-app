@@ -1,10 +1,8 @@
-"use client"
+"use client";
 
-import { ArrowDown, ArrowUp } from "lucide-react"
-import { BanknoteIcon } from "@/components/icons/banknote-icon"
-
-// Importar el hook useAuth
-import { useAuth } from "@/hooks/use-auth"
+import { ArrowDown, ArrowUp } from "lucide-react";
+import { BanknoteIcon } from "@/components/icons/banknote-icon";
+import { useAuth } from "@/hooks/use-auth";
 
 // Mock data for activity
 const ACTIVITIES = [
@@ -52,11 +50,11 @@ const ACTIVITIES = [
     wldAmount: 1,
     time: "2 weeks ago",
   },
-]
+];
 
 // Modificar la función ActivityScreen para mostrar el balance actual
 export default function ActivityScreen() {
-  const { balance } = useAuth() // Obtener el balance del contexto
+  const { balance } = useAuth(); // Obtener el balance del contexto
 
   return (
     <div className="h-full overflow-auto pb-20">
@@ -71,7 +69,9 @@ export default function ActivityScreen() {
                 <span className="text-2xl font-bold">{balance} DROPS</span>
               </div>
             </div>
-            <button className="bg-primary text-white px-4 py-2 rounded-full text-sm font-medium">Buy More</button>
+            <button className="bg-primary text-white px-4 py-2 rounded-full text-sm font-medium">
+              Buy More
+            </button>
           </div>
         </div>
       </div>
@@ -84,7 +84,10 @@ export default function ActivityScreen() {
 
         <div className="space-y-3">
           {ACTIVITIES.map((activity) => (
-            <div key={activity.id} className="bg-white rounded-xl p-4 shadow-sm">
+            <div
+              key={activity.id}
+              className="bg-white rounded-xl p-4 shadow-sm"
+            >
               {activity.type === "donation_sent" && (
                 <div className="flex items-center">
                   <div className="w-10 h-10 rounded-full bg-red-50 flex items-center justify-center mr-3">
@@ -92,8 +95,12 @@ export default function ActivityScreen() {
                   </div>
                   <div className="flex-1">
                     <div className="flex items-center justify-between">
-                      <p className="font-medium">Donation to {activity.user.name}</p>
-                      <p className="text-red-500 font-medium">-{activity.amount} DROPS</p>
+                      <p className="font-medium">
+                        Donation to {activity.user?.name}
+                      </p>
+                      <p className="text-red-500 font-medium">
+                        -{activity.amount} DROPS
+                      </p>
                     </div>
                     <p className="text-xs text-gray-500">{activity.time}</p>
                   </div>
@@ -107,8 +114,12 @@ export default function ActivityScreen() {
                   </div>
                   <div className="flex-1">
                     <div className="flex items-center justify-between">
-                      <p className="font-medium">Donation from {activity.user.name}</p>
-                      <p className="text-green-500 font-medium">+{activity.amount} DROPS</p>
+                      <p className="font-medium">
+                        Donation from {activity.user?.name}
+                      </p>
+                      <p className="text-green-500 font-medium">
+                        +{activity.amount} DROPS
+                      </p>
                     </div>
                     <p className="text-xs text-gray-500">{activity.time}</p>
                   </div>
@@ -123,11 +134,15 @@ export default function ActivityScreen() {
                   <div className="flex-1">
                     <div className="flex items-center justify-between">
                       <p className="font-medium">Purchased BEANS</p>
-                      <p className="text-green-500 font-medium">+{activity.amount} BEANS</p>
+                      <p className="text-green-500 font-medium">
+                        +{activity.amount} BEANS
+                      </p>
                     </div>
                     <div className="flex items-center justify-between">
                       <p className="text-xs text-gray-500">{activity.time}</p>
-                      <p className="text-xs text-gray-500">-{activity.wldAmount} WLD</p>
+                      <p className="text-xs text-gray-500">
+                        -{activity.wldAmount} WLD
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -137,5 +152,5 @@ export default function ActivityScreen() {
         </div>
       </div>
     </div>
-  )
+  );
 }

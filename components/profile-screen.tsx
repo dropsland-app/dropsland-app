@@ -1,9 +1,48 @@
-"use client"
+"use client";
 
-import { ArrowLeft, Banknote, Heart, MessageCircle, Share2 } from "lucide-react"
-import Image from "next/image"
+import {
+  ArrowLeft,
+  Banknote,
+  Heart,
+  MessageCircle,
+  Share2,
+} from "lucide-react";
+import Image from "next/image";
 
-export default function ProfileScreen({ creator = null, onBack, onDonate, isCurrentUser = false }) {
+interface Post {
+  id: string;
+  content: string;
+  image?: string | null;
+  likes: number;
+  comments: number;
+  time: string;
+}
+
+interface CreatorData {
+  id: string;
+  name: string;
+  handle: string;
+  avatar: string;
+  coverImage: string;
+  bio: string;
+  blgReceived: number;
+  supporters: number;
+  posts?: Post[];
+}
+
+interface ProfileScreenProps {
+  creator?: CreatorData | null;
+  onBack?: () => void;
+  onDonate?: () => void;
+  isCurrentUser?: boolean;
+}
+
+export default function ProfileScreen({
+  creator = null,
+  onBack,
+  onDonate,
+  isCurrentUser = false,
+}: ProfileScreenProps) {
   // Default creator data for current user profile if no creator is provided
   const profileData = creator || {
     id: "current-user",
@@ -15,12 +54,13 @@ export default function ProfileScreen({ creator = null, onBack, onDonate, isCurr
     blgReceived: 0,
     supporters: 0,
     posts: [],
-  }
+  };
 
   const defaultPosts = [
     {
       id: "p1",
-      content: "Just released a new digital art collection! Check it out and let me know what you think.",
+      content:
+        "Just released a new digital art collection! Check it out and let me know what you think.",
       image: "/placeholder.svg?height=200&width=300",
       likes: 42,
       comments: 7,
@@ -34,16 +74,18 @@ export default function ProfileScreen({ creator = null, onBack, onDonate, isCurr
       comments: 5,
       time: "1d ago",
     },
-  ]
+  ];
 
-  const posts = profileData.posts || defaultPosts
+  const posts = profileData.posts || defaultPosts;
 
   return (
     <div className="h-full overflow-auto pb-4">
       {/* Header */}
       <div className="relative h-36">
         <Image
-          src={profileData.coverImage || "/placeholder.svg?height=150&width=400"}
+          src={
+            profileData.coverImage || "/placeholder.svg?height=150&width=400"
+          }
           alt="Cover"
           fill
           className="object-cover"
@@ -73,7 +115,10 @@ export default function ProfileScreen({ creator = null, onBack, onDonate, isCurr
             />
           </div>
           {!isCurrentUser && (
-            <button className="bg-primary text-white px-4 py-2 rounded-full text-sm font-medium" onClick={onDonate}>
+            <button
+              className="bg-primary text-white px-4 py-2 rounded-full text-sm font-medium"
+              onClick={onDonate}
+            >
               <Banknote className="h-5 w-5 inline mr-1" />
               Donate BLG
             </button>
@@ -105,8 +150,12 @@ export default function ProfileScreen({ creator = null, onBack, onDonate, isCurr
 
         {/* Tabs */}
         <div className="flex border-b mt-4">
-          <button className="flex-1 py-2 font-medium text-primary border-b-2 border-primary">Posts</button>
-          <button className="flex-1 py-2 font-medium text-gray-500">Rewards</button>
+          <button className="flex-1 py-2 font-medium text-primary border-b-2 border-primary">
+            Posts
+          </button>
+          <button className="flex-1 py-2 font-medium text-gray-500">
+            Rewards
+          </button>
         </div>
       </div>
 
@@ -134,7 +183,12 @@ export default function ProfileScreen({ creator = null, onBack, onDonate, isCurr
 
             {post.image && (
               <div className="rounded-lg overflow-hidden mb-3 h-48 relative">
-                <Image src={post.image || "/placeholder.svg"} alt="Post image" fill className="object-cover" />
+                <Image
+                  src={post.image || "/placeholder.svg"}
+                  alt="Post image"
+                  fill
+                  className="object-cover"
+                />
               </div>
             )}
 
@@ -162,5 +216,5 @@ export default function ProfileScreen({ creator = null, onBack, onDonate, isCurr
         )}
       </div>
     </div>
-  )
+  );
 }

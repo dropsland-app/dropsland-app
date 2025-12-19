@@ -408,7 +408,6 @@ export default function ProfileView({
           </TabsContent>
         </Tabs>
 
-        {/* ... Settings & Dialogs (Unchanged) ... */}
         <div className="mt-8">
           <h2 className="text-xl font-bold mb-4 text-[#1E1E1E]">Settings</h2>
           <Dialog>
@@ -478,7 +477,6 @@ export default function ProfileView({
       </div>
 
       <Dialog open={showCommentDialog} onOpenChange={setShowCommentDialog}>
-        {/* ... Comments Dialog (Unchanged) ... */}
         <DialogContent className="bg-white text-[#1E1E1E] border-[#3A3A3A]/30">
           <DialogHeader>
             <DialogTitle>Comments</DialogTitle>

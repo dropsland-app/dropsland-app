@@ -24,19 +24,30 @@ describe("Dropsland Contracts", async function () {
     const events = await viem.deployContract("DropslandEvents");
     const [owner, fan] = await viem.getWalletClients();
 
-    // Mint ticket
-    await events.write.mint([fan.account.address, 2001n, 1n, "0x"]);
+    // 1. Create ticket (Mints to Owner, ID will be 0)
+    // Signature: createItem(amount, uri, data)
+    await events.write.createItem([1n, "ipfs://ticket", "0x"]);
+    const tokenId = 0n;
 
-    // Connect as fan to burn (redeem)
+    // 2. Transfer from Owner to Fan
+    await events.write.safeTransferFrom([
+      owner.account.address,
+      fan.account.address,
+      tokenId,
+      1n,
+      "0x",
+    ]);
+
+    // 3. Connect as fan to burn (redeem)
     const eventsAsFan = await viem.getContractAt(
       "DropslandEvents",
       events.address,
       { client: { wallet: fan } },
     );
 
-    await eventsAsFan.write.burn([fan.account.address, 2001n, 1n]);
+    await eventsAsFan.write.burn([fan.account.address, tokenId, 1n]);
 
-    const balance = await events.read.balanceOf([fan.account.address, 2001n]);
+    const balance = await events.read.balanceOf([fan.account.address, tokenId]);
     assert.equal(balance, 0n);
   });
 });

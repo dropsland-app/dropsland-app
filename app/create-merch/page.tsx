@@ -116,7 +116,7 @@ export default function CreateMerchPage() {
       console.log("Tx Hash:", hash);
       setStep("Done!");
 
-      router.push("/profile");
+      router.back();
     } catch (error) {
       console.error("Creation failed:", error);
       alert("Failed to create merch. See console.");
