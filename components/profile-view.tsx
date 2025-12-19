@@ -14,6 +14,7 @@ import {
   Pencil,
   Loader2,
   Plus,
+  QrCode,
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -233,6 +234,14 @@ export default function ProfileView({
                 >
                   <Plus className="w-3 h-3" />
                   Create Merch
+                </button>
+
+                <button
+                  onClick={() => router.push("/verify")}
+                  className="bg-[#3A3A3A]/10 px-3 py-1.5 rounded-full border border-[#3A3A3A]/30 text-[#1E1E1E] text-xs hover:bg-[#3A3A3A]/20 inline-flex items-center gap-1"
+                >
+                  <QrCode className="w-3 h-3" />
+                  Verify
                 </button>
               </div>
               {/* ------------------------------- */}
