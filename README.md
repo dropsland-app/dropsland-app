@@ -1,4 +1,4 @@
-# Dropsland 💧
+# Dropsland (Web3 DJs App)
 
 > **Dropsland is a Web3-native application that connects music content, live events, and real-world access using NFTs as verifiable ownership and redemption primitives.**
 
