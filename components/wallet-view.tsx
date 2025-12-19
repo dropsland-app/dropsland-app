@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import {
   TrendingUp,
   Users,
@@ -12,7 +13,6 @@ import {
   Send,
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useAuth } from "@/hooks/use-auth";
 import { BanknoteIcon } from "@/components/icons/banknote-icon";
@@ -20,25 +20,14 @@ import { useWallets } from "@privy-io/react-auth";
 import { createPublicClient, http, formatEther } from "viem";
 import { mainnet } from "viem/chains";
 
-// View Imports
-import SendView from "./send-view";
-import ReceiveView from "./receive-view";
-import ScanView from "./scan-view";
-import TransferAssetView from "@/components/transfer-asset-view";
-
 export default function WalletView() {
+  const router = useRouter(); // Initialize Router
   const { balance, donated } = useAuth();
   const { wallets } = useWallets();
 
   const [nativeBalance, setNativeBalance] = useState("0.00");
   const [isLoadingBalance, setIsLoadingBalance] = useState(false);
   const [isCopied, setIsCopied] = useState(false);
-
-  // --- View State Management ---
-  const [view, setView] = useState<
-    "MAIN" | "SEND" | "RECEIVE" | "SCAN" | "TRANSFER"
-  >("MAIN");
-  const [scannedAddress, setScannedAddress] = useState<string>("");
 
   const wallet =
     wallets.find((w) => w.walletClientType === "privy") || wallets[0];
@@ -48,19 +37,12 @@ export default function WalletView() {
 
   const fetchNativeBalance = async () => {
     if (!wallet) return;
-
     setIsLoadingBalance(true);
     try {
-      // In a real app, use the configured chain (e.g. Base) instead of mainnet
-      const client = createPublicClient({
-        chain: mainnet,
-        transport: http(),
-      });
-
+      const client = createPublicClient({ chain: mainnet, transport: http() });
       const balanceWei = await client.getBalance({
         address: wallet.address as `0x${string}`,
       });
-
       setNativeBalance(formatEther(balanceWei).slice(0, 6));
     } catch (error) {
       console.error("Error fetching balance:", error);
@@ -81,35 +63,12 @@ export default function WalletView() {
     fetchNativeBalance();
   }, [wallets]);
 
-  const handleBuy = () => alert("Buy tokens feature coming soon!");
-
-  // --- View Switcher Logic ---
-  if (view === "SEND") return <SendView onBack={() => setView("MAIN")} />;
-  if (view === "RECEIVE") return <ReceiveView onBack={() => setView("MAIN")} />;
-
-  // New Scan Flow
-  if (view === "SCAN") {
-    return (
-      <ScanView
-        onBack={() => setView("MAIN")}
-        onScanSuccess={(address) => {
-          setScannedAddress(address);
-          setView("TRANSFER");
-        }}
-      />
-    );
-  }
-
-  // New Asset Selection Flow
-  if (view === "TRANSFER") {
-    return (
-      <TransferAssetView
-        recipientAddress={scannedAddress}
-        onBack={() => setView("SCAN")} // Back goes to scanner
-        onComplete={() => setView("MAIN")}
-      />
-    );
-  }
+  // --- NAVIGATION HANDLERS ---
+  // These now push to routes instead of setting state
+  const goToReceive = () => router.push("/wallet/receive");
+  const goToScan = () => router.push("/wallet/scan"); // Or just /scan
+  const goToSend = () => router.push("/wallet/send");
+  const handleBuy = () => alert("Coming Soon");
 
   return (
     <div className="pb-6 bg-white h-full overflow-y-auto">
@@ -157,23 +116,23 @@ export default function WalletView() {
           </div>
         </div>
 
-        {/* UPDATED ACTION BUTTONS GRID */}
+        {/* ACTION BUTTONS GRID - UPDATED HANDLERS */}
         <div className="grid grid-cols-4 gap-3 mt-8">
           <ActionBtn
             icon={<ArrowRightLeft className="w-5 h-5" />}
             label="Receive"
-            onClick={() => setView("RECEIVE")}
+            onClick={goToReceive}
             primary
           />
           <ActionBtn
             icon={<Camera className="w-5 h-5" />}
             label="Scan"
-            onClick={() => setView("SCAN")}
+            onClick={goToScan}
           />
           <ActionBtn
             icon={<Send className="w-4 h-4" />}
             label="Send"
-            onClick={() => setView("SEND")}
+            onClick={goToSend}
           />
           <ActionBtn
             icon={<BanknoteIcon className="w-5 h-5" />}
@@ -246,8 +205,7 @@ export default function WalletView() {
   );
 }
 
-// Helper Components & Data
-
+// Helper Components
 function ActionBtn({
   icon,
   label,

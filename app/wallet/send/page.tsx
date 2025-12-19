@@ -5,21 +5,23 @@ import { useSendTransaction } from "@privy-io/react-auth";
 import { parseEther, isAddress } from "viem";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Loader2, ArrowLeft, Wallet } from "lucide-react"; // Changed ArrowRight to ArrowLeft for back
-import { useRouter } from "next/navigation"; // Use Next.js router
+import { Loader2, ArrowLeft, Info, User, Search } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { Slider } from "@/components/ui/slider";
+import BottomDock from "@/components/bottom-dock"; // Import the new dock
 
 export default function SendFundsPage() {
   const router = useRouter();
   const [recipient, setRecipient] = useState("");
-  const [amount, setAmount] = useState("");
-  const [loading, setLoading] = useState(false); // Manual loading state
+  const [amount, setAmount] = useState<number>(0.001);
+  const [loading, setLoading] = useState(false);
+  const [note, setNote] = useState("");
 
   const { sendTransaction } = useSendTransaction({
     onSuccess: (hash) => {
       setLoading(false);
-      console.log("Transaction sent:", hash);
       alert(`Success! Tx Hash: ${hash}`);
-      router.push("/wallet"); // Go back to wallet on success
+      router.push("/wallet");
     },
     onError: (error) => {
       setLoading(false);
@@ -38,7 +40,7 @@ export default function SendFundsPage() {
     try {
       await sendTransaction({
         to: recipient,
-        value: parseEther(amount),
+        value: parseEther(amount.toString()),
       });
     } catch (err) {
       console.error(err);
@@ -47,75 +49,115 @@ export default function SendFundsPage() {
   };
 
   return (
-    // Added min-h-screen and pb-20 to account for bottom nav if visible
-    <div className="flex flex-col min-h-screen bg-black text-white p-6 pb-24 animate-in slide-in-from-right duration-300">
-      {/* Header with Back Navigation */}
-      <div className="flex items-center gap-4 mb-8">
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => router.back()}
-          className="text-gray-400 hover:text-white hover:bg-white/10"
-        >
-          <ArrowLeft className="w-6 h-6" />
-        </Button>
-        <h2 className="text-2xl font-bold tracking-tight text-[#F9BF15]">
-          SEND FUNDS
-        </h2>
+    // FIXED: Use h-screen and flex-col to match app shell layout
+    <div className="flex flex-col h-screen bg-white text-[#1E1E1E] overflow-hidden">
+      {/* Header - Matches WalletView style */}
+      <div className="px-4 pt-12 pb-6 bg-gradient-to-r from-[#1FA9D6]/10 to-[#1FA9D6]/5 backdrop-blur-xl border-b border-gray-100 shrink-0">
+        <div className="flex items-center gap-2">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => router.back()}
+            className="-ml-2 text-[#1E1E1E] hover:bg-black/5 rounded-full"
+          >
+            <ArrowLeft className="w-5 h-5" />
+          </Button>
+          <h2 className="text-xl font-bold tracking-tight">Send Funds</h2>
+        </div>
       </div>
 
-      {/* Form Content */}
-      <div className="space-y-6 flex-1">
-        {/* Amount */}
-        <div className="space-y-2">
-          <label className="text-xs font-bold text-[#1FA9D6] uppercase tracking-widest">
-            Amount (ETH)
-          </label>
-          <div className="relative">
-            <Input
-              type="number"
-              placeholder="0.00"
-              value={amount}
-              onChange={(e) => setAmount(e.target.value)}
-              className="bg-zinc-900 border-zinc-800 text-3xl font-bold h-20 pl-4 pr-12 text-white focus:ring-[#1FA9D6] focus:border-[#1FA9D6] rounded-xl"
-            />
-            <div className="absolute right-4 top-1/2 -translate-y-1/2 text-sm text-gray-500 font-bold">
-              ETH
+      {/* Scrollable Content Area */}
+      <div className="flex-1 overflow-y-auto p-6 pb-32">
+        {" "}
+        {/* pb-32 adds space for the bottom dock */}
+        {/* Recipient Input */}
+        <div className="space-y-3 mb-8">
+          <label className="text-sm font-bold text-[#1E1E1E]">To</label>
+          <div className="flex gap-2">
+            <div className="relative flex-1">
+              <User className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+              <Input
+                placeholder="0x Address, ENS or Username"
+                value={recipient}
+                onChange={(e) => setRecipient(e.target.value)}
+                className="pl-9 h-11 bg-gray-50 border-gray-200 focus:ring-[#1FA9D6] focus:border-[#1FA9D6] rounded-xl text-[#1E1E1E]"
+              />
             </div>
+            <Button className="h-11 w-11 p-0 bg-[#1FA9D6] hover:bg-[#1FA9D6]/90 rounded-xl">
+              <Search className="h-4 w-4 text-white" />
+            </Button>
           </div>
         </div>
+        {/* Amount Section */}
+        <div className="space-y-4 mb-8">
+          <div className="flex justify-between items-center">
+            <label className="text-sm font-bold text-[#1E1E1E]">Amount</label>
+            <span className="text-xs font-bold text-[#1FA9D6] bg-[#1FA9D6]/10 px-2 py-1 rounded-md">
+              Balance: 0.05 ETH
+            </span>
+          </div>
 
-        {/* Recipient */}
-        <div className="space-y-2">
-          <label className="text-xs font-bold text-[#1FA9D6] uppercase tracking-widest">
-            Recipient Address
+          {/* Big Amount Display */}
+          <div className="bg-gray-50 rounded-2xl p-8 border border-gray-100 flex flex-col items-center justify-center gap-1 shadow-inner">
+            <div className="flex items-baseline gap-1">
+              <span className="text-4xl font-extrabold text-[#1E1E1E] tracking-tight">
+                {amount}
+              </span>
+              <span className="text-lg font-bold text-gray-400">ETH</span>
+            </div>
+            <p className="text-xs text-gray-400 font-medium">
+              ≈ ${(amount * 3500).toFixed(2)} USD
+            </p>
+          </div>
+
+          <Slider
+            defaultValue={[0.001]}
+            max={0.1}
+            step={0.001}
+            value={[amount]}
+            onValueChange={(val) => setAmount(val[0])}
+            className="[&_.bg-primary]:bg-[#1FA9D6] [&_.border-primary]:border-[#1FA9D6]"
+          />
+
+          {/* Quick Select Pills */}
+          <div className="flex justify-between text-xs text-gray-400 mt-1">
+            <span>0 ETH</span>
+            <span>0.1 ETH</span>
+          </div>
+
+          <div className="grid grid-cols-4 gap-2 mt-4">
+            {[0.001, 0.01, 0.05, 0.1].map((val) => (
+              <button
+                key={val}
+                onClick={() => setAmount(val)}
+                className={`py-2 rounded-lg text-xs font-bold transition-all ${
+                  amount === val
+                    ? "bg-[#1FA9D6] text-white shadow-md shadow-[#1FA9D6]/20"
+                    : "bg-gray-50 text-gray-600 hover:bg-gray-100 border border-gray-100"
+                }`}
+              >
+                {val}
+              </button>
+            ))}
+          </div>
+        </div>
+        {/* Note Input */}
+        <div className="space-y-3 mb-8">
+          <label className="text-sm font-bold text-[#1E1E1E]">
+            Note (Optional)
           </label>
-          <div className="relative">
-            <Wallet className="absolute left-4 top-3.5 h-5 w-5 text-gray-500" />
-            <Input
-              placeholder="0x..."
-              value={recipient}
-              onChange={(e) => setRecipient(e.target.value)}
-              className="bg-zinc-900 border-zinc-800 h-12 pl-12 font-mono text-sm text-gray-300 focus:ring-[#1FA9D6] focus:border-[#1FA9D6] rounded-xl"
-            />
-          </div>
+          <Input
+            placeholder="What is this for?"
+            value={note}
+            onChange={(e) => setNote(e.target.value)}
+            className="h-11 bg-gray-50 border-gray-200 focus:ring-[#1FA9D6] focus:border-[#1FA9D6] rounded-xl text-[#1E1E1E]"
+          />
         </div>
-
-        {/* Info Card */}
-        <div className="bg-zinc-900/50 rounded-xl p-4 border border-zinc-800/50">
-          <p className="text-xs text-gray-500 text-center">
-            Transactions are processed on-chain. <br />
-            Gas fees apply.
-          </p>
-        </div>
-      </div>
-
-      {/* Footer Action */}
-      <div className="mt-auto pt-6">
+        {/* Action Button */}
         <Button
           onClick={handleSend}
           disabled={loading || !amount || !recipient}
-          className="w-full bg-[#F9BF15] hover:bg-[#dca60b] text-black font-bold h-14 text-lg rounded-xl transition-all active:scale-[0.98] disabled:opacity-50"
+          className="w-full bg-[#1FA9D6] hover:bg-[#1FA9D6]/90 text-white font-bold h-14 text-lg rounded-xl shadow-lg shadow-[#1FA9D6]/20 transition-all active:scale-[0.98] mb-4"
         >
           {loading ? (
             <>
@@ -123,10 +165,19 @@ export default function SendFundsPage() {
               Processing...
             </>
           ) : (
-            "Confirm Send"
+            "Confirm Transaction"
           )}
         </Button>
+        <div className="flex items-center justify-center text-gray-400 gap-1.5">
+          <Info className="w-3 h-3" />
+          <span className="text-[10px] uppercase tracking-wider font-bold">
+            Gas fees apply
+          </span>
+        </div>
       </div>
+
+      {/* Floating Bottom Dock */}
+      <BottomDock activeIndex={3} theme="light" />
     </div>
   );
 }

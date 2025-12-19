@@ -1,76 +1,60 @@
-// components/login-screen.tsx
-
 "use client";
 
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
-import { ArrowRight, Music2 } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 
 export default function LoginScreen() {
   const { login } = useAuth();
 
   return (
-    <div className="relative flex flex-col h-full w-full overflow-hidden bg-black">
-      {/* 1. Immersive Background Layer */}
-      <div className="absolute inset-0 z-0">
-        <Image
-          src="/electronic-music-stage-lights.jpg" // Using asset from REPO list
-          alt="Background"
-          fill
-          className="object-cover opacity-60"
-          priority
-        />
-        {/* Gradient Overlay for readability */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/80 to-black/30" />
-      </div>
+    <div className="relative flex flex-col h-full w-full bg-white overflow-hidden">
+      {/* Ambient Lighting Effect - Very subtle brand tint for light mode */}
+      <div className="absolute top-[-20%] left-1/2 -translate-x-1/2 w-[150%] h-[60%] bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-[#1FA9D6]/10 via-white/0 to-transparent pointer-events-none blur-3xl" />
 
-      {/* 2. Main Content */}
-      <div className="relative z-10 flex-1 flex flex-col justify-end pb-12 px-6">
-        {/* Brand Section */}
-        <div className="flex flex-col items-center mb-12 animate-in fade-in slide-in-from-bottom-4 duration-1000">
-          <div className="relative w-full max-w-[280px] h-24 mb-2">
-            {/* Using the logo from repo assets */}
-            <Image
-              src="/images/dropsland-logo.png"
-              alt="DROPSLAND"
-              fill
-              className="object-contain filter brightness-0 invert drop-shadow-[0_0_15px_rgba(255,255,255,0.3)]"
-            />
-          </div>
+      <div className="flex-1 flex flex-col items-center justify-center px-6 z-10 relative">
+        {/* Logo Section */}
+        <div className="w-48 mb-12 animate-in fade-in zoom-in-95 duration-1000">
+          <Image
+            src="/images/dropsland-logo.png"
+            alt="DROPSLAND"
+            width={200}
+            height={60}
+            // brightness-0 forces the logo to be solid black (perfect for light mode minimalism)
+            className="w-full h-auto opacity-90"
+            priority
+          />
+        </div>
 
-          <div className="flex items-center gap-2 px-3 py-1 rounded-full border border-white/20 bg-white/5 backdrop-blur-md">
-            <Music2 className="w-3 h-3 text-[#1FA9D6]" />
-            <span className="text-[#1FA9D6] text-xs font-bold tracking-widest uppercase">
-              Web3 Music Events
-            </span>
-          </div>
-
-          <p className="text-gray-300 text-sm text-center mt-6 max-w-xs leading-relaxed">
-            Connect with DJs, collect event access NFTs, and redeem real-world
-            perks.
+        {/* Minimal Typographic Hero - Dark Text */}
+        <div className="text-center space-y-4 max-w-xs mb-16 animate-in slide-in-from-bottom-4 duration-1000 delay-100">
+          <h1 className="text-3xl font-bold tracking-tight text-zinc-900 leading-tight">
+            Music. <br />
+            <span className="text-[#1FA9D6]">Ownership.</span> <br />
+            Access.
+          </h1>
+          <p className="text-sm text-zinc-500 font-medium leading-relaxed">
+            The verifiable event layer for the next generation of music
+            communities.
           </p>
         </div>
 
-        {/* Action Section */}
-        <div className="w-full space-y-5 animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-200">
+        {/* Primary Action - Solid Black Button for High Contrast */}
+        <div className="w-full max-w-xs space-y-8 animate-in slide-in-from-bottom-8 duration-1000 delay-200">
           <Button
             onClick={login}
-            className="w-full bg-[#1FA9D6] hover:bg-[#1F89B9] text-black font-bold h-14 text-lg rounded-xl shadow-[0_0_20px_rgba(249,191,21,0.3)] transition-all hover:scale-[1.02] active:scale-[0.98] border-none group"
+            className="w-full h-14 bg-zinc-900 text-white hover:bg-black border-none rounded-full font-bold text-base transition-all hover:scale-[1.02] active:scale-95 shadow-xl shadow-zinc-200 group"
           >
-            Enter Dropsland
+            Enter App
             <ArrowRight className="ml-2 w-5 h-5 transition-transform group-hover:translate-x-1" />
           </Button>
 
-          <div className="flex flex-col items-center gap-2">
-            <p className="text-[10px] text-gray-500 uppercase tracking-widest">
-              Powered by
-            </p>
-            <div className="flex items-center gap-1.5 opacity-50 hover:opacity-100 transition-opacity">
-              <div className="w-4 h-4 rounded-sm bg-white/20" />{" "}
-              {/* Abstract Privy Logo placeholder */}
-              <span className="text-xs font-semibold text-white">Privy</span>
-            </div>
+          {/* Subtle Footer */}
+          <div className="flex justify-center items-center opacity-40 hover:opacity-100 transition-opacity duration-300">
+            <span className="text-[10px] uppercase tracking-[0.2em] text-zinc-400 font-medium">
+              Powered by Privy
+            </span>
           </div>
         </div>
       </div>
