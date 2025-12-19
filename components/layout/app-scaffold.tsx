@@ -1,7 +1,7 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import BottomDock from "./bottom-navigation";
+import BottomDock from "@/components/bottom-dock";
 
 export default function AppScaffold({
   children,
@@ -34,7 +34,7 @@ export default function AppScaffold({
       </main>
 
       {/* 4. Conditionally render the Navigation */}
-      {!shouldHideNav && <BottomDock />}
+      {/*{!shouldHideNav && <BottomDock />}*/}
     </div>
   );
 }
