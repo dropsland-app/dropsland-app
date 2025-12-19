@@ -187,9 +187,6 @@ export default function ReceivePage() {
           </p>
         </div>
       </div>
-
-      {/* Floating Bottom Dock */}
-      <BottomDock activeIndex={3} theme="light" />
     </div>
   );
 }

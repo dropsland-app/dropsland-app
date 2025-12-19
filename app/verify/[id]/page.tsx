@@ -165,8 +165,6 @@ export default function VerifyItemPage() {
           </div>
         )}
       </div>
-
-      <BottomDock activeIndex={5} theme="light" />
     </div>
   );
 }

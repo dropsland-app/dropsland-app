@@ -10,31 +10,30 @@ export default function AppScaffold({
 }) {
   const pathname = usePathname();
 
-  // 1. Define routes where the Bottom Navigation should be HIDDEN
+  // Routes where we DON'T want the dock (e.g. login, full-screen camera)
   const hideNavRoutes = [
     "/login",
-    "/onboarding",
     "/signup",
-    "/forgot-password",
+    "/onboarding",
+    "/wallet/scan", // Camera view needs full screen
+    "/verify/", // Dynamic verify routes usually use camera
   ];
 
-  // 2. Check if the current path matches any of the hidden routes
-  const shouldHideNav = hideNavRoutes.some((route) =>
-    pathname?.startsWith(route),
+  // Check strict match or startWith for dynamic routes
+  const shouldHideNav = hideNavRoutes.some(
+    (route) => pathname === route || pathname?.startsWith(route),
   );
 
   return (
-    <div className="flex flex-col h-full min-h-screen">
-      {/* 3. Content Area
-         We add padding-bottom (pb-[90px]) ONLY if the nav is visible
-         so content doesn't get hidden behind the fixed bar.
+    <div className="flex flex-col h-full min-h-screen relative bg-white">
+      {/* If nav is visible, add padding-bottom so content isn't covered.
+         We use 'pb-24' to give ample space for the floating dock.
       */}
-      <main className={`flex-1 ${!shouldHideNav ? "pb-[90px]" : ""}`}>
+      <main className={`flex-1 w-full h-full ${!shouldHideNav ? "pb-24" : ""}`}>
         {children}
       </main>
 
-      {/* 4. Conditionally render the Navigation */}
-      {/*{!shouldHideNav && <BottomDock />}*/}
+      {!shouldHideNav && <BottomDock />}
     </div>
   );
 }

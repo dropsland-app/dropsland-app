@@ -22,11 +22,6 @@ export default function ScanPage() {
           }}
         />
       </div>
-
-      {/* Floating Bottom Dock
-        We use theme="dark" here because the scan view is black/camera-based.
-      */}
-      <BottomDock activeIndex={3} theme="dark" />
     </div>
   );
 }

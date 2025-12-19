@@ -96,9 +96,6 @@ export default function VerifyDashboard() {
           </div>
         )}
       </div>
-
-      {/* Dock: We use index 5 (User Profile) as the parent context */}
-      <BottomDock activeIndex={5} theme="light" />
     </div>
   );
 }

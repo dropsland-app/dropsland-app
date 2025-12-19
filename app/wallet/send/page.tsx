@@ -8,7 +8,6 @@ import { Input } from "@/components/ui/input";
 import { Loader2, ArrowLeft, Info, User, Search } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Slider } from "@/components/ui/slider";
-import BottomDock from "@/components/bottom-dock"; // Import the new dock
 
 export default function SendFundsPage() {
   const router = useRouter();
@@ -175,9 +174,6 @@ export default function SendFundsPage() {
           </span>
         </div>
       </div>
-
-      {/* Floating Bottom Dock */}
-      <BottomDock activeIndex={3} theme="light" />
     </div>
   );
 }
