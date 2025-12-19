@@ -5,18 +5,25 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/toaster";
 import { AuthProvider } from "@/hooks/use-auth";
 import PrivyProviderWrapper from "@/components/providers/privy-provider";
+import { Metadata, Viewport } from "next";
 
 const inter = Inter({ subsets: ["latin"] });
 
-export const metadata = {
-  title: "DROPSLAND - Support Artists with Music-Backed Tokens",
-  description: "Buy $DROPS tokens for your favorite artists on World Chain",
-  generator: "v0.dev",
+export const viewport: Viewport = {
+  themeColor: "#000000",
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false, // Often needed for "app-like" feel
+};
+
+export const metadata: Metadata = {
+  title: "Dropsland",
+  description: "Elevate your DJ career on-chain",
   manifest: "/manifest.json",
   icons: {
-    apple: "/icon.png",
+    apple: "/icon.png", // Ensure this file exists in /public
   },
-  themeColor: "#ffffff",
 };
 
 export default function RootLayout({
@@ -26,18 +33,6 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <head>
-        <meta name="application-name" content="Your App" />
-        <meta name="apple-mobile-web-app-capable" content="yes" />
-        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-        <meta name="apple-mobile-web-app-title" content="Your App" />
-        <meta name="format-detection" content="telephone=no" />
-        <meta name="mobile-web-app-capable" content="yes" />
-        <meta name="theme-color" content="#000000" />
-
-        <link rel="manifest" href="/manifest.json" />
-        <link rel="apple-touch-icon" href="/icon-192x192.png" />
-      </head>
       <body className={inter.className}>
         <PrivyProviderWrapper>
           <ThemeProvider
