@@ -5,6 +5,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/toaster";
 import { AuthProvider } from "@/hooks/use-auth";
 import PrivyProviderWrapper from "@/components/providers/privy-provider";
+import AppScaffold from "@/components/layout/app-scaffold";
 import { Metadata, Viewport } from "next";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -41,9 +42,14 @@ export default function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
+            {/* Mobile Container Frame */}
             <div className="flex justify-center items-start min-h-screen bg-gray-900">
-              <div className="w-full max-w-md min-h-screen bg-black relative">
-                <AuthProvider>{children}</AuthProvider>
+              <div className="w-full max-w-md min-h-screen bg-white relative shadow-2xl overflow-hidden">
+                {/* Note: Changed bg-black to bg-white based on your new Dropsland description (clean/light), change back if dark mode */}
+
+                <AuthProvider>
+                  <AppScaffold>{children}</AppScaffold>
+                </AuthProvider>
               </div>
             </div>
             <Toaster />
