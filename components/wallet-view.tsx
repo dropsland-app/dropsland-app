@@ -21,7 +21,7 @@ import { createPublicClient, http, formatEther } from "viem";
 import { mainnet } from "viem/chains";
 
 export default function WalletView() {
-  const router = useRouter(); // Initialize Router
+  const router = useRouter();
   const { balance, donated } = useAuth();
   const { wallets } = useWallets();
 
@@ -29,20 +29,29 @@ export default function WalletView() {
   const [isLoadingBalance, setIsLoadingBalance] = useState(false);
   const [isCopied, setIsCopied] = useState(false);
 
+  // 1. Get Active Wallet
   const wallet =
     wallets.find((w) => w.walletClientType === "privy") || wallets[0];
   const shortAddress = wallet
     ? `${wallet.address.slice(0, 6)}...${wallet.address.slice(-4)}`
     : "No Wallet";
 
+  // 2. Fetch ETH Balance
   const fetchNativeBalance = async () => {
     if (!wallet) return;
+
     setIsLoadingBalance(true);
     try {
-      const client = createPublicClient({ chain: mainnet, transport: http() });
+      // Note: In production, switch 'mainnet' to your specific chain (e.g. Base)
+      const client = createPublicClient({
+        chain: mainnet,
+        transport: http(),
+      });
+
       const balanceWei = await client.getBalance({
         address: wallet.address as `0x${string}`,
       });
+
       setNativeBalance(formatEther(balanceWei).slice(0, 6));
     } catch (error) {
       console.error("Error fetching balance:", error);
@@ -51,6 +60,11 @@ export default function WalletView() {
     }
   };
 
+  useEffect(() => {
+    fetchNativeBalance();
+  }, [wallets]);
+
+  // 3. Copy Address Handler
   const copyAddress = () => {
     if (wallet?.address) {
       navigator.clipboard.writeText(wallet.address);
@@ -59,21 +73,17 @@ export default function WalletView() {
     }
   };
 
-  useEffect(() => {
-    fetchNativeBalance();
-  }, [wallets]);
-
-  // --- NAVIGATION HANDLERS ---
-  // These now push to routes instead of setting state
-  const goToReceive = () => router.push("/wallet/receive");
-  const goToScan = () => router.push("/wallet/scan"); // Or just /scan
-  const goToSend = () => router.push("/wallet/send");
-  const handleBuy = () => alert("Coming Soon");
+  // 4. Navigation Handlers (App Router)
+  const handleReceive = () => router.push("/wallet/receive");
+  const handleScan = () => router.push("/wallet/scan");
+  const handleSend = () => router.push("/wallet/send");
+  const handleBuy = () => alert("Buy crypto feature coming soon!");
 
   return (
     <div className="pb-6 bg-white h-full overflow-y-auto">
       {/* HEADER SECTION */}
       <div className="px-4 pt-12 pb-8 bg-gradient-to-r from-[#1FA9D6]/10 to-[#1FA9D6]/5 backdrop-blur-xl text-[#1E1E1E] border-b border-gray-200">
+        {/* Top Row: Title & Address */}
         <div className="flex justify-between items-start mb-6">
           <h1 className="text-xl font-bold">Wallet</h1>
           <button
@@ -94,6 +104,7 @@ export default function WalletView() {
           </button>
         </div>
 
+        {/* Balance Display */}
         <div className="space-y-1">
           <div className="flex items-center gap-2 opacity-80 text-xs font-medium uppercase tracking-wider">
             Native Balance
@@ -116,23 +127,23 @@ export default function WalletView() {
           </div>
         </div>
 
-        {/* ACTION BUTTONS GRID - UPDATED HANDLERS */}
+        {/* ACTION BUTTONS GRID */}
         <div className="grid grid-cols-4 gap-3 mt-8">
           <ActionBtn
             icon={<ArrowRightLeft className="w-5 h-5" />}
             label="Receive"
-            onClick={goToReceive}
+            onClick={handleReceive}
             primary
           />
           <ActionBtn
             icon={<Camera className="w-5 h-5" />}
             label="Scan"
-            onClick={goToScan}
+            onClick={handleScan}
           />
           <ActionBtn
             icon={<Send className="w-4 h-4" />}
             label="Send"
-            onClick={goToSend}
+            onClick={handleSend}
           />
           <ActionBtn
             icon={<BanknoteIcon className="w-5 h-5" />}
@@ -142,7 +153,7 @@ export default function WalletView() {
         </div>
       </div>
 
-      {/* Stats Cards */}
+      {/* STATS OVERVIEW */}
       <div className="grid grid-cols-3 gap-3 px-4 mt-6">
         <StatCard
           icon={<BanknoteIcon className="h-5 w-5 text-[#1FA9D6]" />}
@@ -161,8 +172,8 @@ export default function WalletView() {
         />
       </div>
 
-      {/* Artist Tokens Section */}
-      <div className="mt-8 px-4">
+      {/* ARTIST TOKENS LIST */}
+      <div className="mt-8 px-4 pb-20">
         <h2 className="text-lg font-bold mb-4 text-[#1E1E1E]">Artist Tokens</h2>
         <div className="space-y-3">
           {artistTokens.map((token) => (
@@ -205,7 +216,8 @@ export default function WalletView() {
   );
 }
 
-// Helper Components
+// --- Helper Components ---
+
 function ActionBtn({
   icon,
   label,
@@ -251,6 +263,7 @@ function StatCard({
   );
 }
 
+// --- Dummy Data ---
 const artistTokens = [
   {
     id: "1",
