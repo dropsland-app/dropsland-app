@@ -41,12 +41,12 @@ export default function ScanView({ onBack, onScanSuccess }: ScanViewProps) {
   return (
     <div className="flex flex-col h-full bg-black relative">
       {/* Overlay Header */}
-      <div className="absolute top-0 left-0 right-0 z-20 p-4 pt-12 flex justify-between items-start bg-gradient-to-b from-black/80 to-transparent">
+      <div className="absolute top-0 left-0 right-0 z-20 p-4 pt-12 flex justify-between items-start bg-gradient-to-b from-black/80 to-transparent pointer-events-none">
         <Button
           variant="ghost"
           size="icon"
           onClick={onBack}
-          className="text-white hover:bg-white/20 rounded-full"
+          className="text-white hover:bg-white/20 rounded-full pointer-events-auto"
         >
           <ArrowLeft className="h-6 w-6" />
         </Button>
@@ -54,17 +54,32 @@ export default function ScanView({ onBack, onScanSuccess }: ScanViewProps) {
 
       {/* Camera View */}
       <div className="flex-1 flex flex-col justify-center bg-black relative overflow-hidden rounded-b-3xl">
-        <div className="relative w-full aspect-[3/4] max-h-[70vh]">
+        <div className="relative w-full aspect-[3/4] max-h-[70vh] bg-black">
           <QrReader
             onResult={handleScan}
             constraints={{ facingMode: "environment" }}
-            className="w-full h-full object-cover"
-            videoContainerStyle={{ paddingTop: 0, height: "100%" }}
-            videoStyle={{ objectFit: "cover", height: "100%" }}
+            className="w-full h-full"
+            // FIX: Force container to fill parent without default padding hack
+            videoContainerStyle={{
+              paddingTop: 0,
+              height: "100%",
+              width: "100%",
+              position: "relative",
+              overflow: "hidden",
+            }}
+            // FIX: Force video to cover the entire container absolutely
+            videoStyle={{
+              height: "100%",
+              width: "100%",
+              objectFit: "cover",
+              position: "absolute",
+              top: 0,
+              left: 0,
+            }}
           />
 
           {/* Scanning Frame Overlay */}
-          <div className="absolute inset-0 border-[40px] border-black/50 z-10">
+          <div className="absolute inset-0 border-[40px] border-black/50 z-10 pointer-events-none">
             <div className="w-full h-full border-2 border-[#1FA9D6] relative">
               {/* Corner Markers */}
               <div className="absolute top-0 left-0 w-4 h-4 border-t-4 border-l-4 border-[#1FA9D6] -mt-1 -ml-1" />
@@ -82,8 +97,8 @@ export default function ScanView({ onBack, onScanSuccess }: ScanViewProps) {
 
         <p className="text-center text-white/70 mt-6 px-6">
           Scan a fan's{" "}
-          <span className="text-[#1FA9D6] font-bold">Receive QR</span> to drop
-          them an asset.
+          <span className="text-[#1FA9D6] font-bold">Wallet QR</span> to verify
+          ownership.
         </p>
       </div>
     </div>
