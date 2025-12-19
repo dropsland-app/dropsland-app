@@ -1,61 +1,96 @@
-import { Ticket, Calendar } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
+import { getEvents } from "@/lib/api/events";
+import { MapPin, CalendarDays, Ticket } from "lucide-react";
 
-export default function WalletEventsPage() {
-  // Dummy Data
-  const events = [
-    {
-      id: 1,
-      title: "Rooftop Sunset",
-      date: "Oct 24",
-      type: "VIP Pass",
-      bg: "bg-indigo-500",
-    },
-    {
-      id: 2,
-      title: "Basement Rave",
-      date: "Nov 02",
-      type: "Entry",
-      bg: "bg-purple-600",
-    },
-  ];
+export default async function WalletEventsPage() {
+  const events = await getEvents();
 
   return (
-    <div className="p-4 space-y-4">
+    <div className="p-4 space-y-5 pb-24">
       {events.map((event) => (
         <div
           key={event.id}
-          className="relative group overflow-hidden rounded-2xl"
+          className="group relative w-full h-44 rounded-3xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 isolate"
         >
-          {/* Ticket Visual */}
-          <div
-            className={`h-32 ${event.bg} p-5 flex flex-col justify-between text-white relative`}
-          >
+          {/* 1. Full Background Image */}
+          {event.cover_image_url ? (
+            <img
+              src={event.cover_image_url}
+              alt={event.title}
+              className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+            />
+          ) : (
+            <div className="absolute inset-0 bg-gray-200" />
+          )}
+
+          {/* 2. Minimalist Gradient Overlay */}
+          {/* Light gradient only at the bottom for text readability */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent pointer-events-none" />
+
+          {/* 3. Content Layout */}
+          <div className="absolute inset-0 p-5 flex flex-col justify-between">
+            {/* Top Row: Type Badge & Date */}
             <div className="flex justify-between items-start">
-              <div>
-                <span className="text-xs font-bold opacity-80 uppercase tracking-widest">
-                  {event.type}
+              {/* Glassmorphic Badge */}
+              <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/20 backdrop-blur-md border border-white/10 text-white shadow-sm">
+                <Ticket className="w-3 h-3 text-[#1FA9D6]" />
+                <span className="text-[10px] font-semibold tracking-wide uppercase">
+                  VIP Access
                 </span>
-                <h3 className="text-xl font-bold mt-1">{event.title}</h3>
               </div>
-              <Ticket className="w-6 h-6 opacity-50" />
-            </div>
-            <div className="flex items-center gap-2 text-sm font-medium opacity-90">
-              <Calendar className="w-4 h-4" />
-              <span>{event.date}</span>
+
+              {/* Clean Date Display */}
+              <div className="flex flex-col items-end text-white">
+                <span className="text-xs font-medium opacity-80 uppercase">
+                  {new Date(event.start_time).toLocaleDateString("en-US", {
+                    month: "short",
+                  })}
+                </span>
+                <span className="text-xl font-bold leading-none tracking-tight">
+                  {new Date(event.start_time).getDate()}
+                </span>
+              </div>
             </div>
 
-            {/* Decorative Circles for Ticket Cutout Look */}
-            <div className="absolute -left-3 top-1/2 -translate-y-1/2 w-6 h-6 bg-white rounded-full" />
-            <div className="absolute -right-3 top-1/2 -translate-y-1/2 w-6 h-6 bg-white rounded-full" />
+            {/* Bottom Row: Title & Location */}
+            <div>
+              <h3 className="text-xl font-bold text-white mb-1.5 tracking-tight group-hover:text-[#1FA9D6] transition-colors">
+                {event.title}
+              </h3>
+
+              <div className="flex items-center gap-2 text-white/80 text-xs font-medium">
+                <div className="flex items-center gap-1">
+                  <MapPin className="w-3.5 h-3.5 text-[#1FA9D6]" />
+                  <span className="truncate max-w-[150px]">
+                    {event.location}
+                  </span>
+                </div>
+                <span className="w-1 h-1 rounded-full bg-white/50" />
+                <span>10:00 PM</span>
+              </div>
+            </div>
           </div>
+
+          {/* 4. Ticket Cutouts (Notches) */}
+          {/* These circles match the background color (white) to create the 'cut' effect */}
+          <div className="absolute top-1/2 -left-3 -translate-y-1/2 w-6 h-6 bg-white rounded-full z-20 shadow-inner" />
+          <div className="absolute top-1/2 -right-3 -translate-y-1/2 w-6 h-6 bg-white rounded-full z-20 shadow-inner" />
+
+          {/* Dashed Line Connector (Optional detail between notches) */}
+          <div className="absolute top-1/2 left-3 right-3 h-[1px] -translate-y-1/2 border-t border-dashed border-white/20 z-10 pointer-events-none" />
         </div>
       ))}
 
       {events.length === 0 && (
-        <div className="text-center py-10 text-gray-400">
-          <Ticket className="w-10 h-10 mx-auto mb-2 opacity-20" />
-          <p className="text-sm">No tickets found.</p>
+        <div className="flex flex-col items-center justify-center py-16 text-center">
+          <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mb-4">
+            <Ticket className="w-6 h-6 text-gray-300" />
+          </div>
+          <h3 className="text-gray-900 font-medium text-sm">
+            No tickets found
+          </h3>
+          <p className="text-gray-500 text-xs mt-1">
+            Upcoming events will appear here
+          </p>
         </div>
       )}
     </div>
