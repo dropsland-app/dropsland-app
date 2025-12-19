@@ -22,5 +22,10 @@ export const PINATA_GATEWAY_URL = process.env.NEXT_PUBLIC_PINATA_GATEWAY_URL!;
 export const PINATA_JWT = process.env.NEXT_PUBLIC_PINATA_JWT!;
 export const PINATA_GROUP_ID = process.env.NEXT_PUBLIC_PINATA_GROUP_ID!;
 
+// === Supabase
+export const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+export const SUPABASE_PUBLISHABLE_KEY =
+  process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!;
+
 // === Alchemy
 export const ALCHEMY_API_KEY = process.env.NEXT_PUBLIC_ALCHEMY_API_KEY!;

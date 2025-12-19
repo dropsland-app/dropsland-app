@@ -19,7 +19,8 @@ export default function BeansApp() {
   return (
     <div className="flex flex-col h-screen max-w-lg mx-auto bg-gray-950 overflow-hidden">
       {/* THE GATEKEEPER LOGIC */}
-      {isAuthenticated ? <MainApp /> : <LoginScreen />}
+      {/*{isAuthenticated ? <MainApp /> : <LoginScreen />}*/}
+      <MainApp />
     </div>
   );
 }

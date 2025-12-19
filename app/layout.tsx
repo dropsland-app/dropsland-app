@@ -14,7 +14,7 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   maximumScale: 1,
-  userScalable: false, // Often needed for "app-like" feel
+  userScalable: false,
 };
 
 export const metadata: Metadata = {
@@ -22,7 +22,7 @@ export const metadata: Metadata = {
   description: "Elevate your DJ career on-chain",
   manifest: "/manifest.json",
   icons: {
-    apple: "/icon.png", // Ensure this file exists in /public
+    apple: "/icon.png",
   },
 };
 
