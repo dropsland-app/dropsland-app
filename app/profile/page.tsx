@@ -17,7 +17,7 @@ import {
   Plus,
   QrCode,
 } from "lucide-react";
-import { useWallets } from "@privy-io/react-auth";
+import { usePrivy, useWallets } from "@privy-io/react-auth";
 
 // UI Components
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -57,6 +57,7 @@ export default function ProfilePage() {
   // --- Hooks ---
   const { wallets } = useWallets();
   const { balance, donated, userData, isArtist, logout } = useAuth();
+  const { login, authenticated, ready } = usePrivy();
 
   // --- State ---
   const [isEditingBio, setIsEditingBio] = useState(false);
@@ -143,6 +144,31 @@ export default function ProfilePage() {
     }));
     setCommentText("");
   };
+
+  if (ready && !authenticated) {
+    return (
+      // Removed "pb-20" which might offset the center visually
+      <div className="w-full min-h-[80vh] flex flex-col items-center justify-center bg-white p-6 text-center">
+        <div className="w-20 h-20 bg-[#1FA9D6]/10 rounded-full flex items-center justify-center mb-6">
+          <Lock className="h-10 w-10 text-[#1FA9D6]" />
+        </div>
+
+        <h1 className="text-2xl font-bold text-[#1E1E1E] mb-2">Guest Access</h1>
+
+        <p className="text-[#3A3A3A] mb-8 max-w-xs mx-auto leading-relaxed">
+          Connect your wallet to view your profile, collect rewards, and manage
+          your assets.
+        </p>
+
+        <Button
+          onClick={login}
+          className="bg-[#1FA9D6] hover:bg-[#1FA9D6]/90 text-white font-bold py-6 px-10 rounded-full text-lg shadow-lg hover:shadow-[#1FA9D6]/20 transition-all"
+        >
+          Login / Connect
+        </Button>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full h-full overflow-y-auto overflow-x-hidden bg-white pb-20">
