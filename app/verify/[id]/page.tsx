@@ -66,8 +66,6 @@ export default function VerifyItemPage() {
             onScanSuccess={checkOwnership}
           />
         </div>
-        {/* Dark Theme Dock for Camera Mode */}
-        <BottomDock activeIndex={5} theme="dark" />
       </div>
     );
   }
