@@ -1,35 +1,32 @@
-// 1. The Single Truth Type
+import { createClient } from "@/lib/supabase/server";
+
 export interface FeedPost {
   id: string;
-  type: "video" | "transaction" | "image";
+  type: "video" | "image"; // Simplified for feed
   artistId: string;
   name: string;
   avatar: string;
   content: string;
-  // Video specific
   videoUrl?: string;
-  // Transaction specific
-  action?: string;
-  amount?: number;
-  tokenName?: string;
-  image?: string; // Cover image for transaction
-  // Stats
+  image?: string;
   likes: number;
   comments: number;
   time: string;
-  audioUrl?: string;
+  amount?: number;     // Optional: for transaction posts
+  tokenName?: string;  // Optional: for transaction posts
+  action?: string;     // Optional: for transaction posts
+  audioUrl?: string;   // Keeping this optional as it might be used by the component
 }
 
-// 2. The Fetcher
-export async function getRealFeed(supabase: any): Promise<FeedPost[]> {
-  // Note: 'author' is an alias for the relation to 'profiles'.
-  // Depending on how your FK is named, you might need to adjust `friends!fk_post_author` or similar.
-  // Assuming 'profiles' is linked via 'author_wallet' -> 'wallet_address'
+export async function getHomeFeed(): Promise<FeedPost[]> {
+  const supabase = await createClient();
+
+  // 1. Fetch posts and join with the author's profile
   const { data, error } = await supabase
     .from("posts")
     .select(`
       *,
-      author:profiles!posts_author_wallet_fkey (
+      author:profiles!fk_post_author (
         username,
         avatar_url,
         role
@@ -38,23 +35,39 @@ export async function getRealFeed(supabase: any): Promise<FeedPost[]> {
     .order("created_at", { ascending: false });
 
   if (error) {
-    console.error("Error loading feed:", error);
+    if (error.code !== 'PGRST116') {
+      console.error("Error loading feed:", error);
+    }
     return [];
   }
 
-  // Map DB structure to App UI structure
-  return data.map((post: any) => ({
-    id: post.id,
-    type: post.type || 'video', // default to video if undefined
-    name: post.author?.username || "Unknown",
-    avatar: post.author?.avatar_url || "/placeholder.svg",
-    content: post.content,
-    time: new Date(post.created_at).toLocaleDateString(),
-    artistId: post.author_wallet,
-    videoUrl: post.media_url,
-    likes: post.likes_count || 0,
-    comments: post.comments_count || 0,
-    // Add extra mappings if needed
-    audioUrl: post.audio_url,
-  }));
+  // 2. Map Database Columns -> Component Props
+  return data.map((post: any) => {
+    // Determine if the media_url is a video or image based on extension or logic
+    // For this seed data, we treat generic URLs as images unless they end in .mp4
+    const isVideo = post.media_url?.endsWith(".mp4") || post.media_url?.includes("youtube") || post.type === 'video';
+
+    return {
+      id: post.id,
+      type: isVideo ? "video" : "image",
+
+      // Author Details (Joined from profiles table)
+      name: post.author?.username || "Unknown Artist",
+      avatar: post.author?.avatar_url || "/avatars/user.jpg",
+      artistId: post.author_wallet,
+
+      // Content
+      content: post.content,
+      time: new Date(post.created_at).toLocaleDateString(),
+
+      // Media Mapping
+      videoUrl: isVideo ? post.media_url : undefined,
+      image: !isVideo ? post.media_url : undefined, // Fallback for images
+
+      // Engagement Stats
+      likes: post.likes_count || 0,
+      comments: post.comments_count || 0,
+      audioUrl: post.audio_url
+    };
+  });
 }

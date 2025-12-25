@@ -1,11 +1,8 @@
-import { createClient } from "@/lib/supabase/server";
-import { getRealFeed } from "@/lib/api/feed";
+import { getHomeFeed } from "@/lib/api/feed";
 import HomeFeedWrapper from "@/components/home-feed-wrapper";
 
 export default async function HomePage() {
-  const supabase = await createClient();
-  const dbPosts = await getRealFeed(supabase);
+  const feedPosts = await getHomeFeed();
 
-  return <HomeFeedWrapper posts={dbPosts} />;
+  return <HomeFeedWrapper initialPosts={feedPosts} />;
 }
-

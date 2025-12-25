@@ -6,10 +6,10 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 
 interface HomeFeedWrapperProps {
-    posts: FeedPost[];
+    initialPosts: FeedPost[];
 }
 
-export default function HomeFeedWrapper({ posts }: HomeFeedWrapperProps) {
+export default function HomeFeedWrapper({ initialPosts }: HomeFeedWrapperProps) {
     const router = useRouter();
 
     const handleSelectArtist = (artistId: string) => {
@@ -35,7 +35,7 @@ export default function HomeFeedWrapper({ posts }: HomeFeedWrapperProps) {
             </header>
 
             {/* The Reel Feed */}
-            <TikTokFeed onSelectArtist={handleSelectArtist} posts={posts} type="home" />
+            <TikTokFeed onSelectArtist={handleSelectArtist} posts={initialPosts} type="home" />
         </div>
     );
 }
