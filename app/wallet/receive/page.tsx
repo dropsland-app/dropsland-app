@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { useWallets } from "@privy-io/react-auth";
-import BottomDock from "@/components/bottom-dock";
 
 export default function ReceivePage() {
   const router = useRouter();
