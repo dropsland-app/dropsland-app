@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { QrReader } from "react-qr-reader";
-import { ArrowLeft, X } from "lucide-react";
+import { ArrowLeft, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { isAddress } from "viem";
 import { useToast } from "@/hooks/use-toast";
@@ -13,8 +13,14 @@ interface ScanViewProps {
 }
 
 export default function ScanView({ onBack, onScanSuccess }: ScanViewProps) {
-  const [error, setError] = useState<string | null>(null);
+  const [mounted, setMounted] = useState(false);
+  const [camKey, setCamKey] = useState(0); // Used to force remount of camera
   const { toast } = useToast();
+
+  // Prevent hydration mismatch and ensure browser APIs are available
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const handleScan = (result: any, error: any) => {
     if (result) {
@@ -25,17 +31,16 @@ export default function ScanView({ onBack, onScanSuccess }: ScanViewProps) {
       if (isAddress(rawAddress)) {
         onScanSuccess(rawAddress);
       } else {
-        // Only show toast if we haven't shown an error recently to avoid spam
-        if (!error) {
-          toast({
-            title: "Invalid QR",
-            description: "No valid wallet address found.",
-            variant: "destructive",
-          });
-          setError("Invalid QR Code");
-        }
+        // Debounce error toasts (optional logic could be added here)
+        // For now, we rely on user feedback or console
+        console.log("Invalid address scanned:", rawAddress);
       }
     }
+    // We ignore 'error' logs here to prevent console spam as the library polls constantly
+  };
+
+  const reloadCamera = () => {
+    setCamKey((prev) => prev + 1);
   };
 
   return (
@@ -50,33 +55,46 @@ export default function ScanView({ onBack, onScanSuccess }: ScanViewProps) {
         >
           <ArrowLeft className="h-6 w-6" />
         </Button>
+
+        {/* Reload Camera Button (Useful fallback if stream hangs) */}
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={reloadCamera}
+          className="text-white hover:bg-white/20 rounded-full pointer-events-auto"
+        >
+          <RefreshCw className="h-5 w-5" />
+        </Button>
       </div>
 
       {/* Camera View */}
       <div className="flex-1 flex flex-col justify-center bg-black relative overflow-hidden rounded-b-3xl">
-        <div className="relative w-full aspect-[3/4] max-h-[70vh] bg-black">
-          <QrReader
-            onResult={handleScan}
-            constraints={{ facingMode: "environment" }}
-            className="w-full h-full"
-            // FIX: Force container to fill parent without default padding hack
-            videoContainerStyle={{
-              paddingTop: 0,
-              height: "100%",
-              width: "100%",
-              position: "relative",
-              overflow: "hidden",
-            }}
-            // FIX: Force video to cover the entire container absolutely
-            videoStyle={{
-              height: "100%",
-              width: "100%",
-              objectFit: "cover",
-              position: "absolute",
-              top: 0,
-              left: 0,
-            }}
-          />
+        <div className="relative w-full aspect-[3/4] max-h-[75vh] bg-black overflow-hidden rounded-3xl mx-auto my-auto">
+          {mounted && (
+            <QrReader
+              key={camKey}
+              onResult={handleScan}
+              constraints={{ facingMode: "environment" }}
+              className="w-full h-full"
+              // Correct styles to override the library's default padding-hack
+              videoContainerStyle={{
+                paddingTop: 0,
+                height: "100%",
+                width: "100%",
+              }}
+              videoStyle={{
+                height: "100%",
+                width: "100%",
+                objectFit: "cover",
+              }}
+            />
+          )}
+
+          {!mounted && (
+            <div className="absolute inset-0 flex items-center justify-center text-white/50">
+              Initializing Camera...
+            </div>
+          )}
 
           {/* Scanning Frame Overlay */}
           <div className="absolute inset-0 border-[40px] border-black/50 z-10 pointer-events-none">
@@ -95,7 +113,7 @@ export default function ScanView({ onBack, onScanSuccess }: ScanViewProps) {
           </div>
         </div>
 
-        <p className="text-center text-white/70 mt-6 px-6">
+        <p className="text-center text-white/70 mt-6 px-6 mb-8">
           Scan a fan's{" "}
           <span className="text-[#1FA9D6] font-bold">Wallet QR</span> to verify
           ownership.
