@@ -41,15 +41,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { getUserRewards, type RewardItem } from "@/lib/alchemy";
 
 // Mock Data
-const USER_POSTS = [
-  {
-    content: "New EP 'Techno Dimensions' out now! 🎵 #NewRelease",
-    time: "2 hours ago",
-    likes: 87,
-    comments: 14,
-    image: "/images/dj-mixer.png",
-  },
-];
+import { userPosts, allArtists } from "@/lib/mock-data";
 
 export default function ProfilePage() {
   const router = useRouter();
@@ -341,50 +333,59 @@ export default function ProfilePage() {
             )}
           </TabsList>
 
-          <TabsContent value="posts" className="mt-4">
-            <div className="bg-[#3A3A3A]/10 rounded-lg p-3 border border-[#3A3A3A]/20">
-              <div className="flex items-start gap-2 mb-2">
-                <Avatar className="h-8 w-8 flex-shrink-0">
-                  <AvatarImage src={avatarSrc} />
-                  <AvatarFallback>
-                    {userProfile.name.substring(0, 2).toUpperCase()}
-                  </AvatarFallback>
-                </Avatar>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-1 mb-0.5">
-                    <span className="font-semibold text-sm text-[#1E1E1E] truncate">
-                      {userProfile.name}
-                    </span>
-                    {userProfile.isVerified && (
-                      <Star className="h-3 w-3 text-[#1FA9D6] fill-[#1FA9D6] flex-shrink-0" />
-                    )}
+          <TabsContent value="posts" className="mt-4 space-y-4">
+            {userPosts.map((post, index) => (
+              <Card key={index} className="bg-[#3A3A3A]/10 border-[#3A3A3A]/20">
+                <CardContent className="p-3">
+                  <div className="flex items-start gap-2 mb-2">
+                    <Avatar className="h-8 w-8 flex-shrink-0">
+                      <AvatarImage src={avatarSrc} />
+                      <AvatarFallback>
+                        {userProfile.name.substring(0, 2).toUpperCase()}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-1 mb-0.5">
+                        <span className="font-semibold text-sm text-[#1E1E1E] truncate">
+                          {userProfile.name}
+                        </span>
+                        {userProfile.isVerified && (
+                          <Star className="h-3 w-3 text-[#1FA9D6] fill-[#1FA9D6] flex-shrink-0" />
+                        )}
+                      </div>
+                      <p className="text-xs text-[#3A3A3A]">{post.time}</p>
+                    </div>
                   </div>
-                  <p className="text-xs text-[#3A3A3A]">2h ago</p>
-                </div>
-              </div>
-              <p className="text-[#1E1E1E] text-sm break-words mb-2">
-                New EP out now! #NewRelease
-              </p>
-              <div className="flex items-center gap-4 text-[#3A3A3A]">
-                <button className="flex items-center gap-1 hover:text-[#1FA9D6] text-xs">
-                  <Heart className="w-4 h-4" />
-                  <span>124</span>
-                </button>
-                <button
-                  className="flex items-center gap-1 hover:text-[#1FA9D6] text-xs"
-                  onClick={() => {
-                    setCurrentPostIndex(0); // Mock index
-                    setShowCommentDialog(true);
-                  }}
-                >
-                  <MessageCircle className="w-4 h-4" />
-                  <span>32</span>
-                </button>
-                <button className="hover:text-[#1FA9D6]">
-                  <Share2 className="w-4 h-4" />
-                </button>
-              </div>
-            </div>
+                  <p className="text-[#1E1E1E] text-sm break-words mb-2">
+                    {post.content}
+                  </p>
+                  {post.image && (
+                    <div className="mb-3 rounded-lg overflow-hidden">
+                      <img src={post.image} alt="Post" className="w-full h-auto" />
+                    </div>
+                  )}
+                  <div className="flex items-center gap-4 text-[#3A3A3A]">
+                    <button className="flex items-center gap-1 hover:text-[#1FA9D6] text-xs">
+                      <Heart className="w-4 h-4" />
+                      <span>{post.likes}</span>
+                    </button>
+                    <button
+                      className="flex items-center gap-1 hover:text-[#1FA9D6] text-xs"
+                      onClick={() => {
+                        setCurrentPostIndex(index);
+                        setShowCommentDialog(true);
+                      }}
+                    >
+                      <MessageCircle className="w-4 h-4" />
+                      <span>{post.comments}</span>
+                    </button>
+                    <button className="hover:text-[#1FA9D6]">
+                      <Share2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
           </TabsContent>
 
           <TabsContent value="artists" className="mt-4">
@@ -444,6 +445,47 @@ export default function ProfilePage() {
                 </CardContent>
               </Card>
             )}
+          </TabsContent>
+
+          <TabsContent value="certs" className="mt-4 space-y-3">
+            {(() => {
+              // Find artist data to show certs (mocking for 'iamjuampi' if user is juampi)
+              // In real app, this would come from backend/profile data
+              const artistData = isJuampi ? allArtists.find(a => a.id === "iamjuampi") : null;
+              const certifications = artistData?.certifications;
+
+              if (certifications && certifications.length > 0) {
+                return certifications.map((cert, index) => (
+                  <Card key={index} className="bg-[#3A3A3A]/10 border-[#3A3A3A]/20">
+                    <CardContent className="p-3">
+                      <div className="flex items-start gap-3">
+                        {/* We need to import icons for this or just use generic */}
+                        <div className="w-12 h-12 rounded-full bg-[#1FA9D6]/20 flex items-center justify-center flex-shrink-0">
+                          <Star className="h-6 w-6 text-[#1FA9D6]" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center justify-between mb-1 gap-2">
+                            <p className="text-sm text-[#1E1E1E] font-medium truncate">{cert.title}</p>
+                            <Badge className="bg-[#1FA9D6] hover:bg-[#1FA9D6]/90 text-white border-0 text-[10px] h-5">
+                              {cert.type.toUpperCase()}
+                            </Badge>
+                          </div>
+                          <p className="text-xs text-[#3A3A3A] break-words">{cert.description}</p>
+                          <p className="text-xs text-[#3A3A3A]/70 mt-1">{cert.date}</p>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ));
+              }
+              return (
+                <div className="text-center py-8 bg-[#3A3A3A]/5 rounded-lg border border-[#3A3A3A]/10">
+                  <Star className="h-12 w-12 text-[#3A3A3A]/30 mx-auto mb-3" />
+                  <p className="text-[#1E1E1E] font-medium">No certifications yet</p>
+                  <p className="text-[#3A3A3A] text-sm mt-1">Earn certifications by reaching milestones</p>
+                </div>
+              );
+            })()}
           </TabsContent>
         </Tabs>
 
@@ -524,7 +566,7 @@ export default function ProfilePage() {
           </DialogHeader>
           <div className="max-h-80 overflow-y-auto space-y-2 my-4">
             {currentPostIndex !== null &&
-            postComments[`profile-${currentPostIndex}`]?.length > 0 ? (
+              postComments[`profile-${currentPostIndex}`]?.length > 0 ? (
               postComments[`profile-${currentPostIndex}`].map((comment, i) => (
                 <div key={i} className="flex gap-2">
                   <Avatar className="h-7 w-7 flex-shrink-0">

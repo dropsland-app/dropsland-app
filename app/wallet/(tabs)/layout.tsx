@@ -25,7 +25,7 @@ export default function WalletLayout({
 }) {
   const pathname = usePathname();
   const router = useRouter();
-  const { balance } = useAuth();
+  const { balance, userData, isArtist } = useAuth();
   const { wallets } = useWallets();
 
   const [nativeBalance, setNativeBalance] = useState("0.00");
@@ -70,8 +70,8 @@ export default function WalletLayout({
   // --- 2. Action Handlers (Modernized) ---
   const actions = [
     {
-      label: "Receive",
-      icon: ArrowDownLeft,
+      label: "My ID",
+      icon: ArrowDownLeft, // Keeping icon or changing to QrCode if preferred? Prompt: "Receive -> My ID (or just use the QR icon)"
       onClick: () => router.push("/wallet/receive"),
       color: "bg-black text-white", // Primary action
     },
@@ -81,12 +81,16 @@ export default function WalletLayout({
       onClick: () => router.push("/wallet/send"),
       color: "bg-gray-100 text-gray-900",
     },
-    {
-      label: "Scan",
-      icon: ScanLine,
-      onClick: () => router.push("/wallet/scan"),
-      color: "bg-gray-100 text-gray-900",
-    },
+    ...(isArtist() // Only show Scan for Artists/Staff
+      ? [
+        {
+          label: "Scan",
+          icon: ScanLine,
+          onClick: () => router.push("/wallet/scan"),
+          color: "bg-gray-100 text-gray-900",
+        },
+      ]
+      : []),
     {
       label: "Buy",
       icon: CreditCard,
