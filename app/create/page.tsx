@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { Music, Ticket, Gift, ArrowRight } from "lucide-react";
+import { Music, Gift, ArrowRight, Sparkles, Plus, Layers } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 
 export default function CreateDashboardPage() {
@@ -13,65 +13,96 @@ export default function CreateDashboardPage() {
       description: "Upload music, set royalty splits, and publish to the network.",
       icon: Music,
       href: "/create/music",
-      color: "bg-blue-500",
+      // Theme: Blue (Dropsland Primary)
+      text: "text-blue-600",
+      iconBg: "bg-blue-50",
+      borderHover: "hover:border-blue-200",
     },
     {
       title: "New Item / Reward",
       description: "Create merchandise, tickets, or exclusive perks for your fans.",
       icon: Gift,
       href: "/create/reward",
-      color: "bg-purple-500",
+      // Theme: Purple (Secondary)
+      text: "text-purple-600",
+      iconBg: "bg-purple-50",
+      borderHover: "hover:border-purple-200",
     },
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50 font-manrope">
-      <div className="px-5 pt-12 pb-6 bg-white border-b border-gray-200">
-        <h1 className="text-2xl font-extrabold text-[#1b1c23] mb-1">Create</h1>
-        <p className="text-gray-500 text-sm">Manage your drops and rewards</p>
-      </div>
+      <div className="min-h-screen bg-white pb-24">
+        {/* Header - Consistent with Explore Page */}
+        <div className="sticky top-0 z-20 bg-white/90 backdrop-blur-md border-b border-neutral-200 px-5 pt-12 pb-4">
+          <h1 className="text-3xl font-extrabold text-neutral-900 tracking-tight">Create</h1>
+          <p className="text-neutral-500 text-sm font-medium mt-1">Manage your drops and rewards</p>
+        </div>
 
-      <div className="p-5 space-y-4">
-        <h2 className="text-sm font-bold text-gray-400 uppercase tracking-wider mb-2">
-          Start Creating
-        </h2>
-        {createOptions.map((option) => (
-          <Card
-            key={option.title}
-            className="border-none shadow-sm hover:shadow-md transition-shadow cursor-pointer bg-white overflow-hidden group"
-            onClick={() => router.push(option.href)}
-          >
-            <CardContent className="p-0 flex items-stretch">
-              <div className={`w-3 ${option.color}`} />
-              <div className="p-5 flex-1 flex items-center justify-between">
-                <div className="flex items-start gap-4">
-                  <div className={`p-3 rounded-full ${option.color} bg-opacity-10 text-${option.color.replace('bg-', 'text-')}`}>
-                    <option.icon className={`w-6 h-6 ${option.color.replace('bg-', 'text-')}`} />
-                  </div>
-                  <div>
-                    <h3 className="font-bold text-[#1b1c23] text-lg">{option.title}</h3>
-                    <p className="text-gray-500 text-sm mt-1 leading-relaxed max-w-[200px]">
-                      {option.description}
-                    </p>
-                  </div>
-                </div>
-                <ArrowRight className="text-gray-300 group-hover:text-primary transition-colors" />
+        <div className="p-5 space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+
+          {/* Main Actions Section */}
+          <section>
+            <div className="flex items-center gap-2 mb-4">
+              <Sparkles className="w-4 h-4 text-[#1FA9D6]" />
+              <h2 className="text-sm font-bold text-neutral-900 uppercase tracking-wider">Start Creating</h2>
+            </div>
+
+            <div className="space-y-4">
+              {createOptions.map((option) => (
+                  <Card
+                      key={option.title}
+                      className={`
+                  relative overflow-hidden border border-neutral-100 shadow-sm 
+                  transition-all duration-300 cursor-pointer group rounded-3xl bg-white
+                  hover:shadow-md hover:scale-[1.01] ${option.borderHover}
+                `}
+                      onClick={() => router.push(option.href)}
+                  >
+                    <CardContent className="p-5 flex items-center gap-5">
+                      {/* Icon Container - Big & Soft */}
+                      <div className={`
+                    h-16 w-16 rounded-2xl flex items-center justify-center shrink-0
+                    ${option.iconBg} ${option.text} transition-transform group-hover:scale-110 duration-300
+                  `}>
+                        <option.icon className="w-8 h-8" strokeWidth={2} />
+                      </div>
+
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-bold text-neutral-900 text-lg mb-1">{option.title}</h3>
+                        <p className="text-sm text-neutral-500 leading-relaxed font-medium">
+                          {option.description}
+                        </p>
+                      </div>
+
+                      {/* Arrow Action */}
+                      <div className="h-10 w-10 rounded-full bg-neutral-50 flex items-center justify-center text-neutral-300 group-hover:bg-[#1FA9D6] group-hover:text-white transition-all duration-300">
+                        <ArrowRight className="w-5 h-5" strokeWidth={2.5} />
+                      </div>
+                    </CardContent>
+                  </Card>
+              ))}
+            </div>
+          </section>
+
+          {/* Recent Activity Section */}
+          <section>
+            <div className="flex items-center gap-2 mb-4">
+              <Layers className="w-4 h-4 text-neutral-400" />
+              <h2 className="text-sm font-bold text-neutral-900 uppercase tracking-wider">Recent Activity</h2>
+            </div>
+
+            {/* Empty State Card */}
+            <div className="bg-neutral-50 rounded-3xl border border-dashed border-neutral-200 p-10 flex flex-col items-center justify-center text-center">
+              <div className="w-14 h-14 bg-white rounded-full flex items-center justify-center mb-4 shadow-sm">
+                <Plus className="w-6 h-6 text-neutral-300" />
               </div>
-            </CardContent>
-          </Card>
-        ))}
-
-        {/* Placeholder for "Your Creations" or "Recent Activity" */}
-        <div className="pt-8">
-          <h2 className="text-sm font-bold text-gray-400 uppercase tracking-wider mb-4">
-            Recent Activity
-          </h2>
-          <div className="bg-white rounded-xl p-8 text-center border border-gray-100 border-dashed">
-            <p className="text-gray-400 font-medium">No recent uploads</p>
-            <p className="text-xs text-gray-300 mt-1">Your created items will appear here</p>
-          </div>
+              <p className="text-neutral-900 font-bold text-lg mb-1">No recent uploads</p>
+              <p className="text-sm text-neutral-500 font-medium max-w-[220px] leading-relaxed">
+                Your newly created tracks and rewards will appear here.
+              </p>
+            </div>
+          </section>
         </div>
       </div>
-    </div>
   );
 }

@@ -6,7 +6,8 @@ import { useAuth } from "@/hooks/use-auth";
 import { BanknoteIcon } from "@/components/icons/banknote-icon";
 
 // Interface and Mock Data
-import { allActivity, type Activity } from "@/lib/mock-data";
+import { allActivity } from "@/lib/mock-data";
+import {Activity} from "@/lib/mock-types";
 
 export default function ActivityPage() {
   const router = useRouter();

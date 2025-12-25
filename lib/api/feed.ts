@@ -1,5 +1,3 @@
-import { createClient } from "@/lib/supabase/server";
-
 // 1. The Single Truth Type
 export interface FeedPost {
   id: string;
@@ -22,42 +20,41 @@ export interface FeedPost {
   audioUrl?: string;
 }
 
-// 2. The Fetcher (Currently Mocks, Ready for DB)
-export async function getHomeFeed(): Promise<FeedPost[]> {
-  // TODO: Replace this array with a real DB query later
-  // const supabase = createClient();
-  // const { data } = await supabase...
+// 2. The Fetcher
+export async function getRealFeed(supabase: any): Promise<FeedPost[]> {
+  // Note: 'author' is an alias for the relation to 'profiles'.
+  // Depending on how your FK is named, you might need to adjust `friends!fk_post_author` or similar.
+  // Assuming 'profiles' is linked via 'author_wallet' -> 'wallet_address'
+  const { data, error } = await supabase
+    .from("posts")
+    .select(`
+      *,
+      author:profiles!posts_author_wallet_fkey (
+        username,
+        avatar_url,
+        role
+      )
+    `)
+    .order("created_at", { ascending: false });
 
-  // For now, return your mixed Mock Data here
-  return [
-    {
-      id: "video-1",
-      type: "video",
-      name: "iamjuampi",
-      avatar: "/avatars/juampi.jpg",
-      content: "Check out this video!",
-      time: "Just now",
-      artistId: "iamjuampi",
-      videoUrl:
-        "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/test-ERO6FWXoXDoQHfYli3YRfJW2707gyn.mp4",
-      likes: 120,
-      comments: 5,
-    },
-    {
-      id: "tx-1",
-      type: "transaction",
-      name: "iamjuampi",
-      avatar: "/avatars/juampi.jpg",
-      artistId: "banger",
-      content: "iamjuampi bought from Banger", // Unified content string
-      action: "bought from Banger",
-      amount: 15,
-      tokenName: "BANGER",
-      image: "/crypto-tokens-glowing.jpg",
-      likes: 89,
-      comments: 12,
-      time: "5 hours ago",
-    },
-    // ... add the rest of your mock data here
-  ];
+  if (error) {
+    console.error("Error loading feed:", error);
+    return [];
+  }
+
+  // Map DB structure to App UI structure
+  return data.map((post: any) => ({
+    id: post.id,
+    type: post.type || 'video', // default to video if undefined
+    name: post.author?.username || "Unknown",
+    avatar: post.author?.avatar_url || "/placeholder.svg",
+    content: post.content,
+    time: new Date(post.created_at).toLocaleDateString(),
+    artistId: post.author_wallet,
+    videoUrl: post.media_url,
+    likes: post.likes_count || 0,
+    comments: post.comments_count || 0,
+    // Add extra mappings if needed
+    audioUrl: post.audio_url,
+  }));
 }
