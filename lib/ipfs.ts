@@ -1,7 +1,7 @@
 import axios from "axios";
 import {
   PINATA_JWT,
-  PINATA_GATEWAY_URL,
+  // PINATA_GATEWAY_URL, -- Unused
   PINATA_GROUP_ID,
 } from "@/config/app";
 

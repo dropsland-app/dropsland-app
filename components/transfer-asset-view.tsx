@@ -67,7 +67,7 @@ export default function TransferAssetView({
       });
 
       // Execute safeTransferFrom
-      const hash = await walletClient.writeContract({
+      await walletClient.writeContract({
         chain: CHAIN,
         address: DROPSLAND_EVENTS_CONTRACT,
         abi: DROPSLAND_EVENTS_ABI,

@@ -1,270 +1,249 @@
+"use client";
+
+import { useState } from "react";
 import Image from "next/image";
-import Link from "next/link";
-import { ArrowLeft, Banknote, Share2, Star, Users } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { ArrowLeft, Share2, Star, Users, Lock, Music } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import DonateForm from "@/components/donate-form";
+import { Badge } from "@/components/ui/badge";
+import { MembershipTierCard, type MembershipTier } from "@/components/creator/membership-tier-card";
 
-// Mock data for a single creator
+// --- Mock Data ---
 const CREATOR = {
   id: "1",
-  name: "Elena Rodriguez",
-  handle: "@elenadraws",
-  avatar: "/avatars/elena.jpg",
-  coverImage: "/covers/elena-cover.jpg",
-  category: "Digital Art",
-  description:
-    "I create vibrant digital illustrations and animations inspired by nature and fantasy worlds. Each piece tells a story and brings a little magic into everyday life.",
-  supporters: 1245,
-  blgReceived: 8750,
-  featured: true,
-  walletAddress: "0x1234567890123456789012345678901234567890", // Placeholder ETH address
-  socialLinks: {
-    twitter: "https://twitter.com/elenadraws",
-    instagram: "https://instagram.com/elenadraws",
-    website: "https://elenadraws.art",
-  },
-  rewards: [
+  name: "DJ Juampi",
+  handle: "@iamjuampi",
+  avatar: "/images/profile/iamjuampi-avatar.jpg",
+  coverImage: "/images/profile/iamjuampi-cover.jpg",
+  category: "Techno / House",
+  description: "Resident at Club Space. Founder of Dropsland. Join my membership for guestlist spots, exclusive edits, and backstage access.",
+  supporters: 2400,
+  tiers: [
     {
-      level: "Bean Sprout",
-      amount: 5,
-      benefits: ["Access to exclusive posts", "Monthly wallpaper download"],
-    },
-    {
-      level: "Coffee Bean",
-      amount: 20,
+      id: "t1",
+      name: "Guestlist",
+      price: 5,
+      currency: "$DROPS",
+      color: "bg-slate-700",
       benefits: [
-        "All previous rewards",
-        "Name in credits",
-        "Early access to new art",
-      ],
+        "Priority Guestlist Entry (Before 12AM)",
+        "Access to 'The Stash' (Monthly Edits)",
+        "Supporter Badge"
+      ]
     },
     {
-      level: "Coffee Cup",
-      amount: 50,
+      id: "t2",
+      name: "Backstage",
+      price: 25,
+      currency: "$DROPS",
+      color: "bg-[#1FA9D6]", // Dropsland Blue
+      isPopular: true,
       benefits: [
-        "All previous rewards",
-        "Digital art print (monthly)",
-        "Vote on future projects",
-      ],
+        "All 'Guestlist' perks",
+        "Guaranteed +1 Entry",
+        "Backstage Access (Subject to capacity)",
+        "Vote on upcoming gig locations"
+      ]
     },
     {
-      level: "Coffee Pot",
-      amount: 100,
+      id: "t3",
+      name: "Inner Circle",
+      price: 100,
+      currency: "$DROPS",
+      color: "bg-purple-600",
       benefits: [
-        "All previous rewards",
-        "Custom digital portrait",
-        "1-on-1 virtual coffee chat",
-      ],
-    },
-  ],
-  recentPosts: [
-    {
-      id: "p1",
-      title: "New Fantasy Series Preview",
-      preview:
-        "I'm excited to share a sneak peek of my upcoming fantasy series...",
-      date: "2 days ago",
-      image: "/posts/elena-post1.jpg",
-    },
-    {
-      id: "p2",
-      title: "Behind the Scenes: Digital Painting Process",
-      preview: "Many of you have asked about my digital painting workflow...",
-      date: "1 week ago",
-      image: "/posts/elena-post2.jpg",
-    },
-    {
-      id: "p3",
-      title: "Thank You for 1000+ Supporters!",
-      preview: "I'm incredibly grateful to have reached this milestone...",
-      date: "2 weeks ago",
-      image: "/posts/elena-post3.jpg",
-    },
-  ],
+        "All 'Backstage' perks",
+        "Free Merch Drop (Quarterly)",
+        "Private discord channel",
+        "Direct DMs"
+      ]
+    }
+  ] as MembershipTier[],
+  content: [
+    { id: 1, type: "video", title: "Live @ Space Miami", isLocked: false, views: "12K", image: "/posts/space.jpg" },
+    { id: 2, type: "audio", title: "Unreleased ID (Juampi Edit)", isLocked: true, views: "Locked", image: "/posts/audio-lock.jpg" },
+    { id: 3, type: "video", title: "Studio Tour & Production Tips", isLocked: true, views: "Locked", image: "/posts/studio.jpg" },
+  ]
 };
 
 export default function CreatorPage({ params }: { params: { id: string } }) {
-  // TODO! fetch the creator data based on the ID
-  // const creator = await getCreator(params.id)
-  const creator = CREATOR;
+  const router = useRouter();
+  const [activeTab, setActiveTab] = useState("membership");
+
+  const handleJoin = (tierId: string) => {
+    // In a real app, this would trigger a smart contract transaction or Stripe flow
+    alert(`Initiating join flow for Tier ${tierId}`);
+  };
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="relative h-48 md:h-64 lg:h-80 w-full">
+    <div className="min-h-screen bg-white pb-24">
+      {/* 1. Immersive Header */}
+      <div className="relative h-64 w-full">
         <Image
-          src={creator.coverImage || "/placeholder.svg?height=300&width=1200"}
-          alt={`${creator.name}'s cover image`}
+          src={CREATOR.coverImage || "/placeholder.svg"}
+          alt="Cover"
           fill
-          className="object-cover"
+          className="object-cover brightness-75"
           priority
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-background to-transparent" />
-        <Button
-          asChild
-          variant="outline"
-          size="sm"
-          className="absolute top-4 left-4 bg-background/80 backdrop-blur-sm"
-        >
-          <Link href="/">
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Back
-          </Link>
-        </Button>
-      </div>
 
-      <div className="container px-4 md:px-6">
-        <div className="relative -mt-20 mb-6 flex flex-col items-center">
-          <Avatar className="h-32 w-32">
-            <AvatarImage src={creator.avatar} alt={creator.name} />
-            <AvatarFallback>{creator.name.substring(0, 2)}</AvatarFallback>
+        {/* Nav */}
+        <div className="absolute top-0 left-0 right-0 p-4 pt-12 flex justify-between items-center z-10">
+          <Button
+            onClick={() => router.back()}
+            variant="ghost"
+            size="icon"
+            className="bg-black/20 text-white hover:bg-black/40 backdrop-blur-md rounded-full"
+          >
+            <ArrowLeft className="h-5 w-5" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="bg-black/20 text-white hover:bg-black/40 backdrop-blur-md rounded-full"
+          >
+            <Share2 className="h-5 w-5" />
+          </Button>
+        </div>
+
+        {/* Floating Avatar */}
+        <div className="absolute -bottom-12 left-1/2 -translate-x-1/2 z-20">
+          <Avatar className="h-28 w-28 border-4 border-white shadow-xl">
+            <AvatarImage src={CREATOR.avatar} />
+            <AvatarFallback>{CREATOR.name.substring(0, 2)}</AvatarFallback>
           </Avatar>
-          <h1 className="mt-4 text-3xl font-bold">{creator.name}</h1>
-          <p className="text-muted-foreground">{creator.handle}</p>
-          <div className="mt-2 flex items-center gap-2">
-            <Badge variant="outline">{creator.category}</Badge>
-            {creator.featured && (
-              <Badge variant="secondary">
-                <Star className="mr-1 h-3 w-3" /> Featured Creator
-              </Badge>
-            )}
-          </div>
-          <div className="mt-4 flex items-center gap-6 text-sm">
-            <div className="flex items-center">
-              <Banknote className="mr-1 h-4 w-4 text-primary" />
-              <span>
-                {creator.blgReceived.toLocaleString()} $DROPS received
-              </span>
-            </div>
-            <div className="flex items-center">
-              <Users className="mr-1 h-4 w-4" />
-              <span>{creator.supporters.toLocaleString()} supporters</span>
-            </div>
-          </div>
-          <div className="mt-6 flex gap-2">
-            <Button size="lg" className="gap-2">
-              <Banknote className="h-4 w-4" />
-              Donate $DROPS
-            </Button>
-            <Button variant="outline" size="lg">
-              <Share2 className="h-4 w-4" />
-            </Button>
-          </div>
-        </div>
-
-        <div className="grid gap-6 md:grid-cols-3 lg:gap-8 py-6">
-          <div className="md:col-span-2 space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>About</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p>{creator.description}</p>
-                <div className="mt-4 flex gap-2">
-                  {Object.entries(creator.socialLinks).map(
-                    ([platform, url]) => (
-                      <Button
-                        key={platform}
-                        variant="outline"
-                        size="sm"
-                        asChild
-                      >
-                        <Link
-                          href={url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                        >
-                          {platform.charAt(0).toUpperCase() + platform.slice(1)}
-                        </Link>
-                      </Button>
-                    ),
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-
-            <Tabs defaultValue="posts">
-              <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="posts">Recent Posts</TabsTrigger>
-                <TabsTrigger value="rewards">Rewards</TabsTrigger>
-              </TabsList>
-              <TabsContent value="posts" className="mt-4 space-y-4">
-                {creator.recentPosts.map((post) => (
-                  <Card key={post.id}>
-                    <CardHeader className="p-4">
-                      <CardTitle className="text-lg">{post.title}</CardTitle>
-                      <CardDescription>{post.date}</CardDescription>
-                    </CardHeader>
-                    <CardContent className="p-4 pt-0">
-                      <div className="grid gap-4 sm:grid-cols-[1fr_200px]">
-                        <p className="text-sm">{post.preview}</p>
-                        <div className="relative h-24 sm:h-full rounded-md overflow-hidden">
-                          <Image
-                            src={
-                              post.image ||
-                              "/placeholder.svg?height=150&width=200"
-                            }
-                            alt={post.title}
-                            fill
-                            className="object-cover"
-                          />
-                        </div>
-                      </div>
-                      <Button variant="link" className="mt-2 px-0">
-                        Read more
-                      </Button>
-                    </CardContent>
-                  </Card>
-                ))}
-              </TabsContent>
-              <TabsContent value="rewards" className="mt-4">
-                <div className="grid gap-4 sm:grid-cols-2">
-                  {creator.rewards.map((reward, index) => (
-                    <Card key={index}>
-                      <CardHeader className="pb-2">
-                        <div className="flex items-center justify-between">
-                          <CardTitle className="text-lg">
-                            {reward.level}
-                          </CardTitle>
-                          <div className="flex items-center text-primary font-bold">
-                            <Banknote className="mr-1 h-4 w-4" />
-                            {reward.amount} $DROPS
-                          </div>
-                        </div>
-                      </CardHeader>
-                      <CardContent>
-                        <ul className="list-disc pl-5 space-y-1 text-sm">
-                          {reward.benefits.map((benefit, i) => (
-                            <li key={i}>{benefit}</li>
-                          ))}
-                        </ul>
-                        <Button className="mt-4 w-full">Select</Button>
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
-              </TabsContent>
-            </Tabs>
-          </div>
-
-          <div>
-            <DonateForm
-              creatorId={creator.id}
-              creatorName={creator.name}
-              creatorAddress={creator.walletAddress}
-            />
+          {/* Verified Badge */}
+          <div className="absolute bottom-1 right-1 bg-[#1FA9D6] p-1 rounded-full border-2 border-white shadow-sm">
+            <Star className="w-3.5 h-3.5 text-white fill-white" />
           </div>
         </div>
       </div>
+
+      {/* 2. Creator Info */}
+      <div className="pt-14 px-5 text-center pb-6">
+        <h1 className="text-2xl font-extrabold text-gray-900 flex items-center justify-center gap-2">
+          {CREATOR.name}
+        </h1>
+        <p className="text-gray-500 font-medium text-sm mb-3">{CREATOR.handle}</p>
+
+        <p className="text-gray-600 text-sm leading-relaxed max-w-sm mx-auto mb-4">
+          {CREATOR.description}
+        </p>
+
+        <div className="flex items-center justify-center gap-4 text-xs font-semibold text-gray-500 mb-6">
+          <div className="flex items-center gap-1.5 bg-gray-50 px-3 py-1.5 rounded-full border border-gray-100">
+            <Users className="w-3.5 h-3.5" />
+            {CREATOR.supporters} Members
+          </div>
+          <div className="flex items-center gap-1.5 bg-gray-50 px-3 py-1.5 rounded-full border border-gray-100">
+            <Music className="w-3.5 h-3.5" />
+            {CREATOR.category}
+          </div>
+        </div>
+      </div>
+
+      {/* 3. Main Content Tabs */}
+      <Tabs defaultValue="membership" className="w-full" onValueChange={setActiveTab}>
+        <div className="px-5 mb-6">
+          <TabsList className="w-full grid grid-cols-2 bg-gray-100 p-1 rounded-xl h-12">
+            <TabsTrigger
+              value="membership"
+              className="rounded-lg text-sm font-bold data-[state=active]:bg-white data-[state=active]:text-black data-[state=active]:shadow-sm transition-all"
+            >
+              Memberships
+            </TabsTrigger>
+            <TabsTrigger
+              value="content"
+              className="rounded-lg text-sm font-bold data-[state=active]:bg-white data-[state=active]:text-black data-[state=active]:shadow-sm transition-all"
+            >
+              Exclusive Feed
+            </TabsTrigger>
+          </TabsList>
+        </div>
+
+        {/* -- MEMBERSHIP TAB -- */}
+        <TabsContent value="membership" className="px-5 space-y-6 animate-in slide-in-from-bottom-4 duration-500">
+          <div className="flex items-center gap-2 mb-2">
+            <Star className="w-4 h-4 text-[#1FA9D6]" />
+            <h2 className="text-sm font-bold text-gray-900 uppercase tracking-wider">Select a Tier</h2>
+          </div>
+
+          <div className="grid gap-5">
+            {CREATOR.tiers.map((tier) => (
+              <MembershipTierCard
+                key={tier.id}
+                tier={tier}
+                onJoin={handleJoin}
+              />
+            ))}
+          </div>
+
+          <p className="text-xs text-center text-gray-400 mt-4 pb-4">
+            Memberships are minted as NFTs on Base/Optimism.<br />You can cancel anytime.
+          </p>
+        </TabsContent>
+
+        {/* -- EXCLUSIVE FEED TAB -- */}
+        <TabsContent value="content" className="px-5 animate-in slide-in-from-right-4 duration-500">
+          <div className="grid grid-cols-2 gap-3">
+            {CREATOR.content.map((item) => (
+              <div
+                key={item.id}
+                className={`
+                  relative aspect-[4/5] rounded-2xl overflow-hidden shadow-sm border border-gray-100
+                  ${item.isLocked ? 'grayscale opacity-90' : ''}
+                `}
+              >
+                {/* Background Image */}
+                <img src={item.image} className="w-full h-full object-cover" alt="Content" />
+
+                {/* Overlay */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex flex-col justify-end p-3">
+
+                  {/* Lock State */}
+                  {item.isLocked ? (
+                    <div className="absolute inset-0 bg-black/40 backdrop-blur-[2px] flex flex-col items-center justify-center text-white gap-2">
+                      <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center backdrop-blur-md">
+                        <Lock className="w-5 h-5 text-white" />
+                      </div>
+                      <Badge variant="secondary" className="bg-white/90 text-black font-bold text-[10px]">
+                        MEMBERS ONLY
+                      </Badge>
+                    </div>
+                  ) : (
+                    <div className="absolute top-2 right-2">
+                      <Badge className="bg-[#1FA9D6] border-none text-[10px]">FREE</Badge>
+                    </div>
+                  )}
+
+                  <h3 className="text-white font-bold text-sm leading-tight mb-0.5 line-clamp-2">
+                    {item.title}
+                  </h3>
+                  <p className="text-white/70 text-[10px] uppercase font-medium">
+                    {item.type} • {item.views}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* CTA for Content Tab */}
+          <div className="mt-8 p-6 bg-gray-50 rounded-2xl border border-dashed border-gray-200 text-center">
+            <Lock className="w-8 h-8 text-gray-300 mx-auto mb-3" />
+            <h3 className="font-bold text-gray-900">Unlock Full Access</h3>
+            <p className="text-sm text-gray-500 mb-4 mt-1">Join a membership tier to access 12+ exclusive sets and edits.</p>
+            <Button
+              onClick={() => setActiveTab('membership')}
+              variant="outline"
+              className="bg-white text-black font-bold border-gray-200"
+            >
+              View Plans
+            </Button>
+          </div>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }

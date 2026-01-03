@@ -103,7 +103,7 @@ export default function WalletLayout({
   const tabs = [
     { name: "Events", href: "/wallet/events" },
     { name: "Rewards", href: "/wallet/rewards" },
-    { name: "Coins", href: "/wallet/coins" },
+    { name: "Memberships", href: "/wallet/memberships" },
   ];
 
   return (
@@ -144,21 +144,8 @@ export default function WalletLayout({
             <span className="text-5xl font-extrabold text-gray-900 tracking-tighter">
               {nativeBalance}
             </span>
-            <span className="text-xl font-medium text-gray-400">ETH</span>
+            <span className="text-xl font-medium text-gray-400">USDC</span>
           </div>
-
-          {/* Secondary Balance (Drops) */}
-          <button
-            onClick={fetchNativeBalance}
-            className="flex items-center gap-1.5 px-3 py-1 bg-[#1FA9D6]/10 text-[#1FA9D6] rounded-full text-xs font-bold uppercase tracking-wide hover:bg-[#1FA9D6]/20 transition-colors"
-          >
-            {isLoadingBalance ? (
-              <RefreshCw className="w-3 h-3 animate-spin" />
-            ) : (
-              <span>$DROPS</span>
-            )}
-            <span>{balance}</span>
-          </button>
         </div>
 
         {/* Modern Action Row (Circles) */}

@@ -51,3 +51,9 @@
 - Never commit secrets; use `.env.local` / `.env` with `.gitignore`. Reference `env.example` when adding new vars.
 - Wallet/chain RPC keys and app auth secrets must be set in deployment environments; prefer provider URLs via env vars.
 - Validate ABI changes against frontend consumers in `lib/` and `app/` before deploying. Track contract addresses in `config/` or deployment outputs in `artifacts/`/`cache/`.
+
+## Important
+- Ensure all tests pass locally before pushing.
+- Keep the codebase clean and organized.
+- Follow the established coding standards and conventions.
+- Always use `pnpm lint` before finishing changes.

@@ -6,6 +6,7 @@
     "build": "next build",
     "dev": "next dev",
     "lint": "tsc && next lint",
+    "test:frontend": "vitest",
     "start": "next start"
   },
   "dependencies": {

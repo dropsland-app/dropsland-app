@@ -8,7 +8,8 @@ import { Button } from "@/components/ui/button";
 
 import { useAuth } from "@/hooks/use-auth";
 import { getUserRewards, type RewardItem } from "@/lib/alchemy";
-import { userPosts, allArtists } from "@/lib/mock-data";
+import { getUserPosts, type Post } from "@/lib/api/posts";
+import { allArtists } from "@/lib/mock-data";
 
 import { ProfileHeader } from "@/components/profile/profile-header";
 import { ProfileTabs } from "@/components/profile/profile-tabs";
@@ -32,6 +33,7 @@ export default function ProfilePage() {
   }>({});
   const [rewards, setRewards] = useState<RewardItem[]>([]);
   const [loadingRewards, setLoadingRewards] = useState(false);
+  const [userPosts, setUserPosts] = useState<any[]>([]); // Adapting to component expectations
 
   // --- Logic / Mocks ---
   const displayName = userData?.username || "musicfan";
@@ -64,6 +66,8 @@ export default function ProfilePage() {
   // --- Effects ---
   useEffect(() => {
     if (!walletAddress) return;
+
+    // Fetch Rewards
     const fetchRewards = async () => {
       setLoadingRewards(true);
       try {
@@ -75,7 +79,27 @@ export default function ProfilePage() {
         setLoadingRewards(false);
       }
     };
+
+    // Fetch Posts
+    const fetchPosts = async () => {
+      try {
+        const posts = await getUserPosts(walletAddress);
+        // Map DB posts to UI format if needed
+        const mappedPosts = posts.map(p => ({
+          content: p.content,
+          time: new Date(p.created_at).toLocaleDateString(),
+          likes: p.likes_count,
+          comments: p.comments_count,
+          image: p.media_url // Assuming media_url is an image for now
+        }));
+        setUserPosts(mappedPosts);
+      } catch (error) {
+        console.error("❌ Error fetching posts:", error);
+      }
+    };
+
     fetchRewards();
+    fetchPosts();
   }, [walletAddress]);
 
   // --- Handlers ---

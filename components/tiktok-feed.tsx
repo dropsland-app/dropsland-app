@@ -140,8 +140,8 @@ export default function TikTokFeed({
                   loop
                   muted
                   preload="metadata"
-                  onLoadedData={(e) => {
-                    const video = e.currentTarget;
+                  onLoadedData={() => {
+                    // const video = e.currentTarget;
                     setIsPlaying((prev) => ({ ...prev, [postKey]: false }));
                   }}
                   onTimeUpdate={(e) => {

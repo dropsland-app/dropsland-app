@@ -2,7 +2,7 @@
 
 import TikTokFeed from "@/components/tiktok-feed";
 import { FeedPost } from "@/lib/api/feed";
-import { useRouter } from "next/navigation";
+// import { useRouter } from "next/navigation"; -- Unused
 import Image from "next/image";
 
 interface HomeFeedWrapperProps {
@@ -10,7 +10,6 @@ interface HomeFeedWrapperProps {
 }
 
 export default function HomeFeedWrapper({ initialPosts }: HomeFeedWrapperProps) {
-    const router = useRouter();
 
     const handleSelectArtist = (artistId: string) => {
         // Navigate via Next.js router

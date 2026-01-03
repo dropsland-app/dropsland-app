@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import ScanView from "@/components/scan-view";
-import BottomDock from "@/components/bottom-dock";
+// import BottomDock from "@/components/bottom-dock"; -- Unused
 
 export default function ScanPage() {
   const router = useRouter();

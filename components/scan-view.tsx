@@ -5,7 +5,7 @@ import { QrReader } from "react-qr-reader";
 import { ArrowLeft, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { isAddress } from "viem";
-import { useToast } from "@/hooks/use-toast";
+// import { useToast } from "@/hooks/use-toast"; -- Unused
 
 interface ScanViewProps {
   onBack: () => void;
@@ -15,7 +15,7 @@ interface ScanViewProps {
 export default function ScanView({ onBack, onScanSuccess }: ScanViewProps) {
   const [mounted, setMounted] = useState(false);
   const [camKey, setCamKey] = useState(0); // Used to force remount of camera
-  const { toast } = useToast();
+  // const { toast } = useToast(); // Removed as it's unused
 
   // Prevent hydration mismatch and ensure browser APIs are available
   useEffect(() => {

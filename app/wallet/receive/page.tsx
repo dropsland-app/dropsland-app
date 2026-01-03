@@ -58,7 +58,7 @@ export default function ReceivePage() {
         className: "bg-green-600 text-white border-none",
       });
       setTimeout(() => setCopied(false), 2000);
-    } catch (err) {
+    } catch (_err) {
       toast({
         title: "Copy Failed",
         description: "Could not copy address.",
