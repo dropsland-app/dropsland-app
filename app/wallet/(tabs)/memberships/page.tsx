@@ -9,7 +9,7 @@ import {
   Dialog,
   DialogContent,
   DialogHeader,
-  DialogTitle
+  DialogTitle,
 } from "@/components/ui/dialog";
 import { QrCode, Ticket, ShieldCheck, Star } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
@@ -23,7 +23,7 @@ const MY_MEMBERSHIPS = [
     color: "bg-[#1FA9D6]", // Dropsland Blue
     expiry: "Renews Oct 12",
     perks: ["+1 Entry", "Backstage"],
-    tokenId: "#8821"
+    tokenId: "#8821",
   },
   {
     id: "m2",
@@ -33,8 +33,8 @@ const MY_MEMBERSHIPS = [
     color: "bg-slate-800",
     expiry: "Renews Oct 15",
     perks: ["Priority Entry"],
-    tokenId: "#0442"
-  }
+    tokenId: "#0442",
+  },
 ];
 
 export default function WalletMembershipsPage() {
@@ -42,31 +42,17 @@ export default function WalletMembershipsPage() {
   const [selectedPass, setSelectedPass] = useState<any | null>(null);
 
   const stats = [
-    { label: "Active Passes", value: MY_MEMBERSHIPS.length.toString(), icon: Ticket },
+    {
+      label: "Active Passes",
+      value: MY_MEMBERSHIPS.length.toString(),
+      icon: Ticket,
+    },
     { label: "Verified", value: "Level 2", icon: ShieldCheck },
     { label: "Saved", value: "$45.00", icon: Star },
   ];
 
   return (
     <div className="pb-24">
-      {/* Stats Overview */}
-      <div className="grid grid-cols-3 gap-3 p-4 bg-gray-50/50 border-b border-gray-100">
-        {stats.map((stat) => (
-          <Card
-            key={stat.label}
-            className="bg-white shadow-none border border-gray-200"
-          >
-            <CardContent className="p-3 flex flex-col items-center justify-center gap-1">
-              <stat.icon className="h-4 w-4 text-[#1FA9D6] mb-1" />
-              <p className="text-[10px] uppercase font-bold text-gray-400">
-                {stat.label}
-              </p>
-              <p className="font-bold text-[#1E1E1E] text-sm">{stat.value}</p>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-
       {/* Memberships List */}
       <div className="p-4 space-y-4">
         <h2 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">
@@ -81,7 +67,9 @@ export default function WalletMembershipsPage() {
               className="group relative w-full rounded-2xl overflow-hidden shadow-md transition-transform active:scale-[0.98] cursor-pointer"
             >
               {/* Card Header / Color Strip */}
-              <div className={`${membership.color} h-24 p-4 relative overflow-hidden`}>
+              <div
+                className={`${membership.color} h-24 p-4 relative overflow-hidden`}
+              >
                 <div className="absolute inset-0 bg-black/10" />
                 <div className="absolute -right-4 -top-4 w-20 h-20 bg-white/10 rounded-full blur-xl" />
 
@@ -137,7 +125,10 @@ export default function WalletMembershipsPage() {
       </div>
 
       {/* QR Code Dialog (Simulated Apple Wallet View) */}
-      <Dialog open={!!selectedPass} onOpenChange={(open) => !open && setSelectedPass(null)}>
+      <Dialog
+        open={!!selectedPass}
+        onOpenChange={(open) => !open && setSelectedPass(null)}
+      >
         <DialogContent className="w-[90%] rounded-3xl bg-white border-none shadow-2xl">
           <DialogHeader className="text-center pt-4">
             <DialogTitle className="text-gray-900">Access Pass</DialogTitle>
@@ -162,8 +153,12 @@ export default function WalletMembershipsPage() {
               </p>
 
               <div className="w-full bg-gray-50 rounded-xl p-4 flex justify-between items-center">
-                <span className="text-xs font-bold text-gray-400 uppercase">Token ID</span>
-                <span className="font-mono text-sm font-bold text-gray-900">{selectedPass.tokenId}</span>
+                <span className="text-xs font-bold text-gray-400 uppercase">
+                  Token ID
+                </span>
+                <span className="font-mono text-sm font-bold text-gray-900">
+                  {selectedPass.tokenId}
+                </span>
               </div>
             </div>
           )}
