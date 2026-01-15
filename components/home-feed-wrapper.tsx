@@ -3,6 +3,8 @@
 import TikTokFeed from "@/components/tiktok-feed";
 import { FeedPost } from "@/lib/api/feed";
 import Image from "next/image";
+import { useEffect } from "react";
+import sdk from "@farcaster/miniapp-sdk";
 
 interface HomeFeedWrapperProps {
   initialPosts: FeedPost[];
@@ -11,6 +13,17 @@ interface HomeFeedWrapperProps {
 export default function HomeFeedWrapper({
   initialPosts,
 }: HomeFeedWrapperProps) {
+  useEffect(() => {
+    // Debug log to confirm this component mounted
+    console.log("Page mounted. Attempting to call ready()...");
+
+    // Force the ready call using the raw SDK
+    // This bypasses any Context/Provider issues in OnchainKit
+    sdk.actions.ready();
+
+    console.log("Ready command sent.");
+  }, []);
+
   const handleSelectArtist = (artistId: string) => {
     // Navigate via Next.js router
     // Checking if it's a valid ID before navigating could be added here

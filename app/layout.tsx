@@ -7,6 +7,7 @@ import { AuthProvider } from "@/hooks/use-auth";
 import PrivyProviderWrapper from "@/components/providers/privy-provider";
 import AppScaffold from "@/components/layout/app-scaffold";
 import { Metadata, Viewport } from "next";
+import { minikitConfig } from "@/minikit.config";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -18,17 +19,30 @@ export const viewport: Viewport = {
   userScalable: false,
 };
 
-export const metadata: Metadata = {
-  title: "Dropsland",
-  description: "Elevate your DJ career on-chain",
-  manifest: "/manifest.json",
-  other: {
-    "base:app_id": "6942108dd77c069a945bdf85",
-  },
-  icons: {
-    apple: "/icon.png",
-  },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  return {
+    title: minikitConfig.miniapp.name,
+    description: minikitConfig.miniapp.description,
+    manifest: "/manifest.json",
+    icons: {
+      apple: "/icon.png",
+    },
+    other: {
+      "fc:miniapp": JSON.stringify({
+        version: minikitConfig.miniapp.version,
+        imageUrl: minikitConfig.miniapp.heroImageUrl,
+        button: {
+          title: `Launch ${minikitConfig.miniapp.name}`,
+          action: {
+            name: `Launch ${minikitConfig.miniapp.name}`,
+            type: "launch_miniapp",
+          },
+        },
+      }),
+      "base:app_id": "696699126622bd23811761f2",
+    },
+  };
+}
 
 export default function RootLayout({
   children,
