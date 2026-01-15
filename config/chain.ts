@@ -64,3 +64,7 @@ export const ALCHEMY_NETWORK = IS_PROD
 export const DROPSLAND_EVENTS_CONTRACT = IS_PROD
   ? active.contracts.events.mainnet
   : active.contracts.events.testnet;
+
+export const DROPSLAND_CREATORS_CONTRACT = IS_PROD
+  ? active.contracts.creators.mainnet
+  : active.contracts.creators.testnet;

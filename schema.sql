@@ -224,3 +224,42 @@ WITH CHECK ( bucket_id = 'audio_files' );
 CREATE POLICY "Allow Upload Images"
 ON storage.objects FOR INSERT
 WITH CHECK ( bucket_id = 'cover_images' );
+
+-- New snippet added
+-- 1. Create the Membership Tiers table
+CREATE TABLE IF NOT EXISTS "public"."membership_tiers" (
+    "id" "uuid" DEFAULT gen_random_uuid() NOT NULL PRIMARY KEY,
+    "creator_wallet" character varying(56) NOT NULL, -- The DJ's wallet
+    "name" character varying(100) NOT NULL,          -- e.g. "Inner Circle"
+    "description" text,
+    "price" numeric NOT NULL,                        -- Display price (e.g., 0.05)
+    "currency" text DEFAULT 'ETH',
+    "image_url" text,                                -- IPFS or Storage URL
+    "perks" text[],                                  -- e.g. ["Backstage", "Merch"]
+    "onchain_token_id" numeric NOT NULL,             -- ID from Smart Contract
+    "max_supply" numeric DEFAULT 0,
+    "created_at" timestamp with time zone DEFAULT "now"()
+);
+
+-- 2. Add Foreign Key to link with Profiles
+ALTER TABLE "public"."membership_tiers"
+    ADD CONSTRAINT "fk_tier_creator"
+    FOREIGN KEY ("creator_wallet")
+    REFERENCES "public"."profiles"("wallet_address");
+
+-- 3. Enable RLS (Optional but recommended)
+ALTER TABLE "public"."membership_tiers" ENABLE ROW LEVEL SECURITY;
+
+-- Allow anyone to read tiers
+CREATE POLICY "Public Read Tiers" ON "public"."membership_tiers"
+    FOR SELECT USING (true);
+
+-- Allow authenticated users (DJs) to insert their own tiers
+CREATE POLICY "DJs Can Create Tiers" ON "public"."membership_tiers"
+    FOR INSERT WITH CHECK (auth.uid() IS NOT NULL); -- Simplified check
+
+-- New snippet added
+-- Add a role column to the profiles table
+-- We default to 'fan' to be safe
+ALTER TABLE "public"."profiles"
+ADD COLUMN "role" text DEFAULT 'fan' CHECK (role IN ('fan', 'dj', 'admin'));

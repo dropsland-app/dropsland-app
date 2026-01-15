@@ -5,6 +5,9 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Dock, DockIcon, DockItem, DockLabel } from "@/components/core/dock";
 import { cn } from "@/lib/utils";
+import { usePrivy } from "@privy-io/react-auth";
+import { useEffect, useState } from "react";
+import { supabase } from "@/lib/supabase/client";
 
 interface BottomDockProps {
   theme?: "light" | "dark";
@@ -12,14 +15,57 @@ interface BottomDockProps {
 
 export default function BottomDock({ theme }: BottomDockProps) {
   const pathname = usePathname();
+  const { user } = usePrivy();
+  const [role, setRole] = useState<string | null>(null);
 
-  const navItems = [
+  // Fetch user role on mount
+  useEffect(() => {
+    async function fetchRole() {
+      if (!user?.wallet?.address) return;
+
+      // Check localStorage first to prevent flickering
+      const cached = localStorage.getItem("user_role");
+      if (cached) setRole(cached);
+
+      const { data } = await supabase
+        .from("profiles")
+        .select("role")
+        .eq("wallet_address", user.wallet.address)
+        .single();
+
+      if (data) {
+        setRole(data.role);
+        localStorage.setItem("user_role", data.role);
+      }
+    }
+    fetchRole();
+  }, [user]);
+
+  // Base nav items
+  const baseNavItems = [
     { path: "/", Icon: Home, label: "Home" },
     { path: "/explore", Icon: Search, label: "Explore" },
-    { path: "/create", Icon: Upload, label: "Create" },
     { path: "/wallet", Icon: Wallet, label: "Wallet" },
-    { path: "/profile", Icon: User, label: "Profile" },
+    {
+      path: user?.wallet?.address
+        ? `/profile/${user.wallet.address}`
+        : "/profile",
+      Icon: User,
+      label: "Profile",
+    },
   ];
+
+  // Conditionally add Create button for DJs only
+  const navItems =
+    role === "DJ"
+      ? [
+          baseNavItems[0], // Home
+          baseNavItems[1], // Explore
+          { path: "/create", Icon: Upload, label: "Create" }, // Create - DJ only
+          baseNavItems[2], // Wallet
+          baseNavItems[3], // Profile
+        ]
+      : baseNavItems;
 
   const isActiveRoute = (path: string) => {
     if (path === "/" && pathname === "/") return true;

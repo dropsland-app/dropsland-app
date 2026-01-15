@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -10,45 +10,53 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { QrCode, Ticket, ShieldCheck, Star } from "lucide-react";
-import { useAuth } from "@/hooks/use-auth";
+import { QrCode, Ticket, Loader2 } from "lucide-react";
+import { useWallets } from "@privy-io/react-auth";
+import { getUserMemberships, type RewardItem } from "@/lib/alchemy";
 
-const MY_MEMBERSHIPS = [
-  {
-    id: "m1",
-    artistName: "DJ Juampi",
-    artistAvatar: "/avatars/juampi.jpg",
-    tierName: "Backstage",
-    color: "bg-[#1FA9D6]", // Dropsland Blue
-    expiry: "Renews Oct 12",
-    perks: ["+1 Entry", "Backstage"],
-    tokenId: "#8821",
-  },
-  {
-    id: "m2",
-    artistName: "Banger",
-    artistAvatar: "/avatars/banger.jpg",
-    tierName: "Guestlist",
-    color: "bg-slate-800",
-    expiry: "Renews Oct 15",
-    perks: ["Priority Entry"],
-    tokenId: "#0442",
-  },
+// Color palette for membership cards
+const MEMBERSHIP_COLORS = [
+  "bg-[#1FA9D6]",
+  "bg-purple-600",
+  "bg-slate-800",
+  "bg-amber-500",
+  "bg-emerald-600",
+  "bg-rose-600",
 ];
 
 export default function WalletMembershipsPage() {
-  const { userData } = useAuth();
-  const [selectedPass, setSelectedPass] = useState<any | null>(null);
+  const { wallets } = useWallets();
+  const [memberships, setMemberships] = useState<RewardItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [selectedPass, setSelectedPass] = useState<RewardItem | null>(null);
 
-  const stats = [
-    {
-      label: "Active Passes",
-      value: MY_MEMBERSHIPS.length.toString(),
-      icon: Ticket,
-    },
-    { label: "Verified", value: "Level 2", icon: ShieldCheck },
-    { label: "Saved", value: "$45.00", icon: Star },
-  ];
+  const wallet =
+    wallets.find((w) => w.walletClientType === "privy") || wallets[0];
+
+  useEffect(() => {
+    const fetchMemberships = async () => {
+      if (!wallet?.address) {
+        setLoading(false);
+        return;
+      }
+
+      setLoading(true);
+      try {
+        const data = await getUserMemberships(wallet.address);
+        setMemberships(data);
+      } catch (error) {
+        console.error("Error fetching memberships:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchMemberships();
+  }, [wallet?.address]);
+
+  const getColorForIndex = (index: number) => {
+    return MEMBERSHIP_COLORS[index % MEMBERSHIP_COLORS.length];
+  };
 
   return (
     <div className="pb-24">
@@ -58,16 +66,21 @@ export default function WalletMembershipsPage() {
           Your Access Passes
         </h2>
 
-        {MY_MEMBERSHIPS.length > 0 ? (
-          MY_MEMBERSHIPS.map((membership) => (
+        {loading ? (
+          <div className="flex flex-col items-center justify-center py-16">
+            <Loader2 className="w-8 h-8 animate-spin text-[#1FA9D6] mb-4" />
+            <p className="text-sm text-gray-500">Loading memberships...</p>
+          </div>
+        ) : memberships.length > 0 ? (
+          memberships.map((membership, index) => (
             <div
-              key={membership.id}
+              key={`${membership.id}-${index}`}
               onClick={() => setSelectedPass(membership)}
               className="group relative w-full rounded-2xl overflow-hidden shadow-md transition-transform active:scale-[0.98] cursor-pointer"
             >
               {/* Card Header / Color Strip */}
               <div
-                className={`${membership.color} h-24 p-4 relative overflow-hidden`}
+                className={`${getColorForIndex(index)} h-24 p-4 relative overflow-hidden`}
               >
                 <div className="absolute inset-0 bg-black/10" />
                 <div className="absolute -right-4 -top-4 w-20 h-20 bg-white/10 rounded-full blur-xl" />
@@ -75,15 +88,18 @@ export default function WalletMembershipsPage() {
                 <div className="relative z-10 flex justify-between items-start">
                   <div>
                     <h3 className="text-white font-extrabold text-lg tracking-tight">
-                      {membership.artistName}
+                      {membership.metadata.name ||
+                        `Membership #${membership.id}`}
                     </h3>
                     <Badge className="bg-white/20 hover:bg-white/30 text-white border-none mt-1 backdrop-blur-md">
-                      {membership.tierName}
+                      Token #{membership.id}
                     </Badge>
                   </div>
                   <Avatar className="h-10 w-10 border-2 border-white/30">
-                    <AvatarImage src={membership.artistAvatar} />
-                    <AvatarFallback>{membership.artistName[0]}</AvatarFallback>
+                    <AvatarImage src={membership.metadata.image} />
+                    <AvatarFallback>
+                      {(membership.metadata.name || "M")[0]}
+                    </AvatarFallback>
                   </Avatar>
                 </div>
               </div>
@@ -93,10 +109,10 @@ export default function WalletMembershipsPage() {
                 <div className="flex justify-between items-end">
                   <div className="space-y-1">
                     <p className="text-xs text-gray-400 font-medium uppercase">
-                      Next Renewal
+                      Balance
                     </p>
                     <p className="text-sm font-semibold text-gray-900">
-                      {membership.expiry}
+                      {membership.balance}x Owned
                     </p>
                   </div>
 
@@ -119,6 +135,9 @@ export default function WalletMembershipsPage() {
           <div className="text-center py-10 opacity-60">
             <Ticket className="w-12 h-12 mx-auto text-gray-300 mb-2" />
             <p className="text-sm font-medium">No active memberships</p>
+            <p className="text-xs text-gray-400 mt-1">
+              Join a creator&apos;s membership to see it here
+            </p>
           </div>
         )}
       </div>
@@ -138,27 +157,49 @@ export default function WalletMembershipsPage() {
               {/* Generative QR Placeholder */}
               <div className="bg-white p-2 rounded-xl border-2 border-dashed border-gray-200 mb-6">
                 <img
-                  src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${selectedPass.id}-${selectedPass.tokenId}`}
+                  src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=membership-${selectedPass.id}`}
                   className="w-48 h-48 opacity-90 mix-blend-multiply"
                   alt="QR Code"
                 />
               </div>
 
               <h3 className="text-xl font-bold text-gray-900 mb-1">
-                {selectedPass.tierName} Access
+                {selectedPass.metadata.name || `Membership #${selectedPass.id}`}
               </h3>
-              <p className="text-gray-500 text-sm mb-6">
-                {selectedPass.artistName}
-              </p>
+              {selectedPass.metadata.description && (
+                <p className="text-gray-500 text-sm mb-6 text-center px-4">
+                  {selectedPass.metadata.description}
+                </p>
+              )}
 
               <div className="w-full bg-gray-50 rounded-xl p-4 flex justify-between items-center">
                 <span className="text-xs font-bold text-gray-400 uppercase">
                   Token ID
                 </span>
                 <span className="font-mono text-sm font-bold text-gray-900">
-                  {selectedPass.tokenId}
+                  #{selectedPass.id}
                 </span>
               </div>
+
+              {selectedPass.metadata.attributes &&
+                selectedPass.metadata.attributes.length > 0 && (
+                  <div className="w-full mt-4 space-y-2">
+                    <span className="text-xs font-bold text-gray-400 uppercase">
+                      Perks
+                    </span>
+                    <div className="flex flex-wrap gap-2">
+                      {selectedPass.metadata.attributes.map((attr, i) => (
+                        <Badge
+                          key={i}
+                          variant="secondary"
+                          className="bg-gray-100 text-gray-700"
+                        >
+                          {attr.value || attr.trait_type}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+                )}
             </div>
           )}
         </DialogContent>

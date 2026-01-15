@@ -1,5 +1,8 @@
 import { Network, Alchemy, type OwnedNft } from "alchemy-sdk";
-import { DROPSLAND_EVENTS_CONTRACT } from "@/config/chain";
+import {
+  DROPSLAND_EVENTS_CONTRACT,
+  DROPSLAND_CREATORS_CONTRACT,
+} from "@/config/chain";
 
 // Configuration for Alchemy
 const settings = {
@@ -61,6 +64,22 @@ export const getUserRewards = async (
     return response.ownedNfts.map(mapAlchemyToReward);
   } catch (error) {
     console.error("Error fetching rewards via Alchemy:", error);
+    return [];
+  }
+};
+
+export const getUserMemberships = async (
+  walletAddress: string,
+): Promise<RewardItem[]> => {
+  try {
+    const response = await alchemy.nft.getNftsForOwner(walletAddress, {
+      contractAddresses: [DROPSLAND_CREATORS_CONTRACT],
+    });
+
+    // Use the mapper function
+    return response.ownedNfts.map(mapAlchemyToReward);
+  } catch (error) {
+    console.error("Error fetching memberships via Alchemy:", error);
     return [];
   }
 };

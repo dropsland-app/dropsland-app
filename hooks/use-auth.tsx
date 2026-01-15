@@ -39,19 +39,19 @@ const AuthContext = createContext<AuthContextType>({
   isAuthenticated: false,
   balance: 0,
   donated: 0,
-  login: () => { },
-  logout: () => { },
-  updateBalance: () => { },
-  addToBalance: () => { },
-  addToDonated: () => { },
+  login: () => {},
+  logout: () => {},
+  updateBalance: () => {},
+  addToBalance: () => {},
+  addToDonated: () => {},
   isArtist: () => false,
 });
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const { login, logout, user, authenticated, ready } = usePrivy();
+  const { login, logout: privyLogout, user, authenticated, ready } = usePrivy();
   const { wallets } = useWallets();
 
-  // Local state 
+  // Local state
   const [balance, setBalance] = useState(0);
   const [donated, setDonated] = useState(0);
   const [userData, setUserData] = useState<UserData | null>(null);
@@ -69,7 +69,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
           // 2. If no profile exists, create a default one (Optional auto-creation)
           if (!profile) {
-            const { data } = await createProfile(address, `User-${address.slice(0, 4)}`);
+            const { data } = await createProfile(
+              address,
+              `User-${address.slice(0, 4)}`,
+            );
             profile = data;
           }
 
@@ -77,8 +80,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           if (profile) {
             setUserData({
               username: profile.username,
-              type: profile.role === 'DJ' ? 'artist' : 'fan',
-              isVerified: profile.role === 'DJ' || profile.role === 'ORGANIZER',
+              type: profile.role === "DJ" ? "artist" : "fan",
+              isVerified: profile.role === "DJ" || profile.role === "ORGANIZER",
               walletAddress: profile.wallet_address,
               avatar: profile.avatar_url || undefined,
             });
@@ -107,6 +110,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const addToBalance = (amount: number) => setBalance((prev) => prev + amount);
   const addToDonated = (amount: number) => setDonated((prev) => prev + amount);
   const isArtist = () => userData?.type === "artist";
+
+  // Enhanced logout with localStorage cleanup
+  const logout = () => {
+    localStorage.removeItem("user_role");
+    privyLogout();
+  };
 
   return (
     <AuthContext.Provider
