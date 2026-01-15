@@ -22,6 +22,9 @@ export const metadata: Metadata = {
   title: "Dropsland",
   description: "Elevate your DJ career on-chain",
   manifest: "/manifest.json",
+  other: {
+    "base:app_id": "6942108dd77c069a945bdf85",
+  },
   icons: {
     apple: "/icon.png",
   },
