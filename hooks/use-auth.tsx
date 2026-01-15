@@ -10,10 +10,11 @@ import {
 import { usePrivy, useWallets } from "@privy-io/react-auth";
 import { getProfile, createProfile } from "@/lib/api/profiles";
 
-// Define the shape of your user data
+// 1. Updated Interface to include 'role'
 interface UserData {
   username: string;
-  type: "fan" | "artist";
+  type: "fan" | "artist"; // Kept for backward compatibility with existing UI
+  role: "FAN" | "DJ" | "STAFF"; // Source of truth for permissions
   isVerified?: boolean;
   walletAddress?: string;
   avatar?: string;
@@ -31,6 +32,7 @@ interface AuthContextType {
   addToBalance: (amount: number) => void;
   addToDonated: (amount: number) => void;
   isArtist: () => boolean;
+  isStaff: () => boolean; // 2. Added helper for Staff
 }
 
 const AuthContext = createContext<AuthContextType>({
@@ -45,6 +47,7 @@ const AuthContext = createContext<AuthContextType>({
   addToBalance: () => {},
   addToDonated: () => {},
   isArtist: () => false,
+  isStaff: () => false,
 });
 
 export function AuthProvider({ children }: { children: ReactNode }) {
@@ -67,7 +70,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           // 1. Try to get existing profile
           let profile = await getProfile(address);
 
-          // 2. If no profile exists, create a default one (Optional auto-creation)
+          // 2. If no profile exists, create a default one (Defaulting to FAN)
           if (!profile) {
             const { data } = await createProfile(
               address,
@@ -76,21 +79,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             profile = data;
           }
 
-          // 3. Set real data
+          // 3. Set real data with Role Mapping
           if (profile) {
             setUserData({
               username: profile.username,
+              // Map legacy 'type' for older components (Only DJ is 'artist', Staff uses 'fan' view base)
               type: profile.role === "DJ" ? "artist" : "fan",
-              isVerified: profile.role === "DJ" || profile.role === "ORGANIZER",
+              // Set explicit role
+              role: (profile.role as "FAN" | "DJ" | "STAFF") || "FAN",
+              // DJs and Staff are verified
+              isVerified: ["DJ", "STAFF", "ORGANIZER"].includes(profile.role),
               walletAddress: profile.wallet_address,
               avatar: profile.avatar_url || undefined,
             });
           } else {
-            // Fallback if DB fails completely, though rarely happens if createProfile works
             console.warn("Could not load or create profile");
           }
 
-          // Initialize mock balances so the wallet isn't empty (keep this for now if needed)
+          // Initialize mock balances
           setBalance(125);
           setDonated(75);
         }
@@ -105,11 +111,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     loadUser();
   }, [ready, authenticated, user, wallets]);
 
-  // Helper functions to keep existing components happy
+  // Helper functions
   const updateBalance = (newBalance: number) => setBalance(newBalance);
   const addToBalance = (amount: number) => setBalance((prev) => prev + amount);
   const addToDonated = (amount: number) => setDonated((prev) => prev + amount);
-  const isArtist = () => userData?.type === "artist";
+
+  // Role checks
+  const isArtist = () => userData?.role === "DJ";
+  const isStaff = () => userData?.role === "STAFF";
 
   // Enhanced logout with localStorage cleanup
   const logout = () => {
@@ -125,12 +134,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         isAuthenticated: authenticated,
         balance,
         donated,
-        login, // This now triggers the Privy Modal
+        login,
         logout,
         updateBalance,
         addToBalance,
         addToDonated,
         isArtist,
+        isStaff,
       }}
     >
       {children}

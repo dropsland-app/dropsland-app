@@ -47,21 +47,19 @@ export default function BottomDock({ theme }: BottomDockProps) {
     { path: "/explore", Icon: Search, label: "Explore" },
     { path: "/wallet", Icon: Wallet, label: "Wallet" },
     {
-      path: user?.wallet?.address
-        ? `/profile/${user.wallet.address}`
-        : "/profile",
+      path: "/profile",
       Icon: User,
       label: "Profile",
     },
   ];
 
-  // Conditionally add Create button for DJs only
+  // Conditionally add Create button for DJs and STAFF (Promoters)
   const navItems =
-    role === "DJ"
+    role === "DJ" || role === "STAFF"
       ? [
           baseNavItems[0], // Home
           baseNavItems[1], // Explore
-          { path: "/create", Icon: Upload, label: "Create" }, // Create - DJ only
+          { path: "/create", Icon: Upload, label: "Create" }, // Create - DJ & STAFF
           baseNavItems[2], // Wallet
           baseNavItems[3], // Profile
         ]

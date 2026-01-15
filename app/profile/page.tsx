@@ -1,4 +1,3 @@
-// app/profile/page.tsx
 "use client";
 
 import { useState, useEffect } from "react";
@@ -12,6 +11,9 @@ import {
   QrCode,
   ShieldCheck,
   Gift,
+  Music,
+  ScanLine,
+  Ticket,
 } from "lucide-react";
 import { usePrivy, useWallets } from "@privy-io/react-auth";
 import { Button } from "@/components/ui/button";
@@ -33,18 +35,21 @@ import { getUserRewards, type RewardItem } from "@/lib/alchemy";
 export default function ProfilePage() {
   const router = useRouter();
   const { wallets } = useWallets();
-  const { balance, donated, userData, isArtist, logout } = useAuth();
+  const { balance, donated, userData, logout } = useAuth();
   const { login, authenticated, ready } = usePrivy();
 
   // --- Local State ---
   const [rewards, setRewards] = useState<RewardItem[]>([]);
   const [loadingRewards, setLoadingRewards] = useState(false);
 
-  // --- Logic / Mocks ---
+  // --- Derived State ---
+  // Fallback to "FAN" if role is missing in the current auth hook version
+  // In a full implementation, userData.role would come directly from useAuth
+  const userRole =
+    userData?.role || (userData?.type === "artist" ? "DJ" : "FAN");
+
   const displayName = userData?.username || "User";
   const handle = `@${displayName.toLowerCase().replace(/\s/g, "")}`;
-
-  // Use a generated avatar style if no image
   const avatarSrc =
     userData?.avatar ||
     `https://api.dicebear.com/9.x/initials/svg?seed=${displayName}`;
@@ -52,6 +57,37 @@ export default function ProfilePage() {
   const primaryWallet =
     wallets.find((w) => w.walletClientType === "privy") || wallets[0];
   const walletAddress = primaryWallet?.address;
+
+  // --- Role Based Config ---
+  const roleConfig = {
+    FAN: {
+      color: "text-[#1FA9D6]",
+      bgColor: "bg-[#1FA9D6]",
+      borderColor: "border-[#1FA9D6]",
+      badge: "Fan",
+      icon: <ShieldCheck className="w-4 h-4" />,
+    },
+    DJ: {
+      color: "text-purple-600",
+      bgColor: "bg-purple-600",
+      borderColor: "border-purple-600",
+      badge: "DJ / Artist",
+      icon: <Music className="w-4 h-4" />,
+    },
+    STAFF: {
+      color: "text-green-600",
+      bgColor: "bg-green-600",
+      borderColor: "border-green-600",
+      badge: "Staff / Promoter",
+      icon: <Ticket className="w-4 h-4" />,
+    },
+  }[userRole as "FAN" | "DJ" | "STAFF"] || {
+    color: "text-gray-600",
+    bgColor: "bg-gray-600",
+    borderColor: "border-gray-600",
+    badge: "User",
+    icon: <ShieldCheck className="w-4 h-4" />,
+  };
 
   // --- Effects ---
   useEffect(() => {
@@ -96,7 +132,7 @@ export default function ProfilePage() {
   // --- Main View ---
   return (
     <div className="w-full h-full overflow-y-auto overflow-x-hidden bg-gray-50/30 pb-24 relative">
-      {/* 1. Header Section (Clean White) */}
+      {/* 1. Header Section */}
       <div className="bg-white pb-6 pt-12 px-6 rounded-b-[2rem] shadow-sm border-b border-gray-100 relative">
         {/* Notification Bell */}
         <button
@@ -107,9 +143,11 @@ export default function ProfilePage() {
         </button>
 
         <div className="flex flex-col items-center text-center">
-          {/* Avatar with Ring */}
+          {/* Avatar with Role-Based Ring */}
           <div className="relative mb-4">
-            <div className="p-1 rounded-full border-2 border-dashed border-[#1FA9D6]/30">
+            <div
+              className={`p-1 rounded-full border-2 border-dashed ${roleConfig.borderColor} bg-opacity-30`}
+            >
               <Avatar className="h-28 w-28 border-4 border-white shadow-lg">
                 <AvatarImage src={avatarSrc} className="object-cover" />
                 <AvatarFallback className="bg-gray-100 text-xl font-bold text-gray-400">
@@ -118,8 +156,10 @@ export default function ProfilePage() {
               </Avatar>
             </div>
             {userData?.isVerified && (
-              <div className="absolute bottom-1 right-1 bg-[#1FA9D6] text-white p-1 rounded-full border-2 border-white shadow-sm">
-                <ShieldCheck className="w-4 h-4" />
+              <div
+                className={`absolute bottom-1 right-1 ${roleConfig.bgColor} text-white p-1 rounded-full border-2 border-white shadow-sm`}
+              >
+                {roleConfig.icon}
               </div>
             )}
           </div>
@@ -134,9 +174,9 @@ export default function ProfilePage() {
           <div className="flex items-center gap-2 mb-4">
             <Badge
               variant="secondary"
-              className="bg-gray-100 text-gray-600 hover:bg-gray-200 border-transparent"
+              className={`bg-gray-100 ${roleConfig.color} hover:bg-gray-200 border-transparent`}
             >
-              {isArtist() ? "Artist" : "Fan"}
+              {roleConfig.badge}
             </Badge>
             <span className="text-xs text-gray-400 font-medium">
               Member since March 2025
@@ -145,12 +185,12 @@ export default function ProfilePage() {
 
           {/* Bio */}
           <p className="text-gray-600 text-sm leading-relaxed max-w-xs mx-auto mb-6">
-            Music enthusiast and electronic music fan.
-            <br />
-            Collecting moments on-chain.
+            {userData?.role === "STAFF"
+              ? "Official Dropsland Event Staff. Authorized for verification."
+              : "Music enthusiast and electronic music fan. Collecting moments on-chain."}
           </p>
 
-          {/* Action Row */}
+          {/* Role-Based Action Row */}
           <div className="flex gap-3 w-full justify-center max-w-sm">
             <Button
               variant="outline"
@@ -160,17 +200,43 @@ export default function ProfilePage() {
               <Edit3 className="w-3.5 h-3.5" />
               Edit Bio
             </Button>
-            {/* TODO: Add 'Create Merch' only if artist?
-              For now keeping it simple as per screenshot
-            */}
-            <Button
-              variant="outline"
-              size="sm"
-              className="rounded-full h-9 px-5 border-gray-200 text-gray-600 font-semibold text-xs gap-2"
-            >
-              <QrCode className="w-3.5 h-3.5" />
-              Verify
-            </Button>
+
+            {/* CTA: STAFF */}
+            {userRole === "STAFF" && (
+              <Button
+                onClick={() => router.push("/verify")}
+                size="sm"
+                className="rounded-full h-9 px-5 bg-green-600 hover:bg-green-700 text-white font-semibold text-xs gap-2 shadow-lg shadow-green-200"
+              >
+                <ScanLine className="w-3.5 h-3.5" />
+                Scan Tickets
+              </Button>
+            )}
+
+            {/* CTA: DJ */}
+            {userRole === "DJ" && (
+              <Button
+                onClick={() => router.push("/create")}
+                size="sm"
+                className="rounded-full h-9 px-5 bg-purple-600 hover:bg-purple-700 text-white font-semibold text-xs gap-2 shadow-lg shadow-purple-200"
+              >
+                <Gift className="w-3.5 h-3.5" />
+                Create Drop
+              </Button>
+            )}
+
+            {/* CTA: FAN */}
+            {userRole === "FAN" && (
+              <Button
+                onClick={() => router.push("/wallet/receive")}
+                variant="outline"
+                size="sm"
+                className="rounded-full h-9 px-5 border-gray-200 text-gray-600 font-semibold text-xs gap-2"
+              >
+                <QrCode className="w-3.5 h-3.5" />
+                My QR
+              </Button>
+            )}
           </div>
         </div>
 
@@ -183,17 +249,30 @@ export default function ProfilePage() {
             </p>
           </div>
           <div className="text-center border-l border-gray-100">
-            <p className="text-xl font-extrabold text-gray-900">{donated}</p>
-            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wide">
-              Purchased
-            </p>
+            {userRole === "STAFF" ? (
+              <>
+                <p className="text-xl font-extrabold text-gray-900">124</p>
+                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wide">
+                  Verified
+                </p>
+              </>
+            ) : (
+              <>
+                <p className="text-xl font-extrabold text-gray-900">
+                  {donated}
+                </p>
+                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wide">
+                  Purchased
+                </p>
+              </>
+            )}
           </div>
           <div className="text-center border-l border-gray-100">
             <p className="text-xl font-extrabold text-gray-900">
               {rewards.length}
             </p>
             <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wide">
-              Rewards
+              Collected
             </p>
           </div>
         </div>
@@ -201,21 +280,55 @@ export default function ProfilePage() {
 
       {/* 2. Tabs Section */}
       <div className="px-4 mt-6">
-        <Tabs defaultValue="following" className="w-full">
+        <Tabs
+          defaultValue={userRole === "STAFF" ? "tools" : "following"}
+          className="w-full"
+        >
           <TabsList className="w-full bg-white p-1 rounded-xl shadow-sm border border-gray-100 h-12 mb-6">
-            <TabsTrigger
-              value="following"
-              className="flex-1 rounded-lg text-xs font-bold data-[state=active]:bg-gray-100 data-[state=active]:text-gray-900 text-gray-400"
-            >
-              Following
-            </TabsTrigger>
+            {/* Staff gets a "Tools" tab */}
+            {userRole === "STAFF" ? (
+              <TabsTrigger
+                value="tools"
+                className="flex-1 rounded-lg text-xs font-bold data-[state=active]:bg-gray-100 data-[state=active]:text-gray-900 text-gray-400"
+              >
+                Promoter Tools
+              </TabsTrigger>
+            ) : (
+              <TabsTrigger
+                value="following"
+                className="flex-1 rounded-lg text-xs font-bold data-[state=active]:bg-gray-100 data-[state=active]:text-gray-900 text-gray-400"
+              >
+                Following
+              </TabsTrigger>
+            )}
+
             <TabsTrigger
               value="rewards"
               className="flex-1 rounded-lg text-xs font-bold data-[state=active]:bg-gray-100 data-[state=active]:text-gray-900 text-gray-400"
             >
-              Rewards
+              Wallet
             </TabsTrigger>
           </TabsList>
+
+          <TabsContent
+            value="tools"
+            className="animate-in fade-in slide-in-from-bottom-4 duration-500"
+          >
+            <Card
+              className="bg-white border-dashed border-2 border-green-100 shadow-none rounded-2xl py-8 cursor-pointer hover:bg-green-50/50 transition-colors"
+              onClick={() => router.push("/verify")}
+            >
+              <CardContent className="flex flex-col items-center justify-center text-center">
+                <div className="w-12 h-12 bg-green-50 rounded-full flex items-center justify-center mb-3">
+                  <ScanLine className="w-6 h-6 text-green-600" />
+                </div>
+                <p className="text-gray-900 font-bold text-sm">Open Scanner</p>
+                <p className="text-gray-400 text-xs mt-1">
+                  Verify tickets and redeem perks at the door.
+                </p>
+              </CardContent>
+            </Card>
+          </TabsContent>
 
           <TabsContent
             value="following"
@@ -314,7 +427,8 @@ export default function ProfilePage() {
           </DialogContent>
         </Dialog>
 
-        {!isArtist() && (
+        {/* Upsell for Fans only */}
+        {userRole === "FAN" && (
           <div className="bg-[#1FA9D6]/10 rounded-2xl p-5 flex items-center justify-between border border-[#1FA9D6]/20">
             <div className="flex gap-3 items-center">
               <div className="w-10 h-10 bg-[#1FA9D6] rounded-full flex items-center justify-center text-white shadow-md shadow-[#1FA9D6]/30">
@@ -335,6 +449,17 @@ export default function ProfilePage() {
             >
               Apply
             </Button>
+          </div>
+        )}
+
+        {/* Staff Indicator */}
+        {userRole === "STAFF" && (
+          <div className="bg-green-50 rounded-2xl p-4 text-center border border-green-100">
+            <p className="text-xs text-green-700 font-medium">
+              You are logged in as Venue Staff.
+              <br />
+              Actions are logged for security.
+            </p>
           </div>
         )}
       </div>

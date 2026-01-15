@@ -263,3 +263,6 @@ CREATE POLICY "DJs Can Create Tiers" ON "public"."membership_tiers"
 -- We default to 'fan' to be safe
 ALTER TABLE "public"."profiles"
 ADD COLUMN "role" text DEFAULT 'fan' CHECK (role IN ('fan', 'dj', 'admin'));
+
+-- New snippet
+DROP POLICY IF EXISTS "DJs Can Create Tiers" ON "public"."membership_tiers";

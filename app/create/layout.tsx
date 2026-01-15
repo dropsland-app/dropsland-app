@@ -39,14 +39,14 @@ export default function CreateLayout({
           return;
         }
 
-        // Check if user is a DJ
-        if (data.role !== "DJ") {
-          // Show brief message then redirect
+        // Check if user is a DJ or STAFF (Promoters can also create events)
+        if (data.role === "DJ" || data.role === "STAFF") {
+          setIsAuthorized(true);
+        } else {
+          // Show brief message then redirect for Fans
           setTimeout(() => {
             router.push("/");
           }, 2000);
-        } else {
-          setIsAuthorized(true);
         }
       } catch (err) {
         console.error("Access check failed:", err);
@@ -80,7 +80,8 @@ export default function CreateLayout({
           Creator Access Only
         </h2>
         <p className="text-gray-600 text-sm max-w-sm">
-          The Create section is only available for DJ/Artist accounts. Redirecting you back...
+          The Create section is only available for DJ/Artist and Staff/Promoter
+          accounts. Redirecting you back...
         </p>
       </div>
     );

@@ -1,28 +1,17 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { QrCode, Ticket, Loader2 } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Ticket, Loader2 } from "lucide-react";
 import { useWallets } from "@privy-io/react-auth";
 import { getUserMemberships, type RewardItem } from "@/lib/alchemy";
-
-// Color palette for membership cards
-const MEMBERSHIP_COLORS = [
-  "bg-[#1FA9D6]",
-  "bg-purple-600",
-  "bg-slate-800",
-  "bg-amber-500",
-  "bg-emerald-600",
-  "bg-rose-600",
-];
+import { MembershipCard } from "@/components/membership-card";
 
 export default function WalletMembershipsPage() {
   const { wallets } = useWallets();
@@ -54,10 +43,6 @@ export default function WalletMembershipsPage() {
     fetchMemberships();
   }, [wallet?.address]);
 
-  const getColorForIndex = (index: number) => {
-    return MEMBERSHIP_COLORS[index % MEMBERSHIP_COLORS.length];
-  };
-
   return (
     <div className="pb-24">
       {/* Memberships List */}
@@ -73,63 +58,16 @@ export default function WalletMembershipsPage() {
           </div>
         ) : memberships.length > 0 ? (
           memberships.map((membership, index) => (
-            <div
+            <MembershipCard
               key={`${membership.id}-${index}`}
+              id={membership.id}
+              name={membership.metadata.name || `Membership #${membership.id}`}
+              image={membership.metadata.image}
+              index={index}
+              balance={membership.balance}
+              variant="wallet"
               onClick={() => setSelectedPass(membership)}
-              className="group relative w-full rounded-2xl overflow-hidden shadow-md transition-transform active:scale-[0.98] cursor-pointer"
-            >
-              {/* Card Header / Color Strip */}
-              <div
-                className={`${getColorForIndex(index)} h-24 p-4 relative overflow-hidden`}
-              >
-                <div className="absolute inset-0 bg-black/10" />
-                <div className="absolute -right-4 -top-4 w-20 h-20 bg-white/10 rounded-full blur-xl" />
-
-                <div className="relative z-10 flex justify-between items-start">
-                  <div>
-                    <h3 className="text-white font-extrabold text-lg tracking-tight">
-                      {membership.metadata.name ||
-                        `Membership #${membership.id}`}
-                    </h3>
-                    <Badge className="bg-white/20 hover:bg-white/30 text-white border-none mt-1 backdrop-blur-md">
-                      Token #{membership.id}
-                    </Badge>
-                  </div>
-                  <Avatar className="h-10 w-10 border-2 border-white/30">
-                    <AvatarImage src={membership.metadata.image} />
-                    <AvatarFallback>
-                      {(membership.metadata.name || "M")[0]}
-                    </AvatarFallback>
-                  </Avatar>
-                </div>
-              </div>
-
-              {/* Card Body */}
-              <div className="bg-white p-4 border-x border-b border-gray-100 rounded-b-2xl">
-                <div className="flex justify-between items-end">
-                  <div className="space-y-1">
-                    <p className="text-xs text-gray-400 font-medium uppercase">
-                      Balance
-                    </p>
-                    <p className="text-sm font-semibold text-gray-900">
-                      {membership.balance}x Owned
-                    </p>
-                  </div>
-
-                  <Button
-                    size="sm"
-                    className="bg-gray-900 text-white hover:bg-black gap-2 h-9 px-4 rounded-lg shadow-sm"
-                  >
-                    <QrCode className="w-3.5 h-3.5" />
-                    Show QR
-                  </Button>
-                </div>
-              </div>
-
-              {/* Decorative "Notch" to simulate a physical ticket punch */}
-              <div className="absolute top-24 left-0 -translate-x-1/2 -translate-y-1/2 w-4 h-4 bg-gray-50 rounded-full" />
-              <div className="absolute top-24 right-0 translate-x-1/2 -translate-y-1/2 w-4 h-4 bg-gray-50 rounded-full" />
-            </div>
+            />
           ))
         ) : (
           <div className="text-center py-10 opacity-60">

@@ -30,6 +30,11 @@ export default function ProfilePage() {
     currentUser?.wallet?.address?.toLowerCase() === profileId.toLowerCase();
 
   const [profile, setProfile] = useState<Profile | null>(null);
+
+  // Handler for profile updates from child components
+  const handleProfileUpdate = (updatedProfile: Profile) => {
+    setProfile(updatedProfile);
+  };
   const [djTiers, setDjTiers] = useState<MembershipTier[]>([]);
   const [fanMemberships, setFanMemberships] = useState<RewardItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -42,10 +47,11 @@ export default function ProfilePage() {
 
       try {
         // 1. Fetch Basic Profile
+        // Use ilike for case-insensitive matching on wallet addresses
         const { data: profileData, error: profileError } = await supabase
           .from("profiles")
           .select("*")
-          .eq("wallet_address", profileId)
+          .ilike("wallet_address", profileId)
           .single();
 
         if (profileError || !profileData) {
@@ -59,11 +65,16 @@ export default function ProfilePage() {
         // 2. Fetch Role-Specific Data
         // CASE: DJ
         if (profileData.role === "DJ") {
-          const { data: tiers } = await supabase
+          const { data: tiers, error: tiersError } = await supabase
             .from("membership_tiers")
             .select("*")
-            .eq("creator_wallet", profileId)
-            .eq("is_active", true);
+            // Use ilike to handle 0xABC vs 0xabc mismatch
+            .ilike("creator_wallet", profileId);
+
+          if (tiersError) {
+            console.error("Error fetching tiers:", tiersError);
+          }
+
           setDjTiers((tiers as MembershipTier[]) || []);
         }
 
@@ -183,6 +194,7 @@ export default function ProfilePage() {
           tiers={djTiers}
           onJoin={handleMint}
           isOwner={isOwner}
+          onProfileUpdate={handleProfileUpdate}
         />
       )}
 
@@ -191,11 +203,16 @@ export default function ProfilePage() {
           profile={profile}
           memberships={fanMemberships}
           isOwner={isOwner}
+          onProfileUpdate={handleProfileUpdate}
         />
       )}
 
       {profile.role === "STAFF" && (
-        <StaffView profile={profile} isOwner={isOwner} />
+        <StaffView
+          profile={profile}
+          isOwner={isOwner}
+          onProfileUpdate={handleProfileUpdate}
+        />
       )}
     </div>
   );
