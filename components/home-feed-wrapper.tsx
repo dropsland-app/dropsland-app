@@ -46,7 +46,6 @@ export default function HomeFeedWrapper({
         </div>
       </header>
 
-      {/* The Reel Feed */}
       <TikTokFeed
         onSelectArtist={handleSelectArtist}
         posts={initialPosts}
