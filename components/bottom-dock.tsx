@@ -1,6 +1,6 @@
 "use client";
 
-import { Home, Search, Upload, Wallet, User } from "lucide-react";
+import { Home, Search, Plus, Wallet, User } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Dock, DockIcon, DockItem, DockLabel } from "@/components/core/dock";
@@ -59,7 +59,7 @@ export default function BottomDock({ theme }: BottomDockProps) {
       ? [
           baseNavItems[0], // Home
           baseNavItems[1], // Explore
-          { path: "/create", Icon: Upload, label: "Create" }, // Create - DJ & STAFF
+          { path: "/create", Icon: Plus, label: "Create" }, // Create - DJ & STAFF
           baseNavItems[2], // Wallet
           baseNavItems[3], // Profile
         ]
@@ -76,13 +76,13 @@ export default function BottomDock({ theme }: BottomDockProps) {
 
   return (
     <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 w-auto max-w-full">
-      <Dock
-        className={cn(
-          "rounded-full border backdrop-blur-3xl shadow-xl px-6 pb-3 pt-3 gap-3 transition-colors duration-300",
-          isLightMode
-            ? "bg-white/40 border-white/40 shadow-black/5 ring-1 ring-white/30"
-            : "bg-black/30 border-white/5 shadow-black/20 ring-1 ring-white/5",
-        )}
+        <Dock
+          className={cn(
+            "rounded-full border backdrop-blur-3xl shadow-xl px-6 pb-3 pt-3 gap-3 transition-colors duration-300",
+            isLightMode
+              ? "bg-white/55 border-gray-200/80 shadow-[0_10px_30px_rgba(15,23,42,0.14)] ring-1 ring-black/5"
+              : "bg-black/20 border-white/5 shadow-black/20 ring-1 ring-white/5",
+          )}
         magnification={60}
         distance={100}
         panelHeight={68}
@@ -117,7 +117,7 @@ export default function BottomDock({ theme }: BottomDockProps) {
                           ? "text-[#1FA9D6] fill-[#1FA9D6]/10"
                           : "text-white fill-white/20 drop-shadow-[0_0_8px_rgba(255,255,255,0.5)]"
                         : isLightMode
-                          ? "text-gray-300 hover:text-gray-600"
+                          ? "text-gray-500 hover:text-gray-800"
                           : "text-white/80 hover:text-white",
                     )}
                   />
