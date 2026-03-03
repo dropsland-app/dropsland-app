@@ -31,7 +31,7 @@ export default function ActivityPage() {
 
   return (
     <div className="w-full max-w-full bg-white h-full overflow-y-auto overflow-x-hidden pb-24">
-      <AppHeader title="Activity" />
+      <AppHeader title="Activity" showBack />
 
       {filteredActivity.length > 0 ? (
         <div className="divide-y divide-gray-200">
