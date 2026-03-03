@@ -311,6 +311,13 @@ export default function CreatorPage({ params }: { params: { id: string } }) {
               {tiers.map((tier) => (
                 <div key={tier.id} className="relative">
                   <MembershipTierCard tier={tier} onJoin={handleJoin} />
+                  <Button
+                    variant="ghost"
+                    className="mt-2 w-full rounded-2xl text-sm font-semibold text-[#1FA9D6] hover:bg-[#1FA9D6]/10"
+                    onClick={() => router.push(`/creator/${params.id}/tier/${tier.id}`)}
+                  >
+                    View Tier Details
+                  </Button>
                   {mintingTierId === tier.id && (
                     <div className="absolute inset-0 bg-white/80 backdrop-blur-sm rounded-2xl flex items-center justify-center">
                       <div className="flex items-center gap-2 text-[#1FA9D6]">

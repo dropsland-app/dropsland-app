@@ -17,6 +17,8 @@ export default function AppScaffold({
     "/onboarding",
     "/wallet/scan", // Camera view needs full screen
     "/verify/", // Dynamic verify routes usually use camera
+    "/events/",
+    "/wallet/rewards/",
   ];
 
   // Check strict match or startWith for dynamic routes
@@ -24,16 +26,21 @@ export default function AppScaffold({
     (route) => pathname === route || pathname?.startsWith(route),
   );
 
+  const shouldHideForCreatorTier =
+    pathname?.startsWith("/creator/") && pathname.includes("/tier/");
+
   return (
     <div className="flex flex-col h-full min-h-screen relative bg-white">
       {/* If nav is visible, add padding-bottom so content isn't covered.
          We use 'pb-24' to give ample space for the floating dock.
       */}
-      <main className={`flex-1 w-full h-full ${!shouldHideNav ? "pb-24" : ""}`}>
+      <main
+        className={`flex-1 w-full h-full ${!shouldHideNav && !shouldHideForCreatorTier ? "pb-24" : ""}`}
+      >
         {children}
       </main>
 
-      {!shouldHideNav && <BottomDock />}
+      {!shouldHideNav && !shouldHideForCreatorTier && <BottomDock />}
     </div>
   );
 }
