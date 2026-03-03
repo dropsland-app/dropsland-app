@@ -34,8 +34,9 @@ function formatDateParts(isoDate?: string | null) {
 export default async function EventDetailPage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
+  const { id } = await params;
   const supabase = await createClient();
   const { data: event } = await supabase
     .from("events")
@@ -48,7 +49,7 @@ export default async function EventDetailPage({
       )
     `,
     )
-    .eq("id", params.id)
+    .eq("id", id)
     .single();
 
   if (!event) {

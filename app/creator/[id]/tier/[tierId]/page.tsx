@@ -33,7 +33,7 @@ type MembershipTierDB = {
 };
 
 export default function TierDetailPage() {
-  const params = useParams<{ creatorId: string; tierId: string }>();
+  const params = useParams<{ id: string; tierId: string }>();
   const router = useRouter();
   const { wallets } = useWallets();
   const [creator, setCreator] = useState<CreatorProfile | null>(null);
@@ -54,12 +54,12 @@ export default function TierDetailPage() {
         supabase
           .from("profiles")
           .select("wallet_address, username, avatar_url, role")
-          .eq("wallet_address", params.creatorId)
+          .eq("wallet_address", params.id)
           .single(),
         supabase
           .from("membership_tiers")
           .select("id, name, description, price, currency, image_url, perks, onchain_token_id")
-          .eq("creator_wallet", params.creatorId)
+          .eq("creator_wallet", params.id)
           .eq("id", params.tierId)
           .single(),
       ]);
@@ -70,7 +70,7 @@ export default function TierDetailPage() {
     }
 
     loadTier();
-  }, [params.creatorId, params.tierId]);
+  }, [params.id, params.tierId]);
 
   const perks = useMemo(() => tier?.perks?.filter(Boolean) || [], [tier?.perks]);
 
@@ -103,7 +103,7 @@ export default function TierDetailPage() {
         value: parseEther(String(tier.price)),
       });
 
-      router.push(`/profile/${params.creatorId}`);
+      router.push(`/profile/${params.id}`);
     } catch (error) {
       console.error("Join tier failed:", error);
       alert("Transaction failed. Please try again.");

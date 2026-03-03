@@ -19,10 +19,7 @@ import {
   MembershipTierCard,
   type MembershipTier,
 } from "@/components/creator/membership-tier-card";
-import { useWallets } from "@privy-io/react-auth";
-import { createWalletClient, custom, parseEther } from "viem";
-import { CHAIN, DROPSLAND_CREATORS_CONTRACT } from "@/config/chain";
-import { DROPSLAND_CREATORS_ABI } from "@/util/abis";
+import { CHAIN } from "@/config/chain";
 import { supabase } from "@/lib/supabase/client";
 
 // Color palette for tiers
@@ -59,12 +56,10 @@ interface MembershipTierDB {
 
 export default function CreatorPage({ params }: { params: { id: string } }) {
   const router = useRouter();
-  const { wallets } = useWallets();
   const [activeTab, setActiveTab] = useState("membership");
   const [tiers, setTiers] = useState<MembershipTier[]>([]);
   const [creator, setCreator] = useState<CreatorProfile | null>(null);
   const [loading, setLoading] = useState(true);
-  const [mintingTierId, setMintingTierId] = useState<string | null>(null);
 
   // Fetch creator profile and tiers
   useEffect(() => {
@@ -115,62 +110,6 @@ export default function CreatorPage({ params }: { params: { id: string } }) {
 
     fetchData();
   }, [params.id]);
-
-  const handleJoin = async (tierId: string) => {
-    const tier = tiers.find((t) => t.id === tierId);
-    if (!tier) return;
-
-    const wallet =
-      wallets.find((w) => w.walletClientType === "privy") || wallets[0];
-
-    if (!wallet) {
-      alert("Please connect your wallet first");
-      return;
-    }
-
-    setMintingTierId(tierId);
-
-    try {
-      // Switch chain if needed
-      const currentChainId = Number(wallet.chainId.split(":")[1]);
-      if (currentChainId !== CHAIN.id) {
-        await wallet.switchChain(CHAIN.id);
-      }
-
-      const provider = await wallet.getEthereumProvider();
-      const walletClient = createWalletClient({
-        account: wallet.address as `0x${string}`,
-        chain: CHAIN,
-        transport: custom(provider),
-      });
-
-      // Get the on-chain token ID from the tier
-      const onchainTokenId = (
-        tier as MembershipTier & { onchainTokenId?: number }
-      ).onchainTokenId;
-
-      if (onchainTokenId === undefined) {
-        throw new Error("Tier does not have an on-chain token ID");
-      }
-
-      const hash = await walletClient.writeContract({
-        chain: CHAIN,
-        address: DROPSLAND_CREATORS_CONTRACT as `0x${string}`,
-        abi: DROPSLAND_CREATORS_ABI,
-        functionName: "mintMembership",
-        args: [BigInt(onchainTokenId), 1n], // TierID, Amount
-        value: parseEther(tier.price.toString()), // Price in ETH
-      });
-
-      console.log("Tx Hash:", hash);
-      alert(`Transaction sent! Hash: ${hash.slice(0, 10)}...`);
-    } catch (e) {
-      console.error("Purchase failed:", e);
-      alert("Purchase failed. See console for details.");
-    } finally {
-      setMintingTierId(null);
-    }
-  };
 
   // Mock content for the feed tab
   const content = [
@@ -310,22 +249,10 @@ export default function CreatorPage({ params }: { params: { id: string } }) {
             <div className="grid gap-5">
               {tiers.map((tier) => (
                 <div key={tier.id} className="relative">
-                  <MembershipTierCard tier={tier} onJoin={handleJoin} />
-                  <Button
-                    variant="ghost"
-                    className="mt-2 w-full rounded-2xl text-sm font-semibold text-[#1FA9D6] hover:bg-[#1FA9D6]/10"
-                    onClick={() => router.push(`/creator/${params.id}/tier/${tier.id}`)}
-                  >
-                    View Tier Details
-                  </Button>
-                  {mintingTierId === tier.id && (
-                    <div className="absolute inset-0 bg-white/80 backdrop-blur-sm rounded-2xl flex items-center justify-center">
-                      <div className="flex items-center gap-2 text-[#1FA9D6]">
-                        <Loader2 className="w-5 h-5 animate-spin" />
-                        <span className="font-medium">Processing...</span>
-                      </div>
-                    </div>
-                  )}
+                  <MembershipTierCard
+                    tier={tier}
+                    onJoin={() => router.push(`/creator/${params.id}/tier/${tier.id}`)}
+                  />
                 </div>
               ))}
             </div>
