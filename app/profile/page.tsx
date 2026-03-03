@@ -35,17 +35,17 @@ import {
 } from "@/components/ui/drawer";
 
 import { useAuth } from "@/hooks/use-auth";
-import { getUserRewards, type RewardItem } from "@/lib/alchemy";
+import { getUserMemberships, getUserRewards, type RewardItem } from "@/lib/alchemy";
 
 export default function ProfilePage() {
   const router = useRouter();
   const { wallets } = useWallets();
-  const { balance, donated, userData, logout } = useAuth();
+  const { balance, userData, logout } = useAuth();
   const { login, authenticated, ready } = usePrivy();
 
   // --- Local State ---
   const [rewards, setRewards] = useState<RewardItem[]>([]);
-  const [loadingRewards, setLoadingRewards] = useState(false);
+  const [membershipsCount, setMembershipsCount] = useState(0);
   const [isEditBioOpen, setIsEditBioOpen] = useState(false);
   const [isQrOpen, setIsQrOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
@@ -68,6 +68,12 @@ export default function ProfilePage() {
   const primaryWallet =
     wallets.find((w) => w.walletClientType === "privy") || wallets[0];
   const walletAddress = primaryWallet?.address;
+  const memberSince = userData?.createdAt
+    ? new Date(userData.createdAt).toLocaleDateString("en-US", {
+        month: "short",
+        year: "numeric",
+      })
+    : "N/A";
 
   // --- Role Based Config ---
   const roleConfig = {
@@ -109,19 +115,20 @@ export default function ProfilePage() {
   useEffect(() => {
     if (!walletAddress) return;
 
-    const fetchRewards = async () => {
-      setLoadingRewards(true);
+    const fetchOwnedAssets = async () => {
       try {
-        const data = await getUserRewards(walletAddress);
-        setRewards(data);
+        const [rewardData, membershipData] = await Promise.all([
+          getUserRewards(walletAddress),
+          getUserMemberships(walletAddress),
+        ]);
+        setRewards(rewardData);
+        setMembershipsCount(membershipData.length);
       } catch (error) {
-        console.error("❌ Error fetching rewards:", error);
-      } finally {
-        setLoadingRewards(false);
+        console.error("❌ Error fetching owned assets:", error);
       }
     };
 
-    fetchRewards();
+    fetchOwnedAssets();
   }, [walletAddress]);
 
   useEffect(() => {
@@ -227,7 +234,7 @@ export default function ProfilePage() {
               {roleConfig.badge}
             </Badge>
             <span className="text-xs text-gray-400 font-medium">
-              Member since March 2025
+              Member since {memberSince}
             </span>
           </div>
 
@@ -392,7 +399,7 @@ export default function ProfilePage() {
             ) : (
               <>
                 <p className="text-xl font-extrabold text-gray-900">
-                  {donated}
+                  {rewards.length + membershipsCount}
                 </p>
                 <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wide">
                   Purchased
