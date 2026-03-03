@@ -29,13 +29,19 @@ export default function AppScaffold({
   const shouldHideForCreatorTier =
     pathname?.startsWith("/creator/") && pathname.includes("/tier/");
 
+  const isHomeFeedRoute = pathname === "/";
+  const shouldPadForDock =
+    !shouldHideNav && !shouldHideForCreatorTier && !isHomeFeedRoute;
+
   return (
-    <div className="flex flex-col h-full min-h-screen relative bg-white">
+    <div
+      className={`flex flex-col h-full min-h-screen relative ${isHomeFeedRoute ? "bg-black" : "bg-white"}`}
+    >
       {/* If nav is visible, add padding-bottom so content isn't covered.
          We use 'pb-24' to give ample space for the floating dock.
       */}
       <main
-        className={`flex-1 w-full h-full ${!shouldHideNav && !shouldHideForCreatorTier ? "pb-24" : ""}`}
+        className={`flex-1 w-full h-full ${shouldPadForDock ? "pb-24" : ""}`}
       >
         {children}
       </main>
