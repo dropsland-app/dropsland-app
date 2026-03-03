@@ -3,11 +3,8 @@
 import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase/client";
-import { usePrivy, useWallets } from "@privy-io/react-auth";
+import { usePrivy } from "@privy-io/react-auth";
 import { getUserMemberships, RewardItem } from "@/lib/alchemy";
-import { createWalletClient, custom, parseEther } from "viem";
-import { CHAIN, DROPSLAND_CREATORS_CONTRACT } from "@/config/chain";
-import { DROPSLAND_CREATORS_ABI } from "@/util/abis";
 
 // Components
 import { DJView } from "@/components/profile/dj-view";
@@ -23,7 +20,6 @@ export default function ProfilePage() {
   const params = useParams();
   const router = useRouter();
   const { user: currentUser } = usePrivy();
-  const { wallets } = useWallets();
 
   const profileId = params.id as string;
   const isOwner =
@@ -96,39 +92,6 @@ export default function ProfilePage() {
     if (profileId) loadData();
   }, [profileId]);
 
-  // --- Minting Logic (For DJs) ---
-  const handleMint = async (tierId: string) => {
-    const tier = djTiers.find((t: MembershipTier) => t.id === tierId);
-    if (!tier) return;
-
-    const wallet = wallets.find((w) => w.walletClientType === "privy");
-    if (!wallet) return alert("Please connect wallet");
-
-    try {
-      await wallet.switchChain(CHAIN.id);
-      const provider = await wallet.getEthereumProvider();
-      const client = createWalletClient({
-        account: wallet.address as `0x${string}`,
-        chain: CHAIN,
-        transport: custom(provider),
-      });
-
-      const hash = await client.writeContract({
-        address: DROPSLAND_CREATORS_CONTRACT,
-        chain: CHAIN,
-        abi: DROPSLAND_CREATORS_ABI,
-        functionName: "mintMembership",
-        args: [BigInt(tier.onchain_token_id), 1n],
-        value: parseEther(tier.price.toString()),
-      });
-
-      alert(`Transaction Sent! Tx: ${hash}`);
-    } catch (e) {
-      console.error(e);
-      alert("Transaction failed. Check console.");
-    }
-  };
-
   // --- Render States ---
 
   if (loading) {
@@ -192,7 +155,7 @@ export default function ProfilePage() {
         <DJView
           profile={profile}
           tiers={djTiers}
-          onJoin={handleMint}
+          onJoin={(tierId) => router.push(`/creator/${profileId}/tier/${tierId}`)}
           isOwner={isOwner}
           onProfileUpdate={handleProfileUpdate}
         />

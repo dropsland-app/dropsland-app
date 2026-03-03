@@ -6,6 +6,7 @@ export interface UserProfile {
     bio: string | null;
     avatar_url: string | null;
     role: "FAN" | "DJ" | "ORGANIZER" | "STAFF";
+    created_at?: string;
 }
 
 export async function getProfile(walletAddress: string): Promise<UserProfile | null> {

@@ -18,6 +18,7 @@ interface UserData {
   isVerified?: boolean;
   walletAddress?: string;
   avatar?: string;
+  createdAt?: string;
 }
 
 interface AuthContextType {
@@ -91,6 +92,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
               isVerified: ["DJ", "STAFF", "ORGANIZER"].includes(profile.role),
               walletAddress: profile.wallet_address,
               avatar: profile.avatar_url || undefined,
+              createdAt: profile.created_at || undefined,
             });
           } else {
             console.warn("Could not load or create profile");

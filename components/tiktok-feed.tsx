@@ -89,10 +89,11 @@ export default function TikTokFeed({
       >
         {posts.map((post, index) => {
           const postKey = `${type}-${post.id || index}`;
-          const likesCount = post.likes || Math.floor(Math.random() * 50) + 10;
+          const likesCount = post.likes ?? 0;
           const commentsCount =
-            (postComments[postKey]?.length || 0) +
-            (post.comments || Math.floor(Math.random() * 20) + 5);
+            postComments[postKey]?.length !== undefined
+              ? postComments[postKey].length
+              : (post.comments ?? 0);
 
           const isYouTubeVideo = post.videoUrl && isYouTubeUrl(post.videoUrl);
           const youtubeVideoId = isYouTubeVideo
@@ -364,17 +365,19 @@ export default function TikTokFeed({
           </DialogHeader>
 
           <div className="max-h-[300px] overflow-y-auto space-y-3 my-4">
-            {currentPostKey !== null &&
-              postComments[currentPostKey]?.map((comment, i) => (
+              {currentPostKey !== null &&
+                postComments[currentPostKey]?.map((comment) => (
                 <div
-                  key={i}
-                  className="flex gap-2 cursor-pointer hover:bg-white/10 p-2 rounded-lg transition-colors backdrop-blur-sm"
-                  onClick={() =>
-                    seekToTimestamp(currentPostKey, comment.timestamp)
-                  }
+                  key={comment.id}
+                  className="flex gap-2 p-2 rounded-lg transition-colors backdrop-blur-sm"
+                  onClick={() => {
+                    if (currentPostKey && comment.timestamp !== null) {
+                      seekToTimestamp(currentPostKey, comment.timestamp);
+                    }
+                  }}
                 >
                   <Avatar className="h-8 w-8 flex-shrink-0">
-                    <AvatarImage src="/avatars/user.jpg" alt={comment.author} />
+                    <AvatarImage src={comment.avatar || "/placeholder.svg"} alt={comment.author} />
                     <AvatarFallback>
                       {comment.author.substring(0, 2).toUpperCase()}
                     </AvatarFallback>
@@ -383,7 +386,11 @@ export default function TikTokFeed({
                     <div className="flex items-center gap-2">
                       <p className="text-sm font-medium">{comment.author}</p>
                       <span className="text-xs text-bright-yellow">
-                        {formatTime(comment.timestamp)}
+                        {comment.timestamp !== null
+                          ? formatTime(comment.timestamp)
+                          : comment.createdAt
+                            ? new Date(comment.createdAt).toLocaleDateString()
+                            : "Now"}
                       </span>
                     </div>
                     <p className="text-sm text-gray-300 break-words">

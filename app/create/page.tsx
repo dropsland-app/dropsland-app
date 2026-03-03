@@ -11,6 +11,7 @@ import {
   Users,
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
+import AppHeader from "@/components/layout/app-header";
 
 export default function CreateDashboardPage() {
   const router = useRouter();
@@ -53,15 +54,7 @@ export default function CreateDashboardPage() {
 
   return (
     <div className="min-h-screen bg-white pb-24">
-      {/* Header - Consistent with Explore Page */}
-      <div className="sticky top-0 z-20 bg-white/90 backdrop-blur-md border-b border-neutral-200 px-5 pt-12 pb-4">
-        <h1 className="text-3xl font-extrabold text-neutral-900 tracking-tight">
-          Create
-        </h1>
-        <p className="text-neutral-500 text-sm font-medium mt-1">
-          Manage your drops and rewards
-        </p>
-      </div>
+      <AppHeader title="Create" subtitle="Manage your drops and rewards" />
 
       <div className="p-5 space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
         {/* Main Actions Section */}

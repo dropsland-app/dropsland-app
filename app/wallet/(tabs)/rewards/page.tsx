@@ -1,31 +1,21 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import {
   Gift,
-  QrCode,
   Loader2,
   Ticket,
   Beer,
   Shirt,
   Utensils,
   Search,
-  X
+  ChevronRight,
 } from "lucide-react";
 import { useWallets } from "@privy-io/react-auth";
 import { getUserRewards, type RewardItem } from "@/lib/alchemy";
 
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogFooter
-} from "@/components/ui/dialog";
 
 // Helper to guess icon based on name (if no image is present)
 const getRewardIcon = (name: string) => {
@@ -38,13 +28,11 @@ const getRewardIcon = (name: string) => {
 };
 
 export default function WalletRewardsPage() {
+  const router = useRouter();
   const { wallets } = useWallets();
   const [rewards, setRewards] = useState<RewardItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
-
-  // Selection State for Redemption
-  const [selectedReward, setSelectedReward] = useState<RewardItem | null>(null);
 
   const primaryWallet = wallets.find((w) => w.walletClientType === "privy") || wallets[0];
   const walletAddress = primaryWallet?.address;
@@ -114,7 +102,7 @@ export default function WalletRewardsPage() {
               return (
                 <div
                   key={reward.id}
-                  onClick={() => setSelectedReward(reward)}
+                  onClick={() => router.push(`/wallet/rewards/${reward.id}`)}
                   className="group relative bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md hover:border-[#1FA9D6]/30 transition-all cursor-pointer overflow-hidden flex flex-col"
                 >
                   {/* Image Aspect Ratio Container */}
@@ -138,11 +126,10 @@ export default function WalletRewardsPage() {
                       </div>
                     )}
 
-                    {/* Redeem Overlay (Hover) */}
                     <div className="absolute inset-0 bg-[#1FA9D6]/90 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                       <div className="text-white font-bold flex items-center gap-2">
-                        <QrCode className="w-5 h-5" />
-                        <span>Use Item</span>
+                        <span>View Item</span>
+                        <ChevronRight className="w-4 h-4" />
                       </div>
                     </div>
                   </div>
@@ -163,70 +150,6 @@ export default function WalletRewardsPage() {
         )}
       </div>
 
-      {/* Redemption Dialog */}
-      <Dialog open={!!selectedReward} onOpenChange={(open) => !open && setSelectedReward(null)}>
-        <DialogContent className="w-[90%] max-w-sm rounded-3xl border-none shadow-2xl p-0 overflow-hidden bg-white">
-          {selectedReward && (
-            <div className="flex flex-col items-center">
-              {/* Header Image */}
-              <div className="w-full h-32 bg-gray-100 relative">
-                {selectedReward.metadata.image ? (
-                  <img
-                    src={selectedReward.metadata.image}
-                    className="w-full h-full object-cover"
-                    alt="Reward Header"
-                  />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center bg-[#1FA9D6]/10">
-                    <Gift className="w-12 h-12 text-[#1FA9D6]" />
-                  </div>
-                )}
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="absolute top-2 right-2 bg-black/20 hover:bg-black/40 text-white rounded-full"
-                  onClick={() => setSelectedReward(null)}
-                >
-                  <X className="w-4 h-4" />
-                </Button>
-              </div>
-
-              <div className="px-6 py-6 w-full flex flex-col items-center">
-                <Badge variant="outline" className="mb-3 border-[#1FA9D6] text-[#1FA9D6] bg-[#1FA9D6]/5">
-                  Available: {selectedReward.balance}
-                </Badge>
-
-                <DialogHeader className="mb-6 text-center">
-                  <DialogTitle className="text-2xl font-extrabold text-gray-900">
-                    {selectedReward.metadata.name}
-                  </DialogTitle>
-                  <DialogDescription className="text-center">
-                    Show this QR code to staff to redeem your perk.
-                  </DialogDescription>
-                </DialogHeader>
-
-                {/* QR Code Container */}
-                <div className="p-4 bg-white border-2 border-dashed border-gray-200 rounded-2xl mb-6 shadow-sm">
-                  <img
-                    src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=redeem:${walletAddress}:${selectedReward.id}`}
-                    alt="Redemption QR"
-                    className="w-48 h-48 mix-blend-multiply opacity-90"
-                  />
-                </div>
-
-                <div className="w-full bg-yellow-50 border border-yellow-100 p-3 rounded-xl flex gap-3 items-start">
-                  <div className="mt-0.5 min-w-[16px]">
-                    <Ticket className="w-4 h-4 text-yellow-600" />
-                  </div>
-                  <p className="text-xs text-yellow-800 leading-relaxed">
-                    Do not scan this yourself. This code is intended for event staff only.
-                  </p>
-                </div>
-              </div>
-            </div>
-          )}
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }

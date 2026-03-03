@@ -2,12 +2,12 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Loader2, QrCode } from "lucide-react";
+import { Loader2, QrCode } from "lucide-react";
+import AppHeader from "@/components/layout/app-header";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useAuth } from "@/hooks/use-auth";
 import { getUserRewards, type RewardItem } from "@/lib/alchemy";
-import BottomDock from "@/components/bottom-dock";
 
 export default function VerifyDashboard() {
   const router = useRouter();
@@ -30,22 +30,7 @@ export default function VerifyDashboard() {
   return (
     // Main layout container: Full screen, no body scroll
     <div className="flex flex-col h-screen bg-white text-[#1E1E1E] overflow-hidden">
-      {/* Header: Fixed height, shrink-0 to prevent compression */}
-      <div className="px-4 pt-12 pb-6 bg-gradient-to-r from-[#1FA9D6]/10 to-[#1FA9D6]/5 backdrop-blur-xl border-b border-gray-100 shrink-0">
-        <div className="flex items-center gap-2">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => router.back()}
-            className="-ml-2 text-[#1E1E1E] hover:bg-black/5 rounded-full"
-          >
-            <ArrowLeft className="w-5 h-5" />
-          </Button>
-          <h1 className="text-xl font-bold tracking-tight">
-            Select Item to Verify
-          </h1>
-        </div>
-      </div>
+      <AppHeader title="Select Item to Verify" showBack className="shrink-0" />
 
       {/* Content Area: Flex-1 to fill remaining space, overflow-y-auto for internal scrolling */}
       <div className="flex-1 overflow-y-auto p-4 pb-32">

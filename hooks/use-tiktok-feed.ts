@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import { usePrivy } from "@privy-io/react-auth";
+import { supabase } from "@/lib/supabase/client";
 import {
     extractYouTubeVideoId,
     isYouTubeUrl,
@@ -8,9 +10,12 @@ import {
 } from "@/lib/youtube-utils";
 
 export interface Comment {
+    id: string;
     author: string;
+    avatar?: string;
     text: string;
-    timestamp: number; // in seconds
+    timestamp: number | null; // in seconds for timestamped comments
+    createdAt?: string;
 }
 
 interface UseTikTokFeedProps {
@@ -24,6 +29,7 @@ export function useTikTokFeed({
     type = "home",
     onSelectArtist,
 }: UseTikTokFeedProps) {
+    const { user } = usePrivy();
     const [currentIndex, setCurrentIndex] = useState(0);
     const [likedPosts, setLikedPosts] = useState<{ [key: string]: boolean }>({});
     const [showCommentDialog, setShowCommentDialog] = useState(false);
@@ -43,6 +49,56 @@ export function useTikTokFeed({
     const [currentTime, setCurrentTime] = useState<{ [key: string]: number }>({});
     const [duration, setDuration] = useState<{ [key: string]: number }>({});
     const [isSeeking, setIsSeeking] = useState<{ [key: string]: boolean }>({});
+
+    const getPostIdFromKey = (postKey: string) => {
+        const prefix = `${type}-`;
+        if (!postKey.startsWith(prefix)) return null;
+        const candidate = postKey.slice(prefix.length);
+        return candidate || null;
+    };
+
+    const loadCommentsForPost = async (postKey: string) => {
+        const postId = getPostIdFromKey(postKey);
+        if (!postId) return;
+
+        const { data, error } = await supabase
+            .from("comments")
+            .select(
+                `
+                id,
+                content,
+                created_at,
+                user_wallet,
+                profile:profiles!fk_comment_user (
+                  username,
+                  avatar_url
+                )
+              `,
+            )
+            .eq("post_id", postId)
+            .order("created_at", { ascending: true });
+
+        if (error) {
+            console.error("Error loading comments:", error);
+            return;
+        }
+
+        const mapped: Comment[] = (data || []).map((comment: any) => ({
+            id: comment.id,
+            author:
+                comment.profile?.username ||
+                `${comment.user_wallet?.slice(0, 4)}...${comment.user_wallet?.slice(-4)}`,
+            avatar: comment.profile?.avatar_url || "/placeholder.svg",
+            text: comment.content,
+            timestamp: null,
+            createdAt: comment.created_at,
+        }));
+
+        setPostComments((prev) => ({
+            ...prev,
+            [postKey]: mapped,
+        }));
+    };
 
     useEffect(() => {
         const postKey = `${type}-${posts[currentIndex]?.id || currentIndex}`;
@@ -169,30 +225,35 @@ export function useTikTokFeed({
         }));
     };
 
-    const handleOpenComments = (postKey: string) => {
+    const handleOpenComments = async (postKey: string) => {
         setCurrentPostKey(postKey);
         setShowCommentDialog(true);
+        await loadCommentsForPost(postKey);
     };
 
-    const handleSendComment = () => {
+    const handleSendComment = async () => {
         if (!commentText.trim() || !currentPostKey) return;
+        const walletAddress = user?.wallet?.address;
+        const postId = getPostIdFromKey(currentPostKey);
 
-        const timestamp = currentTime[currentPostKey] || 0;
+        if (!walletAddress || !postId) {
+            return;
+        }
 
-        setPostComments((prev) => {
-            const newComments = { ...prev };
-            if (!newComments[currentPostKey]) {
-                newComments[currentPostKey] = [];
-            }
-            newComments[currentPostKey].push({
-                author: "fan",
-                text: commentText,
-                timestamp,
-            });
-            return newComments;
+        const { error } = await supabase.from("comments").insert({
+            post_id: postId,
+            user_wallet: walletAddress,
+            content: commentText.trim(),
         });
 
+        if (error) {
+            console.error("Error sending comment:", error);
+            return;
+        }
+
         setCommentText("");
+
+        await loadCommentsForPost(currentPostKey);
     };
 
     const togglePlayPause = (postKey: string) => {

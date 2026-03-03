@@ -9,7 +9,6 @@ import { supabase } from "@/lib/supabase/client";
 import {
   Loader2,
   Upload,
-  ChevronLeft,
   MapPin,
   Calendar,
   Clock,
@@ -20,6 +19,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import AppHeader from "@/components/layout/app-header";
 
 export default function CreateEventPage() {
   const router = useRouter();
@@ -125,18 +125,7 @@ export default function CreateEventPage() {
 
   return (
     <div className="min-h-screen bg-white font-sans flex flex-col">
-      {/* Header */}
-      <div className="flex items-center gap-3 pt-[60px] pb-4 px-5 sticky top-0 z-50 bg-white border-b border-gray-100">
-        <button
-          onClick={() => router.back()}
-          className="p-1 -ml-1 hover:opacity-70 transition-opacity"
-        >
-          <ChevronLeft size={28} className="text-gray-900" />
-        </button>
-        <h1 className="font-extrabold text-[20px] text-gray-900">
-          Create Event
-        </h1>
-      </div>
+      <AppHeader title="Create Event" showBack />
 
       <div className="flex-1 px-5 pb-12 w-full max-w-md mx-auto space-y-8 animate-in slide-in-from-bottom-4 duration-500 pt-6">
         {/* Image Upload */}

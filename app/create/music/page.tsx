@@ -1,9 +1,8 @@
 "use client";
 
 import { useState, useCallback } from "react";
-import { Upload, Music, ImageIcon, X, Loader2, ChevronLeft } from "lucide-react";
+import { Upload, Music, ImageIcon, X, Loader2 } from "lucide-react";
 import { useWallets } from "@privy-io/react-auth";
-import { useRouter } from "next/navigation";
 
 // UI Components
 import { Button } from "@/components/ui/button";
@@ -18,15 +17,13 @@ import {
 } from "@/components/ui/select";
 
 // Hooks & Libs
-import { useAuth } from "@/hooks/use-auth";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/lib/supabase/client";
+import AppHeader from "@/components/layout/app-header";
 
 export default function CreateMusicPage() {
-    const router = useRouter();
     const { toast } = useToast();
     const { wallets } = useWallets();
-    const { userData } = useAuth();
 
     const [audioFile, setAudioFile] = useState<File | null>(null);
     const [artworkFile, setArtworkFile] = useState<File | null>(null);
@@ -185,15 +182,11 @@ export default function CreateMusicPage() {
 
     return (
         <div className="pb-24 bg-white h-full overflow-y-auto">
-            <div className="px-4 pt-12 pb-6 bg-gradient-to-r from-[#1FA9D6]/10 to-[#1FA9D6]/5 backdrop-blur-xl text-[#1E1E1E] border-b border-gray-200">
-                <div className="flex items-center gap-2 mb-2">
-                    <Button variant="ghost" size="icon" className="h-8 w-8 -ml-2 text-[#1E1E1E]" onClick={() => router.back()}>
-                        <ChevronLeft size={24} />
-                    </Button>
-                    <h1 className="text-xl font-bold">Upload Music</h1>
-                </div>
-                <p className="text-sm opacity-90">Share your tracks with the world</p>
-            </div>
+            <AppHeader
+                title="Upload Music"
+                subtitle="Share your tracks with the world"
+                showBack
+            />
 
             <div className="px-4 mt-6 space-y-6">
                 <div>

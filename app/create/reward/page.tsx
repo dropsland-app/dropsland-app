@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { ChevronLeft, Upload, Loader2, Image as ImageIcon } from "lucide-react";
+import { Upload, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -20,6 +20,7 @@ import { uploadFileToIPFS, uploadJSONToIPFS } from "@/lib/ipfs";
 import { createWalletClient, custom } from "viem";
 import { CHAIN, DROPSLAND_EVENTS_CONTRACT } from "@/config/chain";
 import { DROPSLAND_EVENTS_ABI } from "@/util/abis";
+import AppHeader from "@/components/layout/app-header";
 
 export default function CreateRewardPage() {
     const router = useRouter();
@@ -113,15 +114,7 @@ export default function CreateRewardPage() {
 
     return (
         <div className="min-h-screen bg-white font-manrope flex flex-col">
-            <div className="flex items-center gap-3 pt-[60px] pb-4 px-5 sticky top-0 z-50 bg-white">
-                <button
-                    onClick={() => router.back()}
-                    className="p-1 -ml-1 hover:opacity-70 transition-opacity"
-                >
-                    <ChevronLeft size={28} className="text-[#1b1c23]" />
-                </button>
-                <h1 className="font-extrabold text-[20px] text-[#1b1c23]">New Item</h1>
-            </div>
+            <AppHeader title="New Item" showBack />
 
             <div className="flex-1 px-5 pb-12 w-full max-w-md mx-auto space-y-8 animate-in slide-in-from-bottom-4 duration-500">
                 <div className="flex justify-center mt-2">

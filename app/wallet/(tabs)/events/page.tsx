@@ -1,5 +1,6 @@
 import { getEvents } from "@/lib/api/events";
-import { MapPin, CalendarDays, Ticket } from "lucide-react";
+import Link from "next/link";
+import { MapPin, Ticket } from "lucide-react";
 
 export default async function WalletEventsPage() {
   const events = await getEvents();
@@ -7,9 +8,10 @@ export default async function WalletEventsPage() {
   return (
     <div className="p-4 space-y-5 pb-24">
       {events.map((event) => (
-        <div
+        <Link
           key={event.id}
-          className="group relative w-full h-44 rounded-3xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 isolate"
+          href={`/events/${event.id}`}
+          className="group relative block w-full h-44 rounded-3xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 isolate"
         >
           {/* 1. Full Background Image */}
           {event.cover_image_url ? (
@@ -77,7 +79,7 @@ export default async function WalletEventsPage() {
 
           {/* Dashed Line Connector (Optional detail between notches) */}
           <div className="absolute top-1/2 left-3 right-3 h-[1px] -translate-y-1/2 border-t border-dashed border-white/20 z-10 pointer-events-none" />
-        </div>
+        </Link>
       ))}
 
       {events.length === 0 && (
