@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
+import AppHeader from "@/components/layout/app-header"
 import { getDJs, type DJProfile } from "@/lib/api/explore"
 
 export default function ExplorePage() {
@@ -55,13 +56,9 @@ export default function ExplorePage() {
 
   return (
     <div className="w-full h-full pb-24 overflow-y-auto bg-white">
-      {/* Header - Crisp White with strong border */}
-      <div className="sticky top-0 z-20 bg-white/90 backdrop-blur-md border-b border-neutral-200 px-5 pt-12 pb-4">
-        <h1 className="text-3xl font-extrabold text-neutral-900 mb-4 tracking-tight">Explore</h1>
-
-        {/* Search Bar - High Contrast */}
+      <AppHeader title="Explore">
         <div className="relative group">
-          <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-neutral-400 group-focus-within:text-[#1FA9D6] transition-colors">
+          <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-neutral-400 transition-colors group-focus-within:text-[#1FA9D6]">
             <Search className="h-5 w-5" />
           </div>
           <Input
@@ -71,7 +68,7 @@ export default function ExplorePage() {
             onChange={(e) => setSearchQuery(e.target.value)}
           />
         </div>
-      </div>
+      </AppHeader>
 
       <div className="p-5 space-y-8 animate-in fade-in duration-500">
         {searchQuery === "" && (
@@ -190,4 +187,3 @@ export default function ExplorePage() {
     </div>
   )
 }
-

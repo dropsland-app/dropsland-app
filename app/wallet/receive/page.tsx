@@ -1,15 +1,14 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { ArrowLeft, Copy, Check, Share2, Info, Wallet } from "lucide-react";
+import { Copy, Check, Share2, Info, Wallet } from "lucide-react";
+import AppHeader from "@/components/layout/app-header";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { useWallets } from "@privy-io/react-auth";
 
 export default function ReceivePage() {
-  const router = useRouter();
   const { wallets } = useWallets();
   const { toast } = useToast();
   const [copied, setCopied] = useState(false);
@@ -58,7 +57,7 @@ export default function ReceivePage() {
         className: "bg-green-600 text-white border-none",
       });
       setTimeout(() => setCopied(false), 2000);
-    } catch (_err) {
+    } catch {
       toast({
         title: "Copy Failed",
         description: "Could not copy address.",
@@ -87,20 +86,7 @@ export default function ReceivePage() {
   return (
     // FIXED: Use h-screen and flex-col to match app shell layout
     <div className="flex flex-col h-screen bg-white text-[#1E1E1E] overflow-hidden">
-      {/* Header - Consistent styling */}
-      <div className="px-4 pt-12 pb-6 bg-gradient-to-r from-[#1FA9D6]/10 to-[#1FA9D6]/5 backdrop-blur-xl border-b border-gray-100 shrink-0">
-        <div className="flex items-center gap-2">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => router.back()}
-            className="-ml-2 text-[#1E1E1E] hover:bg-black/5 rounded-full"
-          >
-            <ArrowLeft className="w-5 h-5" />
-          </Button>
-          <h1 className="text-xl font-bold tracking-tight">Receive Funds</h1>
-        </div>
-      </div>
+      <AppHeader title="Receive Funds" showBack className="shrink-0" />
 
       {/* Scrollable Content Area */}
       <div className="flex-1 overflow-y-auto p-6 pb-32 flex flex-col items-center">

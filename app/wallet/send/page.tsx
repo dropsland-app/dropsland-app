@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import { useSendTransaction } from "@privy-io/react-auth";
 import { parseEther, isAddress } from "viem";
 import {
-  ArrowLeft,
   ScanLine,
   Search,
   Loader2,
@@ -13,6 +12,7 @@ import {
   XCircle,
 } from "lucide-react";
 
+import AppHeader from "@/components/layout/app-header";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -76,18 +76,7 @@ export default function SendFundsPage() {
 
   return (
     <div className="flex flex-col h-screen bg-white text-[#1E1E1E]">
-      {/* Header */}
-      <div className="px-4 pt-12 pb-4 flex items-center gap-3 shrink-0">
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => router.back()}
-          className="-ml-2 hover:bg-gray-100 rounded-full"
-        >
-          <ArrowLeft className="w-6 h-6" />
-        </Button>
-        <h1 className="text-xl font-bold">Send Funds</h1>
-      </div>
+      <AppHeader title="Send Funds" showBack className="shrink-0" />
 
       <div className="flex-1 overflow-y-auto px-5 pt-2 pb-32">
         {/* 1. Recipient Input with Scan Button */}

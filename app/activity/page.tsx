@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useAuth } from "@/hooks/use-auth";
 import { BanknoteIcon } from "@/components/icons/banknote-icon";
+import AppHeader from "@/components/layout/app-header";
 
 // Interface and Mock Data
 import { allActivity } from "@/lib/mock-data";
@@ -30,9 +31,7 @@ export default function ActivityPage() {
 
   return (
     <div className="w-full max-w-full bg-white h-full overflow-y-auto overflow-x-hidden pb-24">
-      <div className="sticky top-0 bg-white z-10 border-b border-gray-200 px-4 pt-12 pb-3">
-        <h1 className="text-xl font-bold text-[#1E1E1E]">Activity</h1>
-      </div>
+      <AppHeader title="Activity" />
 
       {filteredActivity.length > 0 ? (
         <div className="divide-y divide-gray-200">
