@@ -20,7 +20,7 @@ const categories = [
   {
     name: "Live shows",
     icon: <Music className="h-4 w-4" />,
-    classes: "bg-yellow-300 text-yellow-950",
+    classes: "bg-[#1FA9D6] text-white",
   },
   {
     name: "Festivals",
@@ -79,10 +79,19 @@ export const musicTypes = [
   { id: "ambient", name: "Ambient", hint: "Chill vibes" },
 ];
 
+const musicTypeTones: Record<string, string> = {
+  house: "from-cyan-100 to-sky-50",
+  techno: "from-indigo-100 to-blue-50",
+  trance: "from-violet-100 to-purple-50",
+  dnb: "from-emerald-100 to-teal-50",
+  dubstep: "from-amber-100 to-yellow-50",
+  ambient: "from-rose-100 to-pink-50",
+};
+
 export function ExploreCategoriesSection() {
   return (
-    <section className="pl-5">
-      <div className="mb-3 flex items-center justify-between pr-5">
+    <section className="pl-5 pt-1">
+      <div className="mb-4 flex items-center justify-between pr-5">
         <h2 className="text-lg font-bold tracking-tight text-gray-900">Categories</h2>
       </div>
 
@@ -149,40 +158,49 @@ export function ExploreMusicTypesSection({
       <div className="-mr-5 overflow-hidden">
         <div
           ref={musicTypesCarouselRef}
-          className="scrollbar-hide flex snap-x snap-mandatory gap-3 overflow-x-auto overscroll-x-contain pb-4 pr-5 touch-pan-x"
+          className="scrollbar-hide flex snap-x snap-mandatory gap-4 overflow-x-auto overscroll-x-contain pb-5 pr-5 touch-pan-x"
         >
-          {musicTypes.map((type) => {
-            const isActive = selectedMusicType === type.name;
-            return (
-              <button
-                key={type.id}
+                  {musicTypes.map((type) => {
+                    const isActive = selectedMusicType === type.name;
+                    const tone = musicTypeTones[type.id] || "from-slate-100 to-slate-50";
+                    return (
+                      <button
+                        key={type.id}
                 type="button"
                 onClick={() =>
                   setSelectedMusicType(
                     selectedMusicType === type.name ? null : type.name,
                   )
                 }
-                className={`h-[88px] w-[146px] shrink-0 snap-start rounded-2xl border p-3 text-left shadow-sm shadow-blue-900/5 transition-all active:scale-95 ${
-                  isActive
-                    ? "border-[#1FA9D6]/30 bg-[#1FA9D6]/10"
-                    : "border-gray-100 bg-white"
-                }`}
-              >
-                <div className="mb-2 inline-flex h-6 w-6 items-center justify-center rounded-full bg-[#1FA9D6]/10 text-[#1FA9D6]">
-                  <Music className="h-3.5 w-3.5" />
+                        className={`group relative h-[104px] w-[166px] shrink-0 snap-start overflow-hidden rounded-2xl border p-4 text-left shadow-sm shadow-blue-900/5 transition-all active:scale-95 ${
+                          isActive
+                            ? "border-[#1FA9D6]/35 bg-white ring-1 ring-[#1FA9D6]/20"
+                            : "border-gray-100 bg-white hover:border-gray-200"
+                        }`}
+                      >
+                        <div className={`absolute inset-x-0 top-0 h-12 bg-gradient-to-r ${tone} opacity-90`} />
+
+                        <div className="relative z-10 mb-2 inline-flex h-8 w-8 items-center justify-center rounded-full bg-white/90 text-[#1FA9D6] shadow-sm">
+                          <Music className="h-3.5 w-3.5" strokeWidth={2.4} />
+                        </div>
+                        <p
+                          className={`relative z-10 truncate text-sm font-bold ${
+                            isActive ? "text-[#1FA9D6]" : "text-gray-900"
+                          }`}
+                        >
+                          {type.name}
+                        </p>
+                        <p className="relative z-10 mt-1 text-xs font-medium text-gray-500">
+                          {type.hint}
+                        </p>
+
+                        {isActive && (
+                          <span className="absolute right-3 top-3 h-2 w-2 rounded-full bg-[#1FA9D6]" />
+                        )}
+                      </button>
+                    );
+                  })}
                 </div>
-                <p
-                  className={`truncate text-sm font-bold ${
-                    isActive ? "text-[#1FA9D6]" : "text-gray-900"
-                  }`}
-                >
-                  {type.name}
-                </p>
-                <p className="mt-1 text-xs font-medium text-gray-500">{type.hint}</p>
-              </button>
-            );
-          })}
-        </div>
       </div>
     </section>
   );

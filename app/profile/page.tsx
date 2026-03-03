@@ -14,6 +14,7 @@ import {
   Music,
   ScanLine,
   Ticket,
+  X,
 } from "lucide-react";
 import { usePrivy, useWallets } from "@privy-io/react-auth";
 import { Button } from "@/components/ui/button";
@@ -21,13 +22,17 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Textarea } from "@/components/ui/textarea";
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerDescription,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from "@/components/ui/drawer";
 
 import { useAuth } from "@/hooks/use-auth";
 import { getUserRewards, type RewardItem } from "@/lib/alchemy";
@@ -41,6 +46,12 @@ export default function ProfilePage() {
   // --- Local State ---
   const [rewards, setRewards] = useState<RewardItem[]>([]);
   const [loadingRewards, setLoadingRewards] = useState(false);
+  const [isEditBioOpen, setIsEditBioOpen] = useState(false);
+  const [isQrOpen, setIsQrOpen] = useState(false);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [isAvatarPreviewOpen, setIsAvatarPreviewOpen] = useState(false);
+  const [bio, setBio] = useState("");
+  const [bioDraft, setBioDraft] = useState("");
 
   // --- Derived State ---
   // Fallback to "FAN" if role is missing in the current auth hook version
@@ -89,6 +100,11 @@ export default function ProfilePage() {
     icon: <ShieldCheck className="w-4 h-4" />,
   };
 
+  const defaultBioByRole =
+    userData?.role === "STAFF"
+      ? "Official Dropsland Event Staff. Authorized for verification."
+      : "Music enthusiast and electronic music fan. Collecting moments on-chain.";
+
   // --- Effects ---
   useEffect(() => {
     if (!walletAddress) return;
@@ -107,6 +123,35 @@ export default function ProfilePage() {
 
     fetchRewards();
   }, [walletAddress]);
+
+  useEffect(() => {
+    setBio(defaultBioByRole);
+    setBioDraft(defaultBioByRole);
+  }, [defaultBioByRole]);
+
+  const openEditBio = () => {
+    setBioDraft(bio);
+    setIsEditBioOpen(true);
+  };
+
+  const saveBio = () => {
+    const nextBio = bioDraft.trim();
+    setBio(nextBio || defaultBioByRole);
+    setIsEditBioOpen(false);
+  };
+
+  useEffect(() => {
+    if (!isAvatarPreviewOpen) return;
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setIsAvatarPreviewOpen(false);
+      }
+    };
+
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [isAvatarPreviewOpen]);
 
   // --- Guest View ---
   if (ready && !authenticated) {
@@ -145,8 +190,11 @@ export default function ProfilePage() {
         <div className="flex flex-col items-center text-center">
           {/* Avatar with Role-Based Ring */}
           <div className="relative mb-4">
-            <div
-              className={`p-1 rounded-full border-2 border-dashed ${roleConfig.borderColor} bg-opacity-30`}
+            <button
+              type="button"
+              onClick={() => setIsAvatarPreviewOpen(true)}
+              className={`p-1 rounded-full border-2 border-dashed ${roleConfig.borderColor} bg-opacity-30 transition-transform active:scale-95`}
+              aria-label="Open profile photo preview"
             >
               <Avatar className="h-28 w-28 border-4 border-white shadow-lg">
                 <AvatarImage src={avatarSrc} className="object-cover" />
@@ -154,7 +202,7 @@ export default function ProfilePage() {
                   {displayName.substring(0, 2).toUpperCase()}
                 </AvatarFallback>
               </Avatar>
-            </div>
+            </button>
             {userData?.isVerified && (
               <div
                 className={`absolute bottom-1 right-1 ${roleConfig.bgColor} text-white p-1 rounded-full border-2 border-white shadow-sm`}
@@ -185,21 +233,62 @@ export default function ProfilePage() {
 
           {/* Bio */}
           <p className="text-gray-600 text-sm leading-relaxed max-w-xs mx-auto mb-6">
-            {userData?.role === "STAFF"
-              ? "Official Dropsland Event Staff. Authorized for verification."
-              : "Music enthusiast and electronic music fan. Collecting moments on-chain."}
+            {bio}
           </p>
 
           {/* Role-Based Action Row */}
           <div className="flex gap-3 w-full justify-center max-w-sm">
-            <Button
-              variant="outline"
-              size="sm"
-              className="rounded-full h-9 px-5 border-gray-200 text-gray-600 font-semibold text-xs gap-2"
-            >
-              <Edit3 className="w-3.5 h-3.5" />
-              Edit Bio
-            </Button>
+            <Drawer open={isEditBioOpen} onOpenChange={setIsEditBioOpen}>
+              <DrawerTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={openEditBio}
+                  className="rounded-full h-9 px-5 border-gray-200 text-gray-600 font-semibold text-xs gap-2"
+                >
+                  <Edit3 className="w-3.5 h-3.5" />
+                  Edit Bio
+                </Button>
+              </DrawerTrigger>
+              <DrawerContent className="max-w-md mx-auto">
+                <DrawerHeader className="px-2 text-left">
+                  <DrawerTitle>Edit Bio</DrawerTitle>
+                  <DrawerDescription>
+                    Keep it short and personal. This appears on your profile.
+                  </DrawerDescription>
+                </DrawerHeader>
+
+                <div className="px-2 py-2">
+                  <Textarea
+                    value={bioDraft}
+                    onChange={(e) => setBioDraft(e.target.value)}
+                    placeholder="Tell fans about you..."
+                    className="min-h-[110px] resize-none rounded-2xl border-gray-200 bg-white text-sm text-gray-800"
+                    maxLength={180}
+                  />
+                  <p className="mt-2 text-right text-xs text-gray-400">
+                    {bioDraft.length}/180
+                  </p>
+                </div>
+
+                <DrawerFooter className="px-2 pb-4">
+                  <Button
+                    onClick={saveBio}
+                    className="h-11 rounded-2xl bg-[#1FA9D6] text-white hover:bg-[#1FA9D6]/90"
+                  >
+                    Save Bio
+                  </Button>
+                  <DrawerClose asChild>
+                    <Button
+                      variant="outline"
+                      className="h-11 rounded-2xl border-gray-200"
+                    >
+                      Cancel
+                    </Button>
+                  </DrawerClose>
+                </DrawerFooter>
+              </DrawerContent>
+            </Drawer>
 
             {/* CTA: STAFF */}
             {userRole === "STAFF" && (
@@ -227,15 +316,59 @@ export default function ProfilePage() {
 
             {/* CTA: FAN */}
             {userRole === "FAN" && (
-              <Button
-                onClick={() => router.push("/wallet/receive")}
-                variant="outline"
-                size="sm"
-                className="rounded-full h-9 px-5 border-gray-200 text-gray-600 font-semibold text-xs gap-2"
-              >
-                <QrCode className="w-3.5 h-3.5" />
-                My QR
-              </Button>
+              <Drawer open={isQrOpen} onOpenChange={setIsQrOpen}>
+                <DrawerTrigger asChild>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="rounded-full h-9 px-5 border-gray-200 text-gray-600 font-semibold text-xs gap-2"
+                  >
+                    <QrCode className="w-3.5 h-3.5" />
+                    My QR
+                  </Button>
+                </DrawerTrigger>
+                <DrawerContent className="max-w-md mx-auto">
+                  <DrawerHeader className="px-2 text-left">
+                    <DrawerTitle>My Wallet QR</DrawerTitle>
+                    <DrawerDescription>
+                      Show this code to quickly receive drops and rewards.
+                    </DrawerDescription>
+                  </DrawerHeader>
+
+                  <div className="px-2 py-2">
+                    <div className="mx-auto w-fit rounded-3xl border border-gray-100 bg-white p-4 shadow-lg shadow-blue-900/5">
+                      {walletAddress ? (
+                        <img
+                          src={`https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${walletAddress}`}
+                          alt="Wallet QR"
+                          className="h-52 w-52"
+                        />
+                      ) : (
+                        <div className="flex h-52 w-52 items-center justify-center rounded-2xl bg-gray-50 text-sm text-gray-400">
+                          Wallet unavailable
+                        </div>
+                      )}
+                    </div>
+
+                    {walletAddress && (
+                      <p className="mt-3 truncate text-center text-xs font-medium text-gray-500">
+                        {walletAddress}
+                      </p>
+                    )}
+                  </div>
+
+                  <DrawerFooter className="px-2 pb-4">
+                    <DrawerClose asChild>
+                      <Button
+                        variant="outline"
+                        className="h-11 rounded-2xl border-gray-200"
+                      >
+                        Close
+                      </Button>
+                    </DrawerClose>
+                  </DrawerFooter>
+                </DrawerContent>
+              </Drawer>
             )}
           </div>
         </div>
@@ -400,8 +533,8 @@ export default function ProfilePage() {
       <div className="px-4 mt-8 space-y-4">
         <h3 className="text-lg font-bold text-gray-900">Settings</h3>
 
-        <Dialog>
-          <DialogTrigger asChild>
+        <Drawer open={isSettingsOpen} onOpenChange={setIsSettingsOpen}>
+          <DrawerTrigger asChild>
             <Button
               variant="outline"
               className="w-full justify-start h-14 rounded-xl bg-white border-gray-100 text-gray-700 font-semibold hover:bg-gray-50"
@@ -409,23 +542,35 @@ export default function ProfilePage() {
               <Settings className="w-5 h-5 mr-3 text-gray-400" />
               Account Settings
             </Button>
-          </DialogTrigger>
-          <DialogContent className="w-[90%] rounded-2xl">
-            <DialogHeader>
-              <DialogTitle>Account</DialogTitle>
-            </DialogHeader>
-            <div className="space-y-2 py-4">
+          </DrawerTrigger>
+          <DrawerContent className="max-w-md mx-auto">
+            <DrawerHeader className="px-2 text-left">
+              <DrawerTitle>Account Settings</DrawerTitle>
+              <DrawerDescription>
+                Manage your session and account actions.
+              </DrawerDescription>
+            </DrawerHeader>
+
+            <div className="px-2 py-2 space-y-2">
               <Button
                 onClick={logout}
                 variant="destructive"
-                className="w-full rounded-xl"
+                className="w-full h-11 rounded-2xl"
               >
                 <LogOut className="w-4 h-4 mr-2" />
                 Log Out
               </Button>
             </div>
-          </DialogContent>
-        </Dialog>
+
+            <DrawerFooter className="px-2 pb-4">
+              <DrawerClose asChild>
+                <Button variant="outline" className="h-11 rounded-2xl border-gray-200">
+                  Close
+                </Button>
+              </DrawerClose>
+            </DrawerFooter>
+          </DrawerContent>
+        </Drawer>
 
         {/* Upsell for Fans only */}
         {userRole === "FAN" && (
@@ -463,6 +608,32 @@ export default function ProfilePage() {
           </div>
         )}
       </div>
+
+      {isAvatarPreviewOpen && (
+        <div
+          className="fixed inset-y-0 left-1/2 z-[90] flex w-full max-w-md -translate-x-1/2 items-center justify-center bg-black/35 backdrop-blur-md px-6"
+          onClick={() => setIsAvatarPreviewOpen(false)}
+        >
+          <button
+            type="button"
+            onClick={() => setIsAvatarPreviewOpen(false)}
+            className="absolute right-5 top-5 flex h-9 w-9 items-center justify-center rounded-full bg-white/90 text-gray-700 shadow-sm"
+            aria-label="Close profile photo preview"
+          >
+            <X className="h-4 w-4" />
+          </button>
+
+          <Avatar
+            className="mx-auto h-[72vw] w-[72vw] max-h-[300px] max-w-[300px] border-4 border-white shadow-2xl shadow-blue-900/20"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <AvatarImage src={avatarSrc} className="object-cover" />
+            <AvatarFallback className="bg-gray-100 text-5xl font-bold text-gray-400">
+              {displayName.substring(0, 2).toUpperCase()}
+            </AvatarFallback>
+          </Avatar>
+        </div>
+      )}
     </div>
   );
 }
