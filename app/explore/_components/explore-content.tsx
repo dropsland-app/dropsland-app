@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { useState } from "react";
 import {
   ChevronLeft,
   ChevronRight,
@@ -14,6 +14,12 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  type CarouselApi,
+} from "@/components/ui/carousel";
 import type { DJProfile } from "@/lib/api/explore";
 
 const categories = [
@@ -95,19 +101,20 @@ export function ExploreCategoriesSection() {
         <h2 className="text-lg font-bold tracking-tight text-gray-900">Categories</h2>
       </div>
 
-      <div className="-mr-5 overflow-hidden">
-        <div className="scrollbar-hide flex snap-x snap-mandatory gap-3 overflow-x-auto overscroll-x-contain pb-4 pr-5 touch-pan-x">
+      <Carousel opts={{ align: "start", dragFree: true }}>
+        <CarouselContent className="-ml-3 pb-4 pr-5">
           {categories.map((category) => (
-            <button
-              key={category.name}
-              className={`snap-start whitespace-nowrap rounded-full px-4 py-2.5 shadow-sm transition-transform active:scale-95 ${category.classes} flex items-center gap-2`}
-            >
-              <span className="rounded-full bg-white/40 p-1">{category.icon}</span>
-              <span className="text-sm font-bold">{category.name}</span>
-            </button>
+            <CarouselItem key={category.name} className="basis-auto pl-3">
+              <button
+                className={`flex items-center gap-2 whitespace-nowrap rounded-full px-4 py-2.5 shadow-sm transition-transform active:scale-95 ${category.classes}`}
+              >
+                <span className="rounded-full bg-white/40 p-1">{category.icon}</span>
+                <span className="text-sm font-bold">{category.name}</span>
+              </button>
+            </CarouselItem>
           ))}
-        </div>
-      </div>
+        </CarouselContent>
+      </Carousel>
     </section>
   );
 }
@@ -121,15 +128,7 @@ export function ExploreMusicTypesSection({
   selectedMusicType,
   setSelectedMusicType,
 }: MusicTypesProps) {
-  const musicTypesCarouselRef = useRef<HTMLDivElement | null>(null);
-
-  const scrollMusicTypes = (direction: "left" | "right") => {
-    if (!musicTypesCarouselRef.current) return;
-    musicTypesCarouselRef.current.scrollBy({
-      left: direction === "left" ? -220 : 220,
-      behavior: "smooth",
-    });
-  };
+  const [musicTypesApi, setMusicTypesApi] = useState<CarouselApi>();
 
   return (
     <section className="pl-5">
@@ -138,7 +137,7 @@ export function ExploreMusicTypesSection({
         <div className="flex items-center gap-2">
           <button
             type="button"
-            onClick={() => scrollMusicTypes("left")}
+            onClick={() => musicTypesApi?.scrollPrev()}
             className="flex h-7 w-7 items-center justify-center rounded-full border border-gray-200 bg-white text-gray-500 shadow-sm transition hover:border-[#1FA9D6]/40 hover:text-[#1FA9D6]"
             aria-label="Scroll music types left"
           >
@@ -146,7 +145,7 @@ export function ExploreMusicTypesSection({
           </button>
           <button
             type="button"
-            onClick={() => scrollMusicTypes("right")}
+            onClick={() => musicTypesApi?.scrollNext()}
             className="flex h-7 w-7 items-center justify-center rounded-full border border-gray-200 bg-white text-gray-500 shadow-sm transition hover:border-[#1FA9D6]/40 hover:text-[#1FA9D6]"
             aria-label="Scroll music types right"
           >
@@ -155,67 +154,55 @@ export function ExploreMusicTypesSection({
         </div>
       </div>
 
-      <div className="-mr-5 overflow-hidden">
-        <div
-          ref={musicTypesCarouselRef}
-          className="scrollbar-hide flex snap-x snap-mandatory gap-4 overflow-x-auto overscroll-x-contain pb-5 pr-5 touch-pan-x"
-        >
-                  {musicTypes.map((type) => {
-                    const isActive = selectedMusicType === type.name;
-                    const tone = musicTypeTones[type.id] || "from-slate-100 to-slate-50";
-                    return (
-                      <button
-                        key={type.id}
-                type="button"
-                onClick={() =>
-                  setSelectedMusicType(
-                    selectedMusicType === type.name ? null : type.name,
-                  )
-                }
-                        className={`group relative h-[104px] w-[166px] shrink-0 snap-start overflow-hidden rounded-2xl border p-4 text-left shadow-sm shadow-blue-900/5 transition-all active:scale-95 ${
-                          isActive
-                            ? "border-[#1FA9D6]/35 bg-white ring-1 ring-[#1FA9D6]/20"
-                            : "border-gray-100 bg-white hover:border-gray-200"
-                        }`}
-                      >
-                        <div className={`absolute inset-x-0 top-0 h-12 bg-gradient-to-r ${tone} opacity-90`} />
+      <Carousel setApi={setMusicTypesApi} opts={{ align: "start", dragFree: true }}>
+        <CarouselContent className="-ml-4 pb-5 pr-5">
+          {musicTypes.map((type) => {
+            const isActive = selectedMusicType === type.name;
+            const tone = musicTypeTones[type.id] || "from-slate-100 to-slate-50";
+            return (
+              <CarouselItem key={type.id} className="basis-[calc(166px+1rem)] pl-4">
+                <button
+                  type="button"
+                  onClick={() =>
+                    setSelectedMusicType(selectedMusicType === type.name ? null : type.name)
+                  }
+                  className={`group relative h-[104px] w-full overflow-hidden rounded-2xl border p-4 text-left shadow-sm shadow-blue-900/5 transition-all active:scale-95 ${
+                    isActive
+                      ? "border-[#1FA9D6]/35 bg-white ring-1 ring-[#1FA9D6]/20"
+                      : "border-gray-100 bg-white hover:border-gray-200"
+                  }`}
+                >
+                  <div className={`absolute inset-x-0 top-0 h-12 bg-gradient-to-r ${tone} opacity-90`} />
 
-                        <div className="relative z-10 mb-2 inline-flex h-8 w-8 items-center justify-center rounded-full bg-white/90 text-[#1FA9D6] shadow-sm">
-                          <Music className="h-3.5 w-3.5" strokeWidth={2.4} />
-                        </div>
-                        <p
-                          className={`relative z-10 truncate text-sm font-bold ${
-                            isActive ? "text-[#1FA9D6]" : "text-gray-900"
-                          }`}
-                        >
-                          {type.name}
-                        </p>
-                        <p className="relative z-10 mt-1 text-xs font-medium text-gray-500">
-                          {type.hint}
-                        </p>
+                  <div className="relative z-10 mb-2 inline-flex h-8 w-8 items-center justify-center rounded-full bg-white/90 text-[#1FA9D6] shadow-sm">
+                    <Music className="h-3.5 w-3.5" strokeWidth={2.4} />
+                  </div>
+                  <p
+                    className={`relative z-10 truncate text-sm font-bold ${
+                      isActive ? "text-[#1FA9D6]" : "text-gray-900"
+                    }`}
+                  >
+                    {type.name}
+                  </p>
+                  <p className="relative z-10 mt-1 text-xs font-medium text-gray-500">
+                    {type.hint}
+                  </p>
 
-                        {isActive && (
-                          <span className="absolute right-3 top-3 h-2 w-2 rounded-full bg-[#1FA9D6]" />
-                        )}
-                      </button>
-                    );
-                  })}
-                </div>
-      </div>
+                  {isActive && (
+                    <span className="absolute right-3 top-3 h-2 w-2 rounded-full bg-[#1FA9D6]" />
+                  )}
+                </button>
+              </CarouselItem>
+            );
+          })}
+        </CarouselContent>
+      </Carousel>
     </section>
   );
 }
 
 export function ExploreEventsSection() {
-  const eventsCarouselRef = useRef<HTMLDivElement | null>(null);
-
-  const scrollEvents = (direction: "left" | "right") => {
-    if (!eventsCarouselRef.current) return;
-    eventsCarouselRef.current.scrollBy({
-      left: direction === "left" ? -280 : 280,
-      behavior: "smooth",
-    });
-  };
+  const [eventsApi, setEventsApi] = useState<CarouselApi>();
 
   return (
     <section className="pl-5">
@@ -226,7 +213,7 @@ export function ExploreEventsSection() {
         <div className="flex items-center gap-2">
           <button
             type="button"
-            onClick={() => scrollEvents("left")}
+            onClick={() => eventsApi?.scrollPrev()}
             className="flex h-7 w-7 items-center justify-center rounded-full border border-gray-200 bg-white text-gray-500 shadow-sm transition hover:border-[#1FA9D6]/40 hover:text-[#1FA9D6]"
             aria-label="Scroll events left"
           >
@@ -234,7 +221,7 @@ export function ExploreEventsSection() {
           </button>
           <button
             type="button"
-            onClick={() => scrollEvents("right")}
+            onClick={() => eventsApi?.scrollNext()}
             className="flex h-7 w-7 items-center justify-center rounded-full border border-gray-200 bg-white text-gray-500 shadow-sm transition hover:border-[#1FA9D6]/40 hover:text-[#1FA9D6]"
             aria-label="Scroll events right"
           >
@@ -243,69 +230,65 @@ export function ExploreEventsSection() {
         </div>
       </div>
 
-      <div className="-mr-5 overflow-hidden">
-        <div
-          ref={eventsCarouselRef}
-          className="scrollbar-hide flex snap-x snap-mandatory gap-4 overflow-x-auto overscroll-x-contain pb-6 pr-5 touch-pan-x"
-        >
+      <Carousel setApi={setEventsApi} opts={{ align: "start", dragFree: true }}>
+        <CarouselContent className="-ml-4 pb-6 pr-5">
           {featuredEvents.map((event) => (
-            <article
-              key={event.id}
-              className="group relative h-[360px] w-[300px] shrink-0 snap-start overflow-hidden rounded-[2rem] shadow-xl shadow-blue-900/10"
-            >
-              <img
-                src={event.image}
-                alt={event.title}
-                draggable={false}
-                className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
-              />
+            <CarouselItem key={event.id} className="basis-[calc(300px+1rem)] pl-4">
+              <article className="group relative h-[360px] w-full overflow-hidden rounded-[2rem] shadow-xl shadow-blue-900/10">
+                <img
+                  src={event.image}
+                  alt={event.title}
+                  draggable={false}
+                  className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+                />
 
-              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent" />
 
-              <div className="absolute left-4 top-4 flex flex-col items-center justify-center rounded-2xl border border-white/10 bg-black/40 px-3 py-2 text-white backdrop-blur-md">
-                <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-300">
-                  {event.date.month}
-                </span>
-                <span className="text-lg font-extrabold leading-none">{event.date.day}</span>
-              </div>
-
-              <button className="absolute right-4 top-4 rounded-full bg-black/20 p-2.5 text-white backdrop-blur-md transition-colors hover:bg-white/20">
-                <Heart className="h-5 w-5" />
-              </button>
-
-              <div className="absolute bottom-0 left-0 right-0 p-5">
-                <h3 className="mb-1 text-2xl font-bold tracking-tight text-white">{event.title}</h3>
-                <div className="mb-4 flex items-center gap-1.5 text-sm font-medium text-gray-300">
-                  <MapPin className="h-4 w-4 text-[#1FA9D6]" />
-                  <span className="truncate">{event.location}</span>
+                <div className="absolute left-4 top-4 flex flex-col items-center justify-center rounded-2xl border border-white/10 bg-black/40 px-3 py-2 text-white backdrop-blur-md">
+                  <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-300">
+                    {event.date.month}
+                  </span>
+                  <span className="text-lg font-extrabold leading-none">{event.date.day}</span>
                 </div>
 
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <Badge className="border-none bg-white/20 text-xs font-bold text-white backdrop-blur-md hover:bg-white/20">
-                      {event.likes}
-                    </Badge>
-                    <div className="flex -space-x-2">
-                      {event.attendees.map((avatar, index) => (
-                        <Avatar
-                          key={`${event.id}-${index}`}
-                          className="h-7 w-7 border-2 border-gray-900"
-                        >
-                          <AvatarImage src={avatar} />
-                          <AvatarFallback className="bg-[#1FA9D6] text-[10px] text-white">
-                            U
-                          </AvatarFallback>
-                        </Avatar>
-                      ))}
-                    </div>
+                <button className="absolute right-4 top-4 rounded-full bg-black/20 p-2.5 text-white backdrop-blur-md transition-colors hover:bg-white/20">
+                  <Heart className="h-5 w-5" />
+                </button>
+
+                <div className="absolute bottom-0 left-0 right-0 p-5">
+                  <h3 className="mb-1 text-2xl font-bold tracking-tight text-white">{event.title}</h3>
+                  <div className="mb-4 flex items-center gap-1.5 text-sm font-medium text-gray-300">
+                    <MapPin className="h-4 w-4 text-[#1FA9D6]" />
+                    <span className="truncate">{event.location}</span>
                   </div>
-                  <span className="text-lg font-bold text-white">{event.price}</span>
+
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Badge className="border-none bg-white/20 text-xs font-bold text-white backdrop-blur-md hover:bg-white/20">
+                        {event.likes}
+                      </Badge>
+                      <div className="flex -space-x-2">
+                        {event.attendees.map((avatar, index) => (
+                          <Avatar
+                            key={`${event.id}-${index}`}
+                            className="h-7 w-7 border-2 border-gray-900"
+                          >
+                            <AvatarImage src={avatar} />
+                            <AvatarFallback className="bg-[#1FA9D6] text-[10px] text-white">
+                              U
+                            </AvatarFallback>
+                          </Avatar>
+                        ))}
+                      </div>
+                    </div>
+                    <span className="text-lg font-bold text-white">{event.price}</span>
+                  </div>
                 </div>
-              </div>
-            </article>
+              </article>
+            </CarouselItem>
           ))}
-        </div>
-      </div>
+        </CarouselContent>
+      </Carousel>
     </section>
   );
 }
