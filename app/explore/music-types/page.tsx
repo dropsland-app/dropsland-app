@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { ExploreShell } from "@/app/explore/_components/explore-shell";
 import {
   ExploreArtistsSection,
@@ -11,9 +11,12 @@ import { getDJs, type DJProfile } from "@/lib/api/explore";
 
 export default function ExploreMusicTypesPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [searchQuery, setSearchQuery] = useState("");
   const [artists, setArtists] = useState<DJProfile[]>([]);
-  const [selectedMusicType, setSelectedMusicType] = useState<string | null>("House");
+  const [selectedMusicType, setSelectedMusicType] = useState<string | null>(
+    searchParams.get("genre") || "House"
+  );
 
   useEffect(() => {
     const fetchDJs = async () => {

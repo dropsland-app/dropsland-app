@@ -33,6 +33,7 @@ export default function ExploreOverviewPage() {
           <ExploreMusicTypesSection
             selectedMusicType={selectedMusicType}
             setSelectedMusicType={setSelectedMusicType}
+            onGenreClick={(genre) => router.push(`/explore/music-types?genre=${encodeURIComponent(genre)}`)}
           />
           <ExploreEventsSection />
         </>

@@ -123,11 +123,13 @@ export function ExploreCategoriesSection() {
 type MusicTypesProps = {
   selectedMusicType: string | null;
   setSelectedMusicType: (value: string | null) => void;
+  onGenreClick?: (genreName: string) => void;
 };
 
 export function ExploreMusicTypesSection({
   selectedMusicType,
   setSelectedMusicType,
+  onGenreClick,
 }: MusicTypesProps) {
   const [musicTypesApi, setMusicTypesApi] = useState<CarouselApi>();
 
@@ -164,9 +166,13 @@ export function ExploreMusicTypesSection({
               <CarouselItem key={type.id} className="basis-[calc(166px+1rem)] pl-4">
                 <button
                   type="button"
-                  onClick={() =>
-                    setSelectedMusicType(selectedMusicType === type.name ? null : type.name)
-                  }
+                  onClick={() => {
+                    if (onGenreClick) {
+                      onGenreClick(type.name);
+                    } else {
+                      setSelectedMusicType(selectedMusicType === type.name ? null : type.name);
+                    }
+                  }}
                   className={`group relative h-[104px] w-full overflow-hidden rounded-2xl border p-4 text-left shadow-sm shadow-blue-900/5 transition-all active:scale-95 ${
                     isActive
                       ? "border-[#1FA9D6]/35 bg-white ring-1 ring-[#1FA9D6]/20"
