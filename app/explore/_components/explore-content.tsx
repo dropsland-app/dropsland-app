@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import {
   ChevronLeft,
   ChevronRight,
@@ -203,6 +204,12 @@ export function ExploreMusicTypesSection({
 
 export function ExploreEventsSection() {
   const [eventsApi, setEventsApi] = useState<CarouselApi>();
+  const router = useRouter();
+
+  const handleEventClick = (eventId: string) => {
+    if (eventsApi && !eventsApi.clickAllowed()) return;
+    router.push(`/events/${eventId}`);
+  };
 
   return (
     <section className="pl-5">
@@ -234,7 +241,10 @@ export function ExploreEventsSection() {
         <CarouselContent className="-ml-4 pb-6 pr-5">
           {featuredEvents.map((event) => (
             <CarouselItem key={event.id} className="basis-[calc(300px+1rem)] pl-4">
-              <article className="group relative h-[360px] w-full overflow-hidden rounded-[2rem] shadow-xl shadow-blue-900/10">
+              <article
+                className="group relative h-[360px] w-full cursor-pointer overflow-hidden rounded-[2rem] shadow-xl shadow-blue-900/10"
+                onClick={() => handleEventClick(event.id)}
+              >
                 <img
                   src={event.image}
                   alt={event.title}
@@ -251,7 +261,10 @@ export function ExploreEventsSection() {
                   <span className="text-lg font-extrabold leading-none">{event.date.day}</span>
                 </div>
 
-                <button className="absolute right-4 top-4 rounded-full bg-black/20 p-2.5 text-white backdrop-blur-md transition-colors hover:bg-white/20">
+                <button
+                  onClick={(e) => e.stopPropagation()}
+                  className="absolute right-4 top-4 rounded-full bg-black/20 p-2.5 text-white backdrop-blur-md transition-colors hover:bg-white/20"
+                >
                   <Heart className="h-5 w-5" />
                 </button>
 
