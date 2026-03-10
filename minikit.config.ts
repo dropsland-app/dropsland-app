@@ -21,7 +21,7 @@ export const minikitConfig = {
   },
   miniapp: {
     version: "1",
-    name: "Dropsland XYZ",
+    name: "Dropsland",
     subtitle: "",
     description: "Elevate your DJ career on-chain",
     screenshotUrls: [],

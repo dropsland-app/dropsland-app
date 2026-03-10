@@ -5,6 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase/client";
 import { usePrivy } from "@privy-io/react-auth";
 import { getUserMemberships, RewardItem } from "@/lib/alchemy";
+import { getTracksByArtist } from "@/lib/api/tracks";
 
 // Components
 import { DJView } from "@/components/profile/dj-view";
@@ -14,7 +15,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft, Loader2, AlertCircle } from "lucide-react";
 
 // Types
-import type { Profile, MembershipTier } from "@/types";
+import type { Profile, MembershipTier, Track } from "@/types";
 
 export default function ProfilePage() {
   const params = useParams();
@@ -32,6 +33,7 @@ export default function ProfilePage() {
     setProfile(updatedProfile);
   };
   const [djTiers, setDjTiers] = useState<MembershipTier[]>([]);
+  const [djTracks, setDjTracks] = useState<Track[]>([]);
   const [fanMemberships, setFanMemberships] = useState<RewardItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -72,6 +74,10 @@ export default function ProfilePage() {
           }
 
           setDjTiers((tiers as MembershipTier[]) || []);
+
+          // Fetch public tracks for this DJ
+          const tracks = await getTracksByArtist(profileId);
+          setDjTracks(tracks);
         }
 
         // CASE: FAN (Fetch what they own)
@@ -155,6 +161,7 @@ export default function ProfilePage() {
         <DJView
           profile={profile}
           tiers={djTiers}
+          tracks={djTracks}
           onJoin={(tierId) => router.push(`/creator/${profileId}/tier/${tierId}`)}
           isOwner={isOwner}
           onProfileUpdate={handleProfileUpdate}

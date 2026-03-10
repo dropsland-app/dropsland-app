@@ -2,6 +2,10 @@
 
 import { useState } from "react";
 import { MembershipCard } from "@/components/membership-card";
+import {
+  MembershipTierCard,
+  type MembershipTier as TierCardProps,
+} from "@/components/creator/membership-tier-card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -15,14 +19,59 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Pencil, Upload, Loader2, Check, X } from "lucide-react";
-import type { Profile, MembershipTier } from "@/types";
+import {
+  Pencil,
+  Upload,
+  Loader2,
+  Check,
+  X,
+  Sparkles,
+  Music,
+  Clock,
+} from "lucide-react";
+import type { Profile, MembershipTier, Track } from "@/types";
 import { supabase } from "@/lib/supabase/client";
 import { uploadFileToIPFS } from "@/lib/ipfs";
+
+// Color palette for subscription tier cards
+const TIER_COLORS = [
+  "bg-slate-700",
+  "bg-[#1FA9D6]",
+  "bg-purple-600",
+  "bg-amber-500",
+  "bg-emerald-600",
+  "bg-rose-600",
+];
+
+/** Map DB MembershipTier → MembershipTierCard UI shape */
+function toTierCardProps(
+  tier: MembershipTier,
+  index: number,
+): TierCardProps {
+  return {
+    id: tier.id,
+    name: tier.name,
+    price: tier.price,
+    currency: tier.currency,
+    color: TIER_COLORS[index % TIER_COLORS.length],
+    benefits: tier.perks ?? [],
+    isPopular: index === 1,
+    image: tier.image_url ?? undefined,
+  };
+}
+
+/** Format seconds into m:ss */
+function formatDuration(seconds: number | null): string {
+  if (seconds == null) return "";
+  const m = Math.floor(seconds / 60);
+  const s = seconds % 60;
+  return `${m}:${s.toString().padStart(2, "0")}`;
+}
 
 interface DJViewProps {
   profile: Profile;
   tiers: MembershipTier[];
+  tracks: Track[];
   onJoin: (tierId: string) => void;
   isOwner: boolean;
   onProfileUpdate?: (updatedProfile: Profile) => void;
@@ -31,6 +80,7 @@ interface DJViewProps {
 export function DJView({
   profile,
   tiers,
+  tracks,
   onJoin,
   isOwner,
   onProfileUpdate,
@@ -244,7 +294,126 @@ export function DJView({
         </p>
       </div>
 
-      {/* Selling Section */}
+      {/* --- Benefits Section --- */}
+      {(() => {
+        const allPerks = tiers.flatMap((t) => t.perks ?? []);
+        const uniquePerks = [...new Set(allPerks)];
+        if (uniquePerks.length === 0) return null;
+        return (
+          <div className="space-y-3 mb-8">
+            <div className="flex items-center gap-2 border-b border-gray-100 pb-2">
+              <Sparkles className="w-4 h-4 text-purple-500" />
+              <h2 className="font-bold text-sm text-gray-900 uppercase tracking-wider">
+                Member Benefits
+              </h2>
+            </div>
+            <div className="grid gap-2">
+              {uniquePerks.map((perk, i) => (
+                <div
+                  key={i}
+                  className="flex items-start gap-3 p-3 bg-gray-50 rounded-xl"
+                >
+                  <div className="mt-0.5 min-w-[20px] h-[20px] rounded-full bg-green-50 flex items-center justify-center">
+                    <Check className="w-3 h-3 text-green-600" strokeWidth={3} />
+                  </div>
+                  <span className="text-sm text-gray-700 leading-tight">
+                    {perk}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        );
+      })()}
+
+      {/* --- Subscriptions Section (Tier Cards) --- */}
+      {tiers.length > 0 && (
+        <div className="space-y-4 mb-8">
+          <div className="flex items-center justify-between border-b border-gray-100 pb-2">
+            <h2 className="font-bold text-sm text-gray-900 uppercase tracking-wider">
+              Subscriptions
+            </h2>
+            <span className="text-xs text-gray-400">
+              {tiers.length} {tiers.length === 1 ? "Tier" : "Tiers"}
+            </span>
+          </div>
+          <div className="grid gap-5">
+            {tiers.map((tier, index) => (
+              <MembershipTierCard
+                key={tier.id}
+                tier={toTierCardProps(tier, index)}
+                onJoin={onJoin}
+              />
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* --- Media Section (Tracks) --- */}
+      <div className="space-y-4 mb-8">
+        <div className="flex items-center justify-between border-b border-gray-100 pb-2">
+          <div className="flex items-center gap-2">
+            <Music className="w-4 h-4 text-[#1FA9D6]" />
+            <h2 className="font-bold text-sm text-gray-900 uppercase tracking-wider">
+              Media
+            </h2>
+          </div>
+          <span className="text-xs text-gray-400">
+            {tracks.length} {tracks.length === 1 ? "Track" : "Tracks"}
+          </span>
+        </div>
+
+        {tracks.length === 0 ? (
+          <div className="text-center py-10 bg-gray-50 rounded-xl border border-dashed border-gray-200">
+            <Music className="w-10 h-10 text-gray-300 mx-auto mb-2" />
+            <p className="text-gray-400 text-sm">No tracks yet.</p>
+            {isOwner && (
+              <p className="text-xs text-[#1FA9D6] mt-1">
+                Go to Create &gt; Music to upload one.
+              </p>
+            )}
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 gap-3">
+            {tracks.map((track) => (
+              <div
+                key={track.id}
+                className="relative aspect-square rounded-2xl overflow-hidden shadow-sm border border-gray-100 group"
+              >
+                {/* Cover image or fallback */}
+                {track.cover_image_url ? (
+                  <img
+                    src={track.cover_image_url}
+                    alt={track.title}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="w-full h-full bg-gradient-to-br from-purple-100 to-[#1FA9D6]/20 flex items-center justify-center">
+                    <Music className="w-10 h-10 text-purple-300" />
+                  </div>
+                )}
+
+                {/* Overlay */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent flex flex-col justify-end p-3">
+                  <h3 className="text-white font-bold text-sm leading-tight line-clamp-2">
+                    {track.title}
+                  </h3>
+                  {track.duration_seconds != null && (
+                    <div className="flex items-center gap-1 mt-1">
+                      <Clock className="w-3 h-3 text-white/70" />
+                      <span className="text-white/70 text-[10px] font-medium">
+                        {formatDuration(track.duration_seconds)}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* --- Active Memberships (original section) --- */}
       <div className="space-y-4">
         <div className="flex items-center justify-between border-b border-gray-100 pb-2">
           <h2 className="font-bold text-sm text-gray-900 uppercase tracking-wider">

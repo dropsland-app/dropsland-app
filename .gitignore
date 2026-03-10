@@ -41,3 +41,4 @@ public/workbox-*.js
 public/worker-*.js
 
 .repomixignore
+opencode.json

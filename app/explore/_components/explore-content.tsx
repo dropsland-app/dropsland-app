@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import {
   ChevronLeft,
   ChevronRight,
@@ -20,6 +21,7 @@ import {
   CarouselItem,
   type CarouselApi,
 } from "@/components/ui/carousel";
+import type { EventData } from "@/lib/api/events";
 import type { DJProfile } from "@/lib/api/explore";
 
 const categories = [
@@ -40,41 +42,37 @@ const categories = [
   },
 ];
 
-const featuredEvents = [
-  {
-    id: "demo-skrillex",
-    title: "Skrillex Concert",
-    location: "123 Main Street, New York",
-    date: { month: "May", day: "20" },
-    price: "$40.23",
-    image:
-      "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?q=80&w=800&auto=format&fit=crop",
-    attendees: ["/placeholder.svg", "/placeholder.svg", "/placeholder.svg"],
-    likes: "1.2K",
-  },
-  {
-    id: "demo-afterlife",
-    title: "Afterlife Tulum",
-    location: "Zamna, Tulum",
-    date: { month: "Jan", day: "14" },
-    price: "From $120",
-    image:
-      "https://images.unsplash.com/photo-1574169208507-84376144848b?q=80&w=800&auto=format&fit=crop",
-    attendees: ["/placeholder.svg", "/placeholder.svg"],
-    likes: "3K+",
-  },
-  {
-    id: "demo-midnight-harbor",
-    title: "Midnight Harbor Sessions",
-    location: "Pier 17, Brooklyn",
-    date: { month: "Jun", day: "08" },
-    price: "From $65",
-    image:
-      "https://images.unsplash.com/photo-1506157786151-b8491531f063?q=80&w=800&auto=format&fit=crop",
-    attendees: ["/placeholder.svg", "/placeholder.svg", "/placeholder.svg"],
-    likes: "980",
-  },
-];
+function formatEventDateParts(isoDate?: string | null) {
+  if (!isoDate) {
+    return { month: "TBD", day: "--" };
+  }
+
+  const date = new Date(isoDate);
+
+  return {
+    month: date.toLocaleDateString("en-US", { month: "short" }),
+    day: String(date.getDate()).padStart(2, "0"),
+  };
+}
+
+function formatEventPrice(price?: number | string | null) {
+  const numericPrice =
+    typeof price === "number"
+      ? price
+      : typeof price === "string"
+        ? Number(price)
+        : 0;
+
+  if (!Number.isFinite(numericPrice) || numericPrice <= 0) {
+    return "Free";
+  }
+
+  return `From $${numericPrice.toFixed(0)}`;
+}
+
+function formatEventLikes(isFeatured?: boolean) {
+  return isFeatured ? "Featured" : "Live";
+}
 
 export const musicTypes = [
   { id: "house", name: "House", hint: "Groovy sets" },
@@ -98,7 +96,9 @@ export function ExploreCategoriesSection() {
   return (
     <section className="pl-5 pt-1">
       <div className="mb-4 flex items-center justify-between pr-5">
-        <h2 className="text-lg font-bold tracking-tight text-gray-900">Categories</h2>
+        <h2 className="text-lg font-bold tracking-tight text-gray-900">
+          Categories
+        </h2>
       </div>
 
       <Carousel opts={{ align: "start", dragFree: true }}>
@@ -108,7 +108,9 @@ export function ExploreCategoriesSection() {
               <button
                 className={`flex items-center gap-2 whitespace-nowrap rounded-full px-4 py-2.5 shadow-sm transition-transform active:scale-95 ${category.classes}`}
               >
-                <span className="rounded-full bg-white/40 p-1">{category.icon}</span>
+                <span className="rounded-full bg-white/40 p-1">
+                  {category.icon}
+                </span>
                 <span className="text-sm font-bold">{category.name}</span>
               </button>
             </CarouselItem>
@@ -122,18 +124,26 @@ export function ExploreCategoriesSection() {
 type MusicTypesProps = {
   selectedMusicType: string | null;
   setSelectedMusicType: (value: string | null) => void;
+  onGenreClick?: (genreName: string) => void;
+};
+
+type ExploreEventsSectionProps = {
+  events: EventData[];
 };
 
 export function ExploreMusicTypesSection({
   selectedMusicType,
   setSelectedMusicType,
+  onGenreClick,
 }: MusicTypesProps) {
   const [musicTypesApi, setMusicTypesApi] = useState<CarouselApi>();
 
   return (
     <section className="pl-5">
       <div className="mb-3 flex items-center justify-between pr-5">
-        <h2 className="text-lg font-bold tracking-tight text-gray-900">Music Types</h2>
+        <h2 className="text-lg font-bold tracking-tight text-gray-900">
+          Music Types
+        </h2>
         <div className="flex items-center gap-2">
           <button
             type="button"
@@ -154,25 +164,40 @@ export function ExploreMusicTypesSection({
         </div>
       </div>
 
-      <Carousel setApi={setMusicTypesApi} opts={{ align: "start", dragFree: true }}>
+      <Carousel
+        setApi={setMusicTypesApi}
+        opts={{ align: "start", dragFree: true }}
+      >
         <CarouselContent className="-ml-4 pb-5 pr-5">
           {musicTypes.map((type) => {
             const isActive = selectedMusicType === type.name;
-            const tone = musicTypeTones[type.id] || "from-slate-100 to-slate-50";
+            const tone =
+              musicTypeTones[type.id] || "from-slate-100 to-slate-50";
             return (
-              <CarouselItem key={type.id} className="basis-[calc(166px+1rem)] pl-4">
+              <CarouselItem
+                key={type.id}
+                className="basis-[calc(166px+1rem)] pl-4"
+              >
                 <button
                   type="button"
-                  onClick={() =>
-                    setSelectedMusicType(selectedMusicType === type.name ? null : type.name)
-                  }
+                  onClick={() => {
+                    if (onGenreClick) {
+                      onGenreClick(type.name);
+                    } else {
+                      setSelectedMusicType(
+                        selectedMusicType === type.name ? null : type.name,
+                      );
+                    }
+                  }}
                   className={`group relative h-[104px] w-full overflow-hidden rounded-2xl border p-4 text-left shadow-sm shadow-blue-900/5 transition-all active:scale-95 ${
                     isActive
                       ? "border-[#1FA9D6]/35 bg-white ring-1 ring-[#1FA9D6]/20"
                       : "border-gray-100 bg-white hover:border-gray-200"
                   }`}
                 >
-                  <div className={`absolute inset-x-0 top-0 h-12 bg-gradient-to-r ${tone} opacity-90`} />
+                  <div
+                    className={`absolute inset-x-0 top-0 h-12 bg-gradient-to-r ${tone} opacity-90`}
+                  />
 
                   <div className="relative z-10 mb-2 inline-flex h-8 w-8 items-center justify-center rounded-full bg-white/90 text-[#1FA9D6] shadow-sm">
                     <Music className="h-3.5 w-3.5" strokeWidth={2.4} />
@@ -201,8 +226,15 @@ export function ExploreMusicTypesSection({
   );
 }
 
-export function ExploreEventsSection() {
+export function ExploreEventsSection({ events }: ExploreEventsSectionProps) {
   const [eventsApi, setEventsApi] = useState<CarouselApi>();
+  const router = useRouter();
+
+  const handleEventClick = (eventId: string) => {
+    router.push(`/events/${eventId}`);
+  };
+
+  const featuredEvents = events.slice(0, 8);
 
   return (
     <section className="pl-5">
@@ -230,65 +262,113 @@ export function ExploreEventsSection() {
         </div>
       </div>
 
-      <Carousel setApi={setEventsApi} opts={{ align: "start", dragFree: true }}>
-        <CarouselContent className="-ml-4 pb-6 pr-5">
-          {featuredEvents.map((event) => (
-            <CarouselItem key={event.id} className="basis-[calc(300px+1rem)] pl-4">
-              <article className="group relative h-[360px] w-full overflow-hidden rounded-[2rem] shadow-xl shadow-blue-900/10">
-                <img
-                  src={event.image}
-                  alt={event.title}
-                  draggable={false}
-                  className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
-                />
+      {featuredEvents.length > 0 ? (
+        <Carousel
+          setApi={setEventsApi}
+          opts={{ align: "start", dragFree: true }}
+        >
+          <CarouselContent className="-ml-4 pb-6 pr-5">
+            {featuredEvents.map((event) => {
+              const date = formatEventDateParts(event.start_time);
+              const price = formatEventPrice(
+                (event as EventData & { ticket_price?: number | string | null })
+                  .ticket_price,
+              );
+              const coverImage = event.cover_image_url || "/placeholder.jpg";
+              const likesLabel = formatEventLikes(event.is_featured);
+              const attendees = [
+                event.organizer?.avatar_url || "/placeholder.svg",
+                "/placeholder.svg",
+                "/placeholder.svg",
+              ];
 
-                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent" />
+              return (
+                <CarouselItem
+                  key={event.id}
+                  className="basis-[calc(300px+1rem)] pl-4"
+                >
+                  <article
+                    className="group relative h-[360px] w-full cursor-pointer overflow-hidden rounded-[2rem] shadow-xl shadow-blue-900/10"
+                    onClick={() => handleEventClick(event.id)}
+                  >
+                    <img
+                      src={coverImage}
+                      alt={event.title}
+                      draggable={false}
+                      className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+                    />
 
-                <div className="absolute left-4 top-4 flex flex-col items-center justify-center rounded-2xl border border-white/10 bg-black/40 px-3 py-2 text-white backdrop-blur-md">
-                  <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-300">
-                    {event.date.month}
-                  </span>
-                  <span className="text-lg font-extrabold leading-none">{event.date.day}</span>
-                </div>
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent" />
 
-                <button className="absolute right-4 top-4 rounded-full bg-black/20 p-2.5 text-white backdrop-blur-md transition-colors hover:bg-white/20">
-                  <Heart className="h-5 w-5" />
-                </button>
+                    <div className="absolute left-4 top-4 flex flex-col items-center justify-center rounded-2xl border border-white/10 bg-black/40 px-3 py-2 text-white backdrop-blur-md">
+                      <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-300">
+                        {date.month}
+                      </span>
+                      <span className="text-lg font-extrabold leading-none">
+                        {date.day}
+                      </span>
+                    </div>
 
-                <div className="absolute bottom-0 left-0 right-0 p-5">
-                  <h3 className="mb-1 text-2xl font-bold tracking-tight text-white">{event.title}</h3>
-                  <div className="mb-4 flex items-center gap-1.5 text-sm font-medium text-gray-300">
-                    <MapPin className="h-4 w-4 text-[#1FA9D6]" />
-                    <span className="truncate">{event.location}</span>
-                  </div>
+                    <button
+                      onClick={(e) => e.stopPropagation()}
+                      className="absolute right-4 top-4 rounded-full bg-black/20 p-2.5 text-white backdrop-blur-md transition-colors hover:bg-white/20"
+                    >
+                      <Heart className="h-5 w-5" />
+                    </button>
 
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <Badge className="border-none bg-white/20 text-xs font-bold text-white backdrop-blur-md hover:bg-white/20">
-                        {event.likes}
-                      </Badge>
-                      <div className="flex -space-x-2">
-                        {event.attendees.map((avatar, index) => (
-                          <Avatar
-                            key={`${event.id}-${index}`}
-                            className="h-7 w-7 border-2 border-gray-900"
-                          >
-                            <AvatarImage src={avatar} />
-                            <AvatarFallback className="bg-[#1FA9D6] text-[10px] text-white">
-                              U
-                            </AvatarFallback>
-                          </Avatar>
-                        ))}
+                    <div className="absolute bottom-0 left-0 right-0 p-5">
+                      <h3 className="mb-1 text-2xl font-bold tracking-tight text-white">
+                        {event.title}
+                      </h3>
+                      <div className="mb-4 flex items-center gap-1.5 text-sm font-medium text-gray-300">
+                        <MapPin className="h-4 w-4 text-[#1FA9D6]" />
+                        <span className="truncate">
+                          {event.location || "Location TBA"}
+                        </span>
+                      </div>
+
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <Badge className="border-none bg-white/20 text-xs font-bold text-white backdrop-blur-md hover:bg-white/20">
+                            {likesLabel}
+                          </Badge>
+                          <div className="flex -space-x-2">
+                            {attendees.map((avatar, index) => (
+                              <Avatar
+                                key={`${event.id}-${index}`}
+                                className="h-7 w-7 border-2 border-gray-900"
+                              >
+                                <AvatarImage src={avatar} />
+                                <AvatarFallback className="bg-[#1FA9D6] text-[10px] text-white">
+                                  U
+                                </AvatarFallback>
+                              </Avatar>
+                            ))}
+                          </div>
+                        </div>
+                        <span className="text-lg font-bold text-white">
+                          {price}
+                        </span>
                       </div>
                     </div>
-                    <span className="text-lg font-bold text-white">{event.price}</span>
-                  </div>
-                </div>
-              </article>
-            </CarouselItem>
-          ))}
-        </CarouselContent>
-      </Carousel>
+                  </article>
+                </CarouselItem>
+              );
+            })}
+          </CarouselContent>
+        </Carousel>
+      ) : (
+        <div className="pr-5 pb-6">
+          <div className="flex h-[220px] items-center justify-center rounded-[2rem] border border-dashed border-gray-200 bg-white text-center shadow-sm">
+            <div>
+              <p className="font-bold text-gray-900">No events available</p>
+              <p className="mt-1 text-sm text-gray-500">
+                Check back soon for upcoming Dropsland events.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
     </section>
   );
 }
@@ -319,7 +399,9 @@ export function ExploreArtistsSection({
 
   return (
     <section className="px-5">
-      <h2 className="mb-4 text-lg font-bold tracking-tight text-gray-900">{title}</h2>
+      <h2 className="mb-4 text-lg font-bold tracking-tight text-gray-900">
+        {title}
+      </h2>
 
       <div className="space-y-3">
         {filteredArtists.map((artist) => (
@@ -344,8 +426,12 @@ export function ExploreArtistsSection({
               </div>
 
               <div className="min-w-0 flex-1">
-                <h3 className="truncate text-base font-extrabold text-gray-900">{artist.name}</h3>
-                <p className="mb-1.5 truncate text-sm text-gray-500">{artist.handle}</p>
+                <h3 className="truncate text-base font-extrabold text-gray-900">
+                  {artist.name}
+                </h3>
+                <p className="mb-1.5 truncate text-sm text-gray-500">
+                  {artist.handle}
+                </p>
                 <Badge
                   variant="outline"
                   className="border-gray-200 bg-gray-50 text-[10px] font-bold uppercase tracking-wider text-gray-600"

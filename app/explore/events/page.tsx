@@ -1,15 +1,8 @@
-"use client";
+import { getEvents } from "@/lib/api/events";
+import { ExploreEventsClient } from "./events-client";
 
-import { useState } from "react";
-import { ExploreShell } from "@/app/explore/_components/explore-shell";
-import { ExploreEventsSection } from "@/app/explore/_components/explore-content";
+export default async function ExploreEventsPage() {
+  const events = await getEvents();
 
-export default function ExploreEventsPage() {
-  const [searchQuery, setSearchQuery] = useState("");
-
-  return (
-    <ExploreShell searchQuery={searchQuery} onSearchChange={setSearchQuery}>
-      <ExploreEventsSection />
-    </ExploreShell>
-  );
+  return <ExploreEventsClient events={events} />;
 }
