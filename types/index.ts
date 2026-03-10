@@ -21,3 +21,16 @@ export interface MembershipTier {
   creator_wallet: string;
   is_active: boolean;
 }
+
+export interface Track {
+  id: string;
+  artist_wallet: string;
+  title: string;
+  description: string | null;
+  cover_image_url: string | null;
+  audio_file_path: string;
+  duration_seconds: number | null;
+  is_public: boolean;
+  created_at: string;
+  updated_at: string;
+}

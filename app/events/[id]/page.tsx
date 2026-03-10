@@ -56,9 +56,12 @@ export default async function EventDetailPage({
     notFound();
   }
 
-  const startTime = (event.start_time ?? event.event_date) as string | undefined;
-  const coverImage =
-    (event.cover_image_url ?? event.image_url ?? "/placeholder.jpg") as string;
+  const startTime = (event.start_time ?? event.event_date) as
+    | string
+    | undefined;
+  const coverImage = (event.cover_image_url ??
+    event.image_url ??
+    "/placeholder.jpg") as string;
   const price = Number(event.ticket_price || 0);
   const location = event.location || "Location TBA";
   const date = formatDateParts(startTime);
@@ -67,7 +70,11 @@ export default async function EventDetailPage({
   return (
     <div className="relative min-h-screen bg-[#F7FAFC] pb-32">
       <div className="relative aspect-[4/3] w-full overflow-hidden">
-        <img src={coverImage} alt={event.title} className="h-full w-full object-cover" />
+        <img
+          src={coverImage}
+          alt={event.title}
+          className="h-full w-full object-cover"
+        />
         <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-black/10 to-transparent" />
 
         <AppHeader
@@ -78,12 +85,17 @@ export default async function EventDetailPage({
 
         <div className="absolute bottom-4 left-4 rounded-full bg-white/85 px-4 py-2 shadow-lg shadow-blue-900/10 backdrop-blur-md">
           <p className="text-xs font-semibold text-gray-500">{date.month}</p>
-          <p className="text-lg font-extrabold leading-none text-gray-900">{date.day}</p>
+          <p className="text-lg font-extrabold leading-none text-gray-900">
+            {date.day}
+          </p>
         </div>
       </div>
 
+      {/* Bottom section */}
       <section className="relative -mt-6 rounded-t-[2rem] bg-white px-5 pb-8 pt-6 shadow-xl shadow-blue-900/5">
-        <h1 className="text-3xl font-extrabold tracking-tight text-gray-900">{event.title}</h1>
+        <h1 className="text-3xl font-extrabold tracking-tight text-gray-900">
+          {event.title}
+        </h1>
 
         <div className="mt-4 flex items-center gap-2 text-sm text-gray-600">
           <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#1FA9D6]/10 text-[#1FA9D6]">
@@ -108,22 +120,26 @@ export default async function EventDetailPage({
           </div>
 
           <div className="flex items-center">
-            {[event.organizer?.avatar_url, ...DJ_PLACEHOLDERS].map((avatar, index) => (
-              <Avatar
-                key={`dj-${index}`}
-                className="-ml-2 h-10 w-10 border-2 border-white first:ml-0"
-              >
-                <AvatarImage src={avatar || undefined} />
-                <AvatarFallback className="bg-gray-100 text-xs font-bold text-gray-600">
-                  DJ
-                </AvatarFallback>
-              </Avatar>
-            ))}
+            {[event.organizer?.avatar_url, ...DJ_PLACEHOLDERS].map(
+              (avatar, index) => (
+                <Avatar
+                  key={`dj-${index}`}
+                  className="-ml-2 h-10 w-10 border-2 border-white first:ml-0"
+                >
+                  <AvatarImage src={avatar || undefined} />
+                  <AvatarFallback className="bg-gray-100 text-xs font-bold text-gray-600">
+                    DJ
+                  </AvatarFallback>
+                </Avatar>
+              ),
+            )}
             <div className="ml-3 rounded-full bg-[#1FA9D6]/10 px-3 py-1 text-xs font-bold text-[#1FA9D6]">
               +3
             </div>
           </div>
-          <p className="mt-2 text-xs font-medium text-gray-500">Including {organizerName}</p>
+          <p className="mt-2 text-xs font-medium text-gray-500">
+            Including {organizerName}
+          </p>
         </div>
 
         {event.description && (
@@ -133,10 +149,12 @@ export default async function EventDetailPage({
         )}
       </section>
 
-      <div className="fixed bottom-0 left-1/2 z-40 w-full max-w-md -translate-x-1/2 border-t border-gray-100 bg-white/95 px-4 pb-6 pt-3 backdrop-blur-md safe-bottom">
+      <div className="fixed bottom-0 left-1/2 z-40 w-full max-w-md -translate-x-1/2 border-t border-gray-100 bg-white/95 px-4 pb-[calc(env(safe-area-inset-bottom)+1.5rem)] pt-3 backdrop-blur-md">
         <div className="flex items-center justify-between gap-3">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-wide text-gray-400">Entry</p>
+            <p className="text-xs font-semibold uppercase tracking-wide text-gray-400">
+              Entry
+            </p>
             <p className="text-xl font-extrabold text-gray-900">
               {price > 0 ? `$${price.toFixed(2)}` : "Free"}
             </p>
