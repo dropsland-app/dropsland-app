@@ -9,7 +9,6 @@ import {
   ScanLine,
   ArrowDownLeft,
   ArrowUpRight,
-  CreditCard,
   User,
   ChevronDown,
 } from "lucide-react";
@@ -111,12 +110,6 @@ export default function WalletLayout({
           },
         ]
       : []),
-    {
-      label: "Buy",
-      icon: CreditCard,
-      onClick: () => alert("Coming soon!"),
-      primary: false,
-    },
   ];
 
   const tabs = [

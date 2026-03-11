@@ -150,18 +150,6 @@ export function SendDrawer({
               </div>
             </div>
 
-            {/* Quick Amounts */}
-            <div className="flex gap-2 mt-3">
-              {["10", "20", "50", "Max"].map((val) => (
-                <button
-                  key={val}
-                  onClick={() => setAmount(val === "Max" ? nativeBalance : val)}
-                  className="flex-1 py-2 bg-white border border-gray-100 rounded-xl text-xs font-bold text-gray-600 hover:border-[#1FA9D6] hover:text-[#1FA9D6] transition-all shadow-sm"
-                >
-                  {val === "Max" ? "Max" : `$${val}`}
-                </button>
-              ))}
-            </div>
           </div>
 
           {/* Recent Contacts */}
