@@ -1,3 +1,4 @@
+// DEPRECATED: This functionality is now inline in the wallet layout drawers (components/wallet/receive-drawer.tsx)
 "use client";
 
 import { useState } from "react";
