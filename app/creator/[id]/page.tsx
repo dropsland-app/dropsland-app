@@ -21,6 +21,7 @@ import {
 } from "@/components/creator/membership-tier-card";
 import { CHAIN } from "@/config/chain";
 import { supabase } from "@/lib/supabase/client";
+import { getUserPosts, type Post } from "@/lib/api/posts";
 
 // Color palette for tiers
 const TIER_COLORS = [
@@ -59,6 +60,7 @@ export default function CreatorPage({ params }: { params: { id: string } }) {
   const [activeTab, setActiveTab] = useState("membership");
   const [tiers, setTiers] = useState<MembershipTier[]>([]);
   const [creator, setCreator] = useState<CreatorProfile | null>(null);
+  const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
 
   // Fetch creator profile and tiers
@@ -83,6 +85,10 @@ export default function CreatorPage({ params }: { params: { id: string } }) {
           .select("*")
           .eq("creator_wallet", params.id)
           .order("price", { ascending: true });
+
+        // Fetch creator posts
+        const postsData = await getUserPosts(params.id);
+        setPosts(postsData);
 
         if (tiersData && tiersData.length > 0) {
           // Transform database tiers to MembershipTier format
@@ -110,34 +116,6 @@ export default function CreatorPage({ params }: { params: { id: string } }) {
 
     fetchData();
   }, [params.id]);
-
-  // Mock content for the feed tab
-  const content = [
-    {
-      id: 1,
-      type: "video",
-      title: "Live @ Space Miami",
-      isLocked: false,
-      views: "12K",
-      image: "/posts/space.jpg",
-    },
-    {
-      id: 2,
-      type: "audio",
-      title: "Unreleased ID (Edit)",
-      isLocked: true,
-      views: "Locked",
-      image: "/posts/audio-lock.jpg",
-    },
-    {
-      id: 3,
-      type: "video",
-      title: "Studio Tour & Tips",
-      isLocked: true,
-      views: "Locked",
-      image: "/posts/studio.jpg",
-    },
-  ];
 
   const displayName = creator?.username || `Creator`;
   const displayHandle = `@${creator?.username?.toLowerCase().replace(/\s+/g, "") || params.id.slice(0, 8)}`;
@@ -280,51 +258,49 @@ export default function CreatorPage({ params }: { params: { id: string } }) {
           value="content"
           className="px-5 animate-in slide-in-from-right-4 duration-500"
         >
-          <div className="grid grid-cols-2 gap-3">
-            {content.map((item) => (
-              <div
-                key={item.id}
-                className={`
-                  relative aspect-[4/5] rounded-2xl overflow-hidden shadow-sm border border-gray-100
-                  ${item.isLocked ? "grayscale opacity-90" : ""}
-                `}
-              >
-                {/* Background Image */}
-                <div className="w-full h-full bg-gradient-to-br from-gray-200 to-gray-300" />
-
-                {/* Overlay */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex flex-col justify-end p-3">
-                  {/* Lock State */}
-                  {item.isLocked ? (
-                    <div className="absolute inset-0 bg-black/40 backdrop-blur-[2px] flex flex-col items-center justify-center text-white gap-2">
-                      <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center backdrop-blur-md">
-                        <Lock className="w-5 h-5 text-white" />
-                      </div>
-                      <Badge
-                        variant="secondary"
-                        className="bg-white/90 text-black font-bold text-[10px]"
-                      >
-                        MEMBERS ONLY
-                      </Badge>
-                    </div>
+          {posts.length > 0 ? (
+            <div className="grid grid-cols-2 gap-3">
+              {posts.map((post) => (
+                <div
+                  key={post.id}
+                  className="relative aspect-[4/5] rounded-2xl overflow-hidden shadow-sm border border-gray-100"
+                >
+                  {post.media_url ? (
+                    <img
+                      src={post.media_url}
+                      alt={post.content}
+                      className="w-full h-full object-cover"
+                    />
                   ) : (
-                    <div className="absolute top-2 right-2">
-                      <Badge className="bg-[#1FA9D6] border-none text-[10px]">
-                        FREE
-                      </Badge>
-                    </div>
+                    <div className="w-full h-full bg-gradient-to-br from-gray-200 to-gray-300" />
                   )}
 
-                  <h3 className="text-white font-bold text-sm leading-tight mb-0.5 line-clamp-2">
-                    {item.title}
-                  </h3>
-                  <p className="text-white/70 text-[10px] uppercase font-medium">
-                    {item.type} • {item.views}
-                  </p>
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex flex-col justify-end p-3">
+                    <div className="absolute top-2 right-2">
+                      <Badge className="bg-[#1FA9D6] border-none text-[10px]">
+                        {post.type?.toUpperCase() || "POST"}
+                      </Badge>
+                    </div>
+
+                    <h3 className="text-white font-bold text-sm leading-tight mb-0.5 line-clamp-2">
+                      {post.content}
+                    </h3>
+                    <p className="text-white/70 text-[10px] uppercase font-medium">
+                      {post.likes_count} likes • {post.comments_count} comments
+                    </p>
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-12 bg-gray-50 rounded-2xl border border-dashed border-gray-200">
+              <Music className="w-12 h-12 mx-auto text-gray-300 mb-3" />
+              <h3 className="font-bold text-gray-900 mb-1">No Content Yet</h3>
+              <p className="text-sm text-gray-500">
+                This creator hasn&apos;t posted any content yet.
+              </p>
+            </div>
+          )}
 
           {/* CTA for Content Tab */}
           <div className="mt-8 p-6 bg-gray-50 rounded-2xl border border-dashed border-gray-200 text-center">

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useSendTransaction } from "@privy-io/react-auth";
 import { parseEther, isAddress } from "viem";
@@ -22,17 +22,11 @@ import {
   DrawerDescription,
   DrawerFooter,
 } from "@/components/ui/drawer";
-
-const RECENT_CONTACTS = [
-  {
-    name: "juampi.eth",
-    address: "0x123...456",
-    avatar: "/avatars/juampi.jpg",
-  },
-  { name: "banger.eth", address: "0x789...012", avatar: "/avatars/banger.jpg" },
-  { name: "danilo.eth", address: "0xabc...def", avatar: "/avatars/danilo.jpg" },
-  { name: "nicola.eth", address: "0xdef...123", avatar: "/avatars/nicola.jpg" },
-];
+import {
+  getRecentContacts,
+  upsertContact,
+  type Contact,
+} from "@/lib/api/contacts";
 
 interface SendDrawerProps {
   open: boolean;
@@ -44,16 +38,26 @@ interface SendDrawerProps {
 export function SendDrawer({
   open,
   onOpenChange,
+  walletAddress,
   nativeBalance,
 }: SendDrawerProps) {
   const router = useRouter();
   const [recipient, setRecipient] = useState("");
   const [amount, setAmount] = useState("");
   const [loading, setLoading] = useState(false);
+  const [recentContacts, setRecentContacts] = useState<Contact[]>([]);
+
+  useEffect(() => {
+    if (!walletAddress || !open) return;
+    getRecentContacts(walletAddress).then(setRecentContacts);
+  }, [walletAddress, open]);
 
   const { sendTransaction } = useSendTransaction({
     onSuccess: (hash) => {
       setLoading(false);
+      if (walletAddress && isAddress(recipient)) {
+        upsertContact(walletAddress, recipient);
+      }
       alert(`Success! Tx: ${hash}`);
       setRecipient("");
       setAmount("");
@@ -153,6 +157,7 @@ export function SendDrawer({
           </div>
 
           {/* Recent Contacts */}
+          {recentContacts.length > 0 && (
           <div>
             <div className="flex items-center gap-2 mb-3 ml-1">
               <History className="w-4 h-4 text-[#1FA9D6]" />
@@ -160,7 +165,7 @@ export function SendDrawer({
             </div>
 
             <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
-              {RECENT_CONTACTS.map((contact, i) => (
+              {recentContacts.map((contact, i) => (
                 <div
                   key={i}
                   onClick={() => setRecipient(contact.address)}
@@ -179,6 +184,7 @@ export function SendDrawer({
               ))}
             </div>
           </div>
+          )}
         </div>
 
         <DrawerFooter>

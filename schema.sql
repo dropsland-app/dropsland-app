@@ -124,7 +124,32 @@ CREATE TABLE IF NOT EXISTS "public"."tracks" (
     "updated_at" timestamp with time zone DEFAULT "now"()
 );
 
--- 4.8 LIKES (Social Graph)
+-- 4.8 ACTIVITY (Notifications)
+-- Tracks user interactions: purchases, mentions, rewards, follows.
+CREATE TABLE IF NOT EXISTS "public"."activity" (
+    "id" "uuid" DEFAULT gen_random_uuid() NOT NULL PRIMARY KEY,
+    "type" character varying(20) NOT NULL CHECK (type IN ('purchase', 'mention', 'reward', 'follow')),
+    "actor_wallet" character varying(56) NOT NULL,   -- Who performed the action
+    "target_wallet" character varying(56) NOT NULL,   -- Who receives the notification
+    "action" text NOT NULL,                           -- e.g., "bought your tokens", "mentioned you"
+    "message" text,
+    "amount" numeric,
+    "token_name" text,
+    "related_to" character varying(10) NOT NULL CHECK (related_to IN ('artist', 'fan')),
+    "created_at" timestamp with time zone DEFAULT "now"()
+);
+
+-- 4.9 CONTACTS (Recent Send Recipients)
+-- Stores recent wallet send contacts for quick access in the send drawer.
+CREATE TABLE IF NOT EXISTS "public"."contacts" (
+    "id" "uuid" DEFAULT gen_random_uuid() NOT NULL PRIMARY KEY,
+    "owner_wallet" character varying(56) NOT NULL,
+    "contact_wallet" character varying(56) NOT NULL,
+    "last_used_at" timestamp with time zone DEFAULT "now"(),
+    CONSTRAINT "contacts_owner_contact_unique" UNIQUE ("owner_wallet", "contact_wallet")
+);
+
+-- 4.10 LIKES (Social Graph)
 CREATE TABLE IF NOT EXISTS "public"."post_likes" (
     "user_wallet" character varying(56) NOT NULL,
     "post_id" "uuid" NOT NULL,
@@ -162,6 +187,14 @@ ALTER TABLE "public"."tracks" ADD CONSTRAINT "fk_track_artist" FOREIGN KEY ("art
 ALTER TABLE "public"."post_likes" ADD CONSTRAINT "fk_like_user" FOREIGN KEY ("user_wallet") REFERENCES "public"."profiles"("wallet_address") ON DELETE CASCADE;
 ALTER TABLE "public"."post_likes" ADD CONSTRAINT "fk_like_post" FOREIGN KEY ("post_id") REFERENCES "public"."posts"("id") ON DELETE CASCADE;
 
+-- Activity (constraint names must match Supabase JS join hints in lib/api/activity.ts)
+ALTER TABLE "public"."activity" ADD CONSTRAINT "activity_actor_wallet_fkey" FOREIGN KEY ("actor_wallet") REFERENCES "public"."profiles"("wallet_address");
+ALTER TABLE "public"."activity" ADD CONSTRAINT "activity_target_wallet_fkey" FOREIGN KEY ("target_wallet") REFERENCES "public"."profiles"("wallet_address");
+
+-- Contacts (constraint names must match Supabase JS join hints in lib/api/contacts.ts)
+ALTER TABLE "public"."contacts" ADD CONSTRAINT "contacts_owner_wallet_fkey" FOREIGN KEY ("owner_wallet") REFERENCES "public"."profiles"("wallet_address");
+ALTER TABLE "public"."contacts" ADD CONSTRAINT "contacts_contact_wallet_fkey" FOREIGN KEY ("contact_wallet") REFERENCES "public"."profiles"("wallet_address");
+
 -- =============================================================================
 -- 6. TRIGGERS (Auto-update timestamps)
 -- =============================================================================
@@ -185,6 +218,13 @@ CREATE INDEX IF NOT EXISTS "idx_events_featured" ON "public"."events" ("is_featu
 -- Optimize Redemption/Wallet Lookups
 CREATE INDEX IF NOT EXISTS "idx_redemptions_user" ON "public"."redemptions" ("user_wallet");
 CREATE INDEX IF NOT EXISTS "idx_rewards_event" ON "public"."rewards" ("event_id");
+
+-- Optimize Activity Feed
+CREATE INDEX IF NOT EXISTS "idx_activity_target_wallet" ON "public"."activity" ("target_wallet", "related_to");
+CREATE INDEX IF NOT EXISTS "idx_activity_created_at" ON "public"."activity" ("created_at" DESC);
+
+-- Optimize Contacts Lookup
+CREATE INDEX IF NOT EXISTS "idx_contacts_owner_wallet" ON "public"."contacts" ("owner_wallet", "last_used_at" DESC);
 
 -- =============================================================================
 -- 8. STORAGE BUCKETS & POLICIES (Corrected)
@@ -224,6 +264,19 @@ WITH CHECK ( bucket_id = 'audio_files' );
 CREATE POLICY "Allow Upload Images"
 ON storage.objects FOR INSERT
 WITH CHECK ( bucket_id = 'cover_images' );
+
+-- =============================================================================
+-- 9. ROW LEVEL SECURITY (Activity & Contacts)
+-- =============================================================================
+
+ALTER TABLE "public"."activity" ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Public Read Activity" ON "public"."activity" FOR SELECT USING (true);
+CREATE POLICY "Authenticated Insert Activity" ON "public"."activity" FOR INSERT WITH CHECK (true);
+
+ALTER TABLE "public"."contacts" ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Public Read Contacts" ON "public"."contacts" FOR SELECT USING (true);
+CREATE POLICY "Authenticated Insert Contacts" ON "public"."contacts" FOR INSERT WITH CHECK (true);
+CREATE POLICY "Authenticated Update Contacts" ON "public"."contacts" FOR UPDATE USING (true);
 
 -- New snippet added
 -- 1. Create the Membership Tiers table
