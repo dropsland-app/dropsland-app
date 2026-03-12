@@ -18,6 +18,8 @@ import {
   getYouTubeEmbedUrl,
 } from "@/lib/youtube-utils";
 import { useTikTokFeed } from "@/hooks/use-tiktok-feed";
+import { ShareDrawer } from "@/components/feed/share-drawer";
+import { useState } from "react";
 
 interface TikTokFeedProps {
   onSelectArtist: (artistId: string) => void;
@@ -72,6 +74,11 @@ export default function TikTokFeed({
     posts,
     type,
   });
+
+  const [sharePostKey, setSharePostKey] = useState<string | null>(null);
+  const sharePost = sharePostKey
+    ? posts.find((p, i) => `${type}-${p.id || i}` === sharePostKey) || null
+    : null;
 
   return (
     <>
@@ -297,7 +304,10 @@ export default function TikTokFeed({
                       </span>
                     </button>
 
-                    <button className="flex flex-col items-center gap-1 text-white">
+                    <button
+                      onClick={() => setSharePostKey(postKey)}
+                      className="flex flex-col items-center gap-1 text-white"
+                    >
                       <div className="bg-white/10 backdrop-blur-md p-3 rounded-full border border-white/20">
                         <Share2 className="h-6 w-6" />
                       </div>
@@ -437,6 +447,12 @@ export default function TikTokFeed({
           </div>
         </DialogContent>
       </Dialog>
+
+      <ShareDrawer
+        open={sharePostKey !== null}
+        onOpenChange={(open) => { if (!open) setSharePostKey(null); }}
+        post={sharePost ? { id: sharePost.id, name: sharePost.name, content: sharePost.content } : null}
+      />
     </>
   );
 }
