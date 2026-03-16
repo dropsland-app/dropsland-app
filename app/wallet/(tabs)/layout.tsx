@@ -9,7 +9,6 @@ import {
   ScanLine,
   ArrowDownLeft,
   ArrowUpRight,
-  CreditCard,
   User,
   ChevronDown,
 } from "lucide-react";
@@ -18,6 +17,8 @@ import { useWallets } from "@privy-io/react-auth";
 import { createPublicClient, http, formatEther } from "viem";
 import { mainnet } from "viem/chains";
 import { cn } from "@/lib/utils";
+import { ReceiveDrawer } from "@/components/wallet/receive-drawer";
+import { SendDrawer } from "@/components/wallet/send-drawer";
 
 export default function WalletLayout({
   children,
@@ -32,6 +33,8 @@ export default function WalletLayout({
   const [nativeBalance, setNativeBalance] = useState("0.00");
   const [isCopied, setIsCopied] = useState(false);
   const [isAccountOpen, setIsAccountOpen] = useState(false);
+  const [isReceiveOpen, setIsReceiveOpen] = useState(false);
+  const [isSendOpen, setIsSendOpen] = useState(false);
   const accountPopoverRef = useRef<HTMLDivElement | null>(null);
 
   // --- 1. Wallet Logic ---
@@ -88,13 +91,13 @@ export default function WalletLayout({
     {
       label: "My ID",
       icon: ArrowDownLeft,
-      onClick: () => router.push("/wallet/receive"),
+      onClick: () => setIsReceiveOpen(true),
       primary: true,
     },
     {
       label: "Send",
       icon: ArrowUpRight,
-      onClick: () => router.push("/wallet/send"),
+      onClick: () => setIsSendOpen(true),
       primary: false,
     },
     ...(isArtist()
@@ -107,12 +110,6 @@ export default function WalletLayout({
           },
         ]
       : []),
-    {
-      label: "Buy",
-      icon: CreditCard,
-      onClick: () => alert("Coming soon!"),
-      primary: false,
-    },
   ];
 
   const tabs = [
@@ -250,6 +247,19 @@ export default function WalletLayout({
       <div className="flex-1 bg-gray-50/50 animate-in fade-in duration-300">
         {children}
       </div>
+
+      {/* --- DRAWERS --- */}
+      <ReceiveDrawer
+        open={isReceiveOpen}
+        onOpenChange={setIsReceiveOpen}
+        walletAddress={wallet?.address || ""}
+      />
+      <SendDrawer
+        open={isSendOpen}
+        onOpenChange={setIsSendOpen}
+        walletAddress={wallet?.address || ""}
+        nativeBalance={nativeBalance}
+      />
     </div>
   );
 }

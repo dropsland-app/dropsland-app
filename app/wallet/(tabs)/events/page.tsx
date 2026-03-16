@@ -67,7 +67,13 @@ export default async function WalletEventsPage() {
                   </span>
                 </div>
                 <span className="w-1 h-1 rounded-full bg-white/50" />
-                <span>10:00 PM</span>
+                <span>
+                  {new Date(event.start_time).toLocaleTimeString("en-US", {
+                    hour: "numeric",
+                    minute: "2-digit",
+                    hour12: true,
+                  })}
+                </span>
               </div>
             </div>
           </div>

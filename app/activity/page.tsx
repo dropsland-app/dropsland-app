@@ -1,44 +1,53 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useAuth } from "@/hooks/use-auth";
 import { BanknoteIcon } from "@/components/icons/banknote-icon";
 import AppHeader from "@/components/layout/app-header";
-
-// Interface and Mock Data
-import { allActivity } from "@/lib/mock-data";
-import {Activity} from "@/lib/mock-types";
+import { getActivityFeed, type ActivityItem } from "@/lib/api/activity";
+import { Loader2 } from "lucide-react";
 
 export default function ActivityPage() {
   const router = useRouter();
-  const { isArtist } = useAuth();
+  const { isArtist, userData } = useAuth();
+  const [activity, setActivity] = useState<ActivityItem[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  // Navigation handler
+  useEffect(() => {
+    if (!userData?.walletAddress) return;
+
+    const fetchActivity = async () => {
+      setLoading(true);
+      const role = userData.role || (userData.type === "artist" ? "DJ" : "FAN");
+      const data = await getActivityFeed(userData.walletAddress!, role);
+      setActivity(data);
+      setLoading(false);
+    };
+
+    fetchActivity();
+  }, [userData?.walletAddress, userData?.role, userData?.type]);
+
   const handleSelectArtist = (artistId: string) => {
-    console.log("Navigating to artist:", artistId);
-    // Assuming you will implement a dynamic profile page later:
     router.push(`/profile/${artistId}`);
   };
-
-  const filteredActivity = allActivity.filter((activity) => {
-    if (isArtist()) {
-      return activity.relatedTo === "artist";
-    } else {
-      return activity.relatedTo === "fan";
-    }
-  });
 
   return (
     <div className="w-full max-w-full bg-white h-full overflow-y-auto overflow-x-hidden pb-24">
       <AppHeader title="Activity" showBack />
 
-      {filteredActivity.length > 0 ? (
+      {loading ? (
+        <div className="flex flex-col items-center justify-center py-16">
+          <Loader2 className="w-8 h-8 animate-spin text-[#1FA9D6] mb-4" />
+          <p className="text-gray-500 text-sm">Loading activity...</p>
+        </div>
+      ) : activity.length > 0 ? (
         <div className="divide-y divide-gray-200">
-          {filteredActivity.map((activity) => (
+          {activity.map((item) => (
             <ActivityCard
-              key={activity.id}
-              activity={activity}
+              key={item.id}
+              activity={item}
               onSelectArtist={handleSelectArtist}
             />
           ))}
@@ -63,7 +72,7 @@ function ActivityCard({
   activity,
   onSelectArtist,
 }: {
-  activity: Activity;
+  activity: ActivityItem;
   onSelectArtist: (artistId: string) => void;
 }) {
   return (
